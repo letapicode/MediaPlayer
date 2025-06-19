@@ -76,5 +76,6 @@ This file enumerates all tasks in a numbered list grouped by module. The tasks m
 
 1051. Core unit tests setup
 ...
+1101. Comprehensive codebase audit and refactoring plan
 
 *Note*: Ellipses indicate additional tasks as detailed in `Tasks.MD`. Numbers are spaced to allow insertion of new tasks without renumbering existing ones.
