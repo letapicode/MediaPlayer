@@ -1,0 +1,56 @@
+# CMake build directories
+build/
+CMakeFiles/
+CMakeCache.txt
+cmake-build-*/
+
+# IDE/project files
+.idea/
+.vscode/
+*.sln
+*.vcxproj*
+*.vcproj*
+*.user
+*.userprefs
+*.kdev4
+*.kateproject
+*.code-workspace
+
+# Compiled objects and binaries
+*.o
+*.obj
+*.lo
+*.a
+*.so
+*.dll
+*.dylib
+*.exe
+*.out
+*.app
+*.jar
+*.class
+
+# Platform-specific output
+# Android/Gradle
+.gradle/
+*/build/
+*.apk
+*.aar
+
+# Xcode
+*.xcworkspace
+*.xcuserstate
+*.xcuserdata/
+*.xcodeproj/
+*.pbxuser
+*.mode1v3
+*.mode2v3
+*.nib
+*.plist
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+Desktop.ini
