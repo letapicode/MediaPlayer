@@ -7,7 +7,7 @@
 | 1 | Initialize Core Engine Project Structure | done |
 | 2 | Define Core Engine API (Header) | done |
 | 3 | Stub Implementation of Core Classes | done |
-| 4 | Build & Integration CI Setup | open |
+| 4 | Build & Integration CI Setup | done |
 | 5 | Integrate FFmpeg for Demuxing | open |
 | 6 | Implement Audio Decoding (FFmpeg) | open |
 | 7 | Implement Video Decoding (FFmpeg) | open |
@@ -222,7 +222,7 @@
 | 171 | Dockerfile for Qt | open |
 | 172 | Android Build Environment | open |
 | 173 | iOS Build Setup | open |
-| 174 | GitHub Actions CI Workflow | open |
+| 174 | GitHub Actions CI Workflow | done |
 | 175 | Automated Tests in CI | open |
 | 176 | Static Analysis & Lint | open |
 | 177 | Code Formatting | open |
