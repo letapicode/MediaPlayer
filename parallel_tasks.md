@@ -76,5 +76,8 @@ This file enumerates all tasks in a numbered list grouped by module. The tasks m
 
 1051. Core unit tests setup
 ...
+## Codebase Review & Refactoring
+
+1101. Perform comprehensive codebase analysis to uncover inefficiencies and design flaws, propose superior alternatives, and implement a cleaner architecture.
 
 *Note*: Ellipses indicate additional tasks as detailed in `Tasks.MD`. Numbers are spaced to allow insertion of new tasks without renumbering existing ones.
