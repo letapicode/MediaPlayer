@@ -1,6 +1,7 @@
 #ifndef MEDIAPLAYER_MEDIAPLAYER_H
 #define MEDIAPLAYER_MEDIAPLAYER_H
 
+#include <libavformat/avformat.h>
 #include <string>
 
 namespace mediaplayer {
@@ -15,6 +16,9 @@ public:
   void pause();
   void stop();
   double position() const; // seconds
+
+private:
+  AVFormatContext *m_formatCtx{nullptr};
 };
 
 } // namespace mediaplayer
