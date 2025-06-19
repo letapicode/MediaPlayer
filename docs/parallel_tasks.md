@@ -4,9 +4,9 @@
 
 | # | Task | Status |
 |-:|------|--------|
-| 1 | Initialize Core Engine Project Structure | open |
-| 2 | Define Core Engine API (Header) | open |
-| 3 | Stub Implementation of Core Classes | open |
+| 1 | Initialize Core Engine Project Structure | done |
+| 2 | Define Core Engine API (Header) | done |
+| 3 | Stub Implementation of Core Classes | done |
 | 4 | Build & Integration CI Setup | open |
 | 5 | Integrate FFmpeg for Demuxing | open |
 | 6 | Implement Audio Decoding (FFmpeg) | open |
