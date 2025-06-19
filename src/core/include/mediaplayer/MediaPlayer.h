@@ -4,6 +4,8 @@
 #include <libavformat/avformat.h>
 #include <string>
 
+#include "AudioDecoder.h"
+
 namespace mediaplayer {
 
 class MediaPlayer {
@@ -16,9 +18,12 @@ public:
   void pause();
   void stop();
   double position() const; // seconds
+  int readAudio(uint8_t *buffer, int bufferSize);
 
 private:
   AVFormatContext *m_formatCtx{nullptr};
+  AudioDecoder m_audioDecoder;
+  int m_audioStream{-1};
 };
 
 } // namespace mediaplayer
