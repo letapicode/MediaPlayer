@@ -23,11 +23,13 @@ A detailed breakdown of planned modules and tasks can be found in [Tasks.MD](Tas
 - Qt 6 development files
 
 ```
-# Example build steps (conceptual)
+# Example build steps
 mkdir build && cd build
 cmake .. -DCMAKE_BUILD_TYPE=Release
 make
 ```
+
+This will build the `mediaplayer_core` library defined in `src/core`.
 
 ## Usage
 
