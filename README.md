@@ -30,6 +30,8 @@ make
 ```
 
 This will build the `mediaplayer_core` library defined in `src/core`.
+The core library now links with FFmpeg and can open media files using
+`avformat_open_input`.
 
 ## Continuous Integration
 

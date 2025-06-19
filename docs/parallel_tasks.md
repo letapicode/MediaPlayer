@@ -8,7 +8,7 @@
 | 2 | Define Core Engine API (Header) | done |
 | 3 | Stub Implementation of Core Classes | done |
 | 4 | Build & Integration CI Setup | done |
-| 5 | Integrate FFmpeg for Demuxing | open |
+| 5 | Integrate FFmpeg for Demuxing | done |
 | 6 | Implement Audio Decoding (FFmpeg) | open |
 | 7 | Implement Video Decoding (FFmpeg) | open |
 | 8 | Audio/Video Synchronization | open |
@@ -225,7 +225,7 @@
 | 174 | GitHub Actions CI Workflow | done |
 | 175 | Automated Tests in CI | open |
 | 176 | Static Analysis & Lint | open |
-| 177 | Code Formatting | open |
+| 177 | Code Formatting | done |
 | 178 | Git Submodules for Libraries | open |
 | 179 | Issue Templates and Contribution Guide | open |
 | 180 | Merge Strategy for AI Agents | open |

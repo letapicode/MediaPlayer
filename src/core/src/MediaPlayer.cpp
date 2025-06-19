@@ -1,15 +1,30 @@
 #include "mediaplayer/MediaPlayer.h"
 #include <iostream>
+#include <libavformat/avformat.h>
 
 namespace mediaplayer {
 
-MediaPlayer::MediaPlayer() = default;
-MediaPlayer::~MediaPlayer() = default;
+MediaPlayer::MediaPlayer() { avformat_network_init(); }
 
-bool MediaPlayer::open(const std::string & /*path*/) {
-  // TODO: implement opening media via FFmpeg
-  std::cout << "open not implemented\n";
-  return false;
+MediaPlayer::~MediaPlayer() {
+  if (m_formatCtx) {
+    avformat_close_input(&m_formatCtx);
+  }
+  avformat_network_deinit();
+}
+
+bool MediaPlayer::open(const std::string &path) {
+  if (avformat_open_input(&m_formatCtx, path.c_str(), nullptr, nullptr) < 0) {
+    std::cerr << "Failed to open media: " << path << '\n';
+    return false;
+  }
+  if (avformat_find_stream_info(m_formatCtx, nullptr) < 0) {
+    std::cerr << "Failed to retrieve stream info\n";
+    avformat_close_input(&m_formatCtx);
+    return false;
+  }
+  std::cout << "Opened " << path << '\n';
+  return true;
 }
 
 void MediaPlayer::play() { std::cout << "play not implemented\n"; }
