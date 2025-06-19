@@ -2,22 +2,22 @@
 
 ## Core Media Engine (C++17) ([Tasks.MD](../Tasks.MD#core-media-engine-c17))
 
-| # | Task | Status |
-|-:|------|--------|
-| 1 | Initialize Core Engine Project Structure | done |
-| 2 | Define Core Engine API (Header) | done |
-| 3 | Stub Implementation of Core Classes | done |
-| 4 | Build & Integration CI Setup | done |
-| 5 | Integrate FFmpeg for Demuxing | done |
-| 6 | Implement Audio Decoding (FFmpeg) | open |
-| 7 | Implement Video Decoding (FFmpeg) | open |
-| 8 | Audio/Video Synchronization | open |
-| 9 | Buffering and Caching Logic | open |
-| 10 | Threading and Locking | open |
-| 11 | Hardware Decoding Support (Optional) | open |
-| 12 | Abstract Audio Output Interface | open |
-| 13 | Audio Output – Windows (WASAPI) | open |
-| 14 | Audio Output – macOS (CoreAudio) | open |
+| # | Task | Status | Notes |
+|-:|------|--------|-------|
+| 1 | Initialize Core Engine Project Structure | done | relevant |
+| 2 | Define Core Engine API (Header) | done | relevant |
+| 3 | Stub Implementation of Core Classes | done | relevant |
+| 4 | Build & Integration CI Setup | done | relevant |
+| 5 | Integrate FFmpeg for Demuxing | done | relevant |
+| 6 | Implement Audio Decoding (FFmpeg) | open | relevant |
+| 7 | Implement Video Decoding (FFmpeg) | open | relevant |
+| 8 | Audio/Video Synchronization | open | relevant |
+| 9 | Buffering and Caching Logic | open | relevant |
+| 10 | Threading and Locking | open | relevant |
+| 11 | Hardware Decoding Support (Optional) | open | relevant |
+| 12 | Abstract Audio Output Interface | open | relevant |
+| 13 | Audio Output – Windows (WASAPI) | open | relevant |
+| 14 | Audio Output – macOS (CoreAudio) | open | relevant |
 | 15 | Audio Output – Linux (PulseAudio/ALSA) | open |
 | 16 | Audio Output – Android (OpenSL ES or AAudio) | open |
 | 17 | Audio Output – iOS (AVAudio) | open |
@@ -55,8 +55,8 @@
 
 ## Media Library & Smart Playlists (C++17, SQLite) ([Tasks.MD](../Tasks.MD#media-library-smart-playlists-c17,-sqlite))
 
-| # | Task | Status |
-|-:|------|--------|
+| # | Task | Status | Notes |
+|-:|------|--------|-------|
 | 49 | Integrate SQLite Database | open |
 | 50 | Define DB Schema | open |
 | 51 | Implement Library Scanning | open |
@@ -75,8 +75,8 @@
 
 ## Visualization Module (C++17 OpenGL) ([Tasks.MD](../Tasks.MD#visualization-module-c17-opengl))
 
-| # | Task | Status |
-|-:|------|--------|
+| # | Task | Status | Notes |
+|-:|------|--------|-------|
 | 64 | Include projectM Library | open |
 | 65 | Initialize projectM Instance | open |
 | 66 | PCM Data Feeding | open |
@@ -218,30 +218,30 @@
 
 | # | Task | Status |
 |-:|------|--------|
-| 170 | Dockerfile for Core/C++ | open |
-| 171 | Dockerfile for Qt | open |
-| 172 | Android Build Environment | open |
-| 173 | iOS Build Setup | open |
-| 174 | GitHub Actions CI Workflow | done |
-| 175 | Automated Tests in CI | open |
-| 176 | Static Analysis & Lint | open |
-| 177 | Code Formatting | done |
-| 178 | Git Submodules for Libraries | open |
-| 179 | Issue Templates and Contribution Guide | open |
-| 180 | Merge Strategy for AI Agents | open |
+| 170 | Dockerfile for Core/C++ | open | relevant |
+| 171 | Dockerfile for Qt | open | relevant |
+| 172 | Android Build Environment | open | relevant |
+| 173 | iOS Build Setup | open | relevant |
+| 174 | GitHub Actions CI Workflow | done | relevant |
+| 175 | Automated Tests in CI | open | relevant |
+| 176 | Static Analysis & Lint | open | relevant |
+| 177 | Code Formatting | done | relevant |
+| 178 | Git Submodules for Libraries | open | relevant |
+| 179 | Issue Templates and Contribution Guide | open | relevant |
+| 180 | Merge Strategy for AI Agents | open | relevant |
 
 ## Testing & Quality Assurance ([Tasks.MD](../Tasks.MD#testing-quality-assurance))
 
-| # | Task | Status |
-|-:|------|--------|
-| 181 | Core Unit Tests Setup | open |
-| 182 | Library Module Tests | open |
-| 183 | Visualization Tests | open |
-| 184 | Playback Integration Test | open |
-| 185 | End-to-End Script | open |
-| 186 | Startup Time Test | open |
-| 187 | Memory/CPU Profiling | open |
-| 188 | Battery Test (Mobile) | open |
-| 189 | Formats Compatibility Test | open |
-| 190 | UI Responsiveness Test | open |
-| 191 | Automate Regression Suite | open |
+| # | Task | Status | Notes |
+|-:|------|--------|-------|
+| 181 | Core Unit Tests Setup | open | relevant |
+| 182 | Library Module Tests | open | relevant |
+| 183 | Visualization Tests | open | relevant |
+| 184 | Playback Integration Test | open | relevant |
+| 185 | End-to-End Script | open | relevant |
+| 186 | Startup Time Test | open | relevant |
+| 187 | Memory/CPU Profiling | open | relevant |
+| 188 | Battery Test (Mobile) | open | relevant |
+| 189 | Formats Compatibility Test | open | relevant |
+| 190 | UI Responsiveness Test | open | relevant |
+| 191 | Automate Regression Suite | open | relevant |

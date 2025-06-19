@@ -1,5 +1,6 @@
 add_library(mediaplayer_core
     src/MediaPlayer.cpp
+    src/AudioDecoder.cpp
 )
 
 find_package(PkgConfig)
