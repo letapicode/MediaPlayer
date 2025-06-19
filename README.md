@@ -31,6 +31,12 @@ make
 
 This will build the `mediaplayer_core` library defined in `src/core`.
 
+## Continuous Integration
+
+All pushes and pull requests are built using GitHub Actions. The workflow
+config in `.github/workflows/build.yml` compiles the project on Linux,
+Windows and macOS with CMake to ensure the code builds across platforms.
+
 ## Usage
 
 Run the resulting `mediaplayer` executable with a media file:
