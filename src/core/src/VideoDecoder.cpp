@@ -64,4 +64,10 @@ int VideoDecoder::decode(AVPacket *pkt, uint8_t *outBuffer, int outBufferSize) {
   return total;
 }
 
+void VideoDecoder::flush() {
+  if (m_codecCtx) {
+    avcodec_flush_buffers(m_codecCtx);
+  }
+}
+
 } // namespace mediaplayer

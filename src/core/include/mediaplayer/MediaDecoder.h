@@ -13,6 +13,7 @@ public:
   virtual ~MediaDecoder() = default;
   virtual bool open(AVFormatContext *fmtCtx, int streamIndex) = 0;
   virtual int decode(AVPacket *pkt, uint8_t *outBuffer, int outBufferSize) = 0;
+  virtual void flush() = 0;
 };
 
 } // namespace mediaplayer

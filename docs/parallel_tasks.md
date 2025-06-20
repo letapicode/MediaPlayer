@@ -29,7 +29,7 @@
 | 23 | Frame Renderer – Android (OpenGL ES) | open | relevant |
 | 24 | Frame Renderer – iOS (Metal/GL ES) | open | relevant |
 | 25 | Video Output Integration | open | relevant |
-| 26 | Implement Play/Pause/Seek Logic | open | relevant |
+| 26 | Implement Play/Pause/Seek Logic | done | relevant |
 | 27 | Track and Playlist Management (Core) | open | relevant |
 | 28 | Playback State Notifications | open | relevant |
 | 29 | Volume and Audio Effects | open | relevant |
