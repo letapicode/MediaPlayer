@@ -4,6 +4,7 @@
 extern "C" {
 #include <libavcodec/avcodec.h>
 #include <libavformat/avformat.h>
+#include <libavutil/avutil.h>
 #include <libswresample/swresample.h>
 }
 
@@ -19,11 +20,14 @@ public:
   void flush();
   int sampleRate() const;
   int channels() const;
+  double lastPts() const;
 
 private:
   AVCodecContext *m_codecCtx{nullptr};
   SwrContext *m_swrCtx{nullptr};
   AVFrame *m_frame{nullptr};
+  AVRational m_timeBase{1, 1};
+  int64_t m_lastPts{AV_NOPTS_VALUE};
 };
 
 } // namespace mediaplayer

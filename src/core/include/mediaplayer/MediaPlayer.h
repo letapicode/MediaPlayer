@@ -42,10 +42,13 @@ private:
   std::unique_ptr<AudioOutput> m_output;
   std::unique_ptr<VideoOutput> m_videoOutput;
   std::thread m_playThread;
-  std::mutex m_mutex;
+  mutable std::mutex m_mutex;
   std::condition_variable m_cv;
   std::atomic<bool> m_running{false};
   bool m_paused{false};
+  double m_audioClock{0.0};
+  double m_videoClock{0.0};
+  double m_startTime{0.0};
   bool m_stopRequested{false};
   int m_audioStream{-1};
   int m_videoStream{-1};

@@ -11,7 +11,7 @@
 | 5 | Integrate FFmpeg for Demuxing | done | relevant |
 | 6 | Implement Audio Decoding (FFmpeg) | done | relevant |
 | 7 | Implement Video Decoding (FFmpeg) | done | relevant |
-| 8 | Audio/Video Synchronization | open | relevant |
+| 8 | Audio/Video Synchronization | done | relevant |
 | 9 | Buffering and Caching Logic | open | relevant |
 | 10 | Threading and Locking | open | relevant |
 | 11 | Hardware Decoding Support (Optional) | open | relevant |

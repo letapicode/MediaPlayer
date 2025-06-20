@@ -2,6 +2,7 @@
 #include <iostream>
 #include <libavformat/avformat.h>
 #include <libavutil/imgutils.h>
+#include <libavutil/time.h>
 #include <vector>
 
 namespace mediaplayer {
@@ -61,11 +62,18 @@ bool MediaPlayer::open(const std::string &path) {
       return false;
     }
   }
+  m_audioClock = 0.0;
+  m_videoClock = 0.0;
   std::cout << "Opened " << path << '\n';
   return true;
 }
 
-double MediaPlayer::position() const { return 0.0; }
+double MediaPlayer::position() const {
+  std::lock_guard<std::mutex> lock(m_mutex);
+  if (m_audioStream >= 0)
+    return m_audioClock;
+  return m_videoClock;
+}
 
 int MediaPlayer::readAudio(uint8_t *buffer, int bufferSize) {
   if (!m_formatCtx || m_audioStream < 0) {
@@ -130,6 +138,7 @@ void MediaPlayer::play() {
   m_running = true;
   m_output->resume();
   m_playThread = std::thread([this]() {
+    m_startTime = av_gettime() / 1000000.0;
     const int videoBufferSize =
         m_videoStream >= 0 ? av_image_get_buffer_size(AV_PIX_FMT_RGBA, m_videoDecoder.width(),
                                                       m_videoDecoder.height(), 1)
@@ -148,12 +157,21 @@ void MediaPlayer::play() {
         break;
       if (pkt.stream_index == m_audioStream) {
         int bytes = m_audioDecoder.decode(&pkt, audioBuffer, sizeof(audioBuffer));
-        if (bytes > 0 && m_output)
+        if (bytes > 0 && m_output) {
+          m_audioClock = m_audioDecoder.lastPts();
           m_output->write(audioBuffer, bytes);
+        }
       } else if (pkt.stream_index == m_videoStream) {
         int bytes = m_videoDecoder.decode(&pkt, videoBuffer.data(), videoBufferSize);
-        if (bytes > 0 && m_videoOutput)
+        if (bytes > 0 && m_videoOutput) {
+          m_videoClock = m_videoDecoder.lastPts();
+          double master =
+              m_audioStream >= 0 ? m_audioClock : (av_gettime() / 1000000.0 - m_startTime);
+          double delay = m_videoClock - master;
+          if (delay > 0)
+            std::this_thread::sleep_for(std::chrono::duration<double>(delay));
           m_videoOutput->displayFrame(videoBuffer.data(), m_videoDecoder.width() * 4);
+        }
       }
       av_packet_unref(&pkt);
     }
@@ -198,6 +216,8 @@ void MediaPlayer::seek(double seconds) {
   av_seek_frame(m_formatCtx, -1, ts, AVSEEK_FLAG_BACKWARD);
   m_audioDecoder.flush();
   m_videoDecoder.flush();
+  m_audioClock = seconds;
+  m_videoClock = seconds;
 }
 
 } // namespace mediaplayer
