@@ -118,6 +118,11 @@ void MediaPlayer::setVideoOutput(std::unique_ptr<VideoOutput> output) {
   m_videoOutput = std::move(output);
 }
 
+void MediaPlayer::setCallbacks(PlaybackCallbacks callbacks) {
+  std::lock_guard<std::mutex> lock(m_mutex);
+  m_callbacks = std::move(callbacks);
+}
+
 void MediaPlayer::play() {
   std::unique_lock<std::mutex> lock(m_mutex);
   if (m_running) {
@@ -138,6 +143,9 @@ void MediaPlayer::play() {
     m_audioThread = std::thread(&MediaPlayer::audioLoop, this);
   if (m_videoStream >= 0)
     m_videoThread = std::thread(&MediaPlayer::videoLoop, this);
+  lock.unlock();
+  if (m_callbacks.onPlay)
+    m_callbacks.onPlay();
 }
 
 void MediaPlayer::pause() {
@@ -146,6 +154,8 @@ void MediaPlayer::pause() {
     m_paused = true;
     if (m_output)
       m_output->pause();
+    if (m_callbacks.onPause)
+      m_callbacks.onPause();
   }
 }
 
@@ -171,6 +181,8 @@ void MediaPlayer::stop() {
   m_audioPackets.clear();
   m_videoPackets.clear();
   m_running = false;
+  if (m_callbacks.onStop)
+    m_callbacks.onStop();
 }
 
 void MediaPlayer::seek(double seconds) {
@@ -195,6 +207,8 @@ void MediaPlayer::demuxLoop() {
     }
     if (av_read_frame(m_formatCtx, &pkt) < 0) {
       m_eof = true;
+      if (m_callbacks.onFinished)
+        m_callbacks.onFinished();
       break;
     }
     if (pkt.stream_index == m_audioStream && !m_audioPackets.full()) {
@@ -222,6 +236,8 @@ void MediaPlayer::audioLoop() {
       if (bytes > 0 && m_output) {
         m_audioClock = m_audioDecoder.lastPts();
         m_output->write(audioBuffer, bytes);
+        if (m_callbacks.onPosition)
+          m_callbacks.onPosition(m_audioClock);
       }
     } else if (m_eof) {
       break;
@@ -254,6 +270,8 @@ void MediaPlayer::videoLoop() {
         if (delay > 0)
           std::this_thread::sleep_for(std::chrono::duration<double>(delay));
         m_videoOutput->displayFrame(videoBuffer.data(), m_videoDecoder.width() * 4);
+        if (m_callbacks.onPosition)
+          m_callbacks.onPosition(m_videoClock);
       }
     } else if (m_eof) {
       break;

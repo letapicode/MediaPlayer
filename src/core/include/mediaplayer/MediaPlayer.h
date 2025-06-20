@@ -9,6 +9,7 @@
 #include "NullAudioOutput.h"
 #include "NullVideoOutput.h"
 #include "PacketQueue.h"
+#include "PlaybackCallbacks.h"
 #include "VideoDecoder.h"
 #include "VideoOutput.h"
 
@@ -32,6 +33,7 @@ public:
   void seek(double seconds);
   void setAudioOutput(std::unique_ptr<AudioOutput> output);
   void setVideoOutput(std::unique_ptr<VideoOutput> output);
+  void setCallbacks(PlaybackCallbacks callbacks);
   double position() const; // seconds
   int readAudio(uint8_t *buffer, int bufferSize);
   int readVideo(uint8_t *buffer, int bufferSize);
@@ -61,6 +63,7 @@ private:
   PacketQueue m_audioPackets;
   PacketQueue m_videoPackets;
   bool m_eof{false};
+  PlaybackCallbacks m_callbacks;
 };
 
 } // namespace mediaplayer
