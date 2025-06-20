@@ -1,5 +1,6 @@
 #include "mediaplayer/VideoDecoder.h"
 #include <iostream>
+#include <libavutil/frame.h>
 #include <libavutil/imgutils.h>
 
 namespace mediaplayer {
@@ -23,6 +24,7 @@ bool VideoDecoder::open(AVFormatContext *fmtCtx, int streamIndex) {
     return false;
   }
   AVStream *stream = fmtCtx->streams[streamIndex];
+  m_timeBase = stream->time_base;
   const AVCodec *dec = avcodec_find_decoder(stream->codecpar->codec_id);
   if (!dec) {
     std::cerr << "No video decoder" << std::endl;
@@ -52,6 +54,7 @@ int VideoDecoder::decode(AVPacket *pkt, uint8_t *outBuffer, int outBufferSize) {
   const int frameBytes =
       av_image_get_buffer_size(AV_PIX_FMT_RGBA, m_codecCtx->width, m_codecCtx->height, 1);
   while (avcodec_receive_frame(m_codecCtx, m_frame) == 0) {
+    m_lastPts = m_frame->best_effort_timestamp;
     if (total + frameBytes > outBufferSize) {
       break;
     }
@@ -68,6 +71,12 @@ void VideoDecoder::flush() {
   if (m_codecCtx) {
     avcodec_flush_buffers(m_codecCtx);
   }
+}
+
+double VideoDecoder::lastPts() const {
+  if (m_lastPts == AV_NOPTS_VALUE)
+    return 0.0;
+  return m_lastPts * av_q2d(m_timeBase);
 }
 
 } // namespace mediaplayer

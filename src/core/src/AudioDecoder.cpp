@@ -1,5 +1,6 @@
 #include "mediaplayer/AudioDecoder.h"
 #include <iostream>
+#include <libavutil/frame.h>
 
 namespace mediaplayer {
 
@@ -22,6 +23,7 @@ bool AudioDecoder::open(AVFormatContext *fmtCtx, int streamIndex) {
     return false;
   }
   AVStream *stream = fmtCtx->streams[streamIndex];
+  m_timeBase = stream->time_base;
   const AVCodec *dec = avcodec_find_decoder(stream->codecpar->codec_id);
   if (!dec) {
     std::cerr << "No decoder for stream" << std::endl;
@@ -53,6 +55,7 @@ int AudioDecoder::decode(AVPacket *pkt, uint8_t *outBuffer, int outBufferSize) {
   }
   int total = 0;
   while (avcodec_receive_frame(m_codecCtx, m_frame) == 0) {
+    m_lastPts = m_frame->best_effort_timestamp;
     int dst_nb_samples =
         av_rescale_rnd(swr_get_delay(m_swrCtx, m_codecCtx->sample_rate) + m_frame->nb_samples,
                        m_codecCtx->sample_rate, m_codecCtx->sample_rate, AV_ROUND_UP);
@@ -80,5 +83,11 @@ void AudioDecoder::flush() {
 int AudioDecoder::sampleRate() const { return m_codecCtx ? m_codecCtx->sample_rate : 0; }
 
 int AudioDecoder::channels() const { return m_codecCtx ? m_codecCtx->channels : 0; }
+
+double AudioDecoder::lastPts() const {
+  if (m_lastPts == AV_NOPTS_VALUE)
+    return 0.0;
+  return m_lastPts * av_q2d(m_timeBase);
+}
 
 } // namespace mediaplayer
