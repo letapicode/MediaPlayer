@@ -5,6 +5,7 @@
 #include <string>
 
 #include "AudioDecoder.h"
+#include "VideoDecoder.h"
 
 namespace mediaplayer {
 
@@ -19,11 +20,14 @@ public:
   void stop();
   double position() const; // seconds
   int readAudio(uint8_t *buffer, int bufferSize);
+  int readVideo(uint8_t *buffer, int bufferSize);
 
 private:
   AVFormatContext *m_formatCtx{nullptr};
   AudioDecoder m_audioDecoder;
+  VideoDecoder m_videoDecoder;
   int m_audioStream{-1};
+  int m_videoStream{-1};
 };
 
 } // namespace mediaplayer

@@ -43,16 +43,24 @@ bool VideoDecoder::open(AVFormatContext *fmtCtx, int streamIndex) {
   return m_swsCtx != nullptr;
 }
 
-int VideoDecoder::decode(AVPacket *pkt) {
+int VideoDecoder::decode(AVPacket *pkt, uint8_t *outBuffer, int outBufferSize) {
   if (avcodec_send_packet(m_codecCtx, pkt) < 0) {
     return -1;
   }
-  int got = 0;
+  int total = 0;
+  const int frameBytes =
+      av_image_get_buffer_size(AV_PIX_FMT_RGBA, m_codecCtx->width, m_codecCtx->height, 1);
   while (avcodec_receive_frame(m_codecCtx, m_frame) == 0) {
-    // For stub, just pretend we converted frame to RGBA
-    got += m_codecCtx->width * m_codecCtx->height * 4;
+    if (total + frameBytes > outBufferSize) {
+      break;
+    }
+    uint8_t *dstData[4] = {outBuffer + total, nullptr, nullptr, nullptr};
+    int dstLinesize[4] = {m_codecCtx->width * 4, 0, 0, 0};
+    sws_scale(m_swsCtx, m_frame->data, m_frame->linesize, 0, m_codecCtx->height, dstData,
+              dstLinesize);
+    total += frameBytes;
   }
-  return got;
+  return total;
 }
 
 } // namespace mediaplayer

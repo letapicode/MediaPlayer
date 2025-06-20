@@ -15,7 +15,8 @@ public:
   ~VideoDecoder() override;
 
   bool open(AVFormatContext *fmtCtx, int streamIndex) override;
-  int decode(AVPacket *pkt) override; // returns number of bytes of RGB data
+  // Decode packet and write RGBA data into outBuffer. Returns bytes written.
+  int decode(AVPacket *pkt, uint8_t *outBuffer, int outBufferSize) override;
 
 private:
   AVCodecContext *m_codecCtx{nullptr};

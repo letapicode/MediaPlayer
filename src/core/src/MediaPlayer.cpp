@@ -24,14 +24,22 @@ bool MediaPlayer::open(const std::string &path) {
     return false;
   }
   for (unsigned i = 0; i < m_formatCtx->nb_streams; ++i) {
-    if (m_formatCtx->streams[i]->codecpar->codec_type == AVMEDIA_TYPE_AUDIO) {
+    if (m_formatCtx->streams[i]->codecpar->codec_type == AVMEDIA_TYPE_AUDIO && m_audioStream < 0) {
       m_audioStream = i;
-      break;
+    } else if (m_formatCtx->streams[i]->codecpar->codec_type == AVMEDIA_TYPE_VIDEO &&
+               m_videoStream < 0) {
+      m_videoStream = i;
     }
   }
   if (m_audioStream >= 0) {
     if (!m_audioDecoder.open(m_formatCtx, m_audioStream)) {
       std::cerr << "Failed to open audio decoder\n";
+      return false;
+    }
+  }
+  if (m_videoStream >= 0) {
+    if (!m_videoDecoder.open(m_formatCtx, m_videoStream)) {
+      std::cerr << "Failed to open video decoder\n";
       return false;
     }
   }
@@ -56,6 +64,23 @@ int MediaPlayer::readAudio(uint8_t *buffer, int bufferSize) {
   while (av_read_frame(m_formatCtx, &pkt) >= 0) {
     if (pkt.stream_index == m_audioStream) {
       int ret = m_audioDecoder.decode(&pkt, buffer, bufferSize);
+      av_packet_unref(&pkt);
+      return ret;
+    }
+    av_packet_unref(&pkt);
+  }
+  return 0;
+}
+
+int MediaPlayer::readVideo(uint8_t *buffer, int bufferSize) {
+  if (!m_formatCtx || m_videoStream < 0) {
+    return 0;
+  }
+  AVPacket pkt;
+  av_init_packet(&pkt);
+  while (av_read_frame(m_formatCtx, &pkt) >= 0) {
+    if (pkt.stream_index == m_videoStream) {
+      int ret = m_videoDecoder.decode(&pkt, buffer, bufferSize);
       av_packet_unref(&pkt);
       return ret;
     }
