@@ -1,10 +1,13 @@
 #include "mediaplayer/MediaPlayer.h"
 #include <chrono>
 #include <cstdint>
+#include <filesystem>
 #include <iostream>
 #include <libavformat/avformat.h>
 #include <libavutil/imgutils.h>
 #include <libavutil/time.h>
+#include <taglib/fileref.h>
+#include <taglib/tag.h>
 #include <vector>
 
 namespace mediaplayer {
@@ -72,6 +75,37 @@ bool MediaPlayer::open(const std::string &path) {
       return false;
     }
   }
+  // Extract metadata
+  m_metadata = {};
+  m_metadata.path = path;
+  if (m_formatCtx->duration != AV_NOPTS_VALUE)
+    m_metadata.duration = m_formatCtx->duration / (double)AV_TIME_BASE;
+  if (m_videoStream >= 0) {
+    m_metadata.width = m_videoDecoder.width();
+    m_metadata.height = m_videoDecoder.height();
+  }
+  AVDictionaryEntry *tag = av_dict_get(m_formatCtx->metadata, "title", nullptr, 0);
+  if (tag && tag->value)
+    m_metadata.title = tag->value;
+  tag = av_dict_get(m_formatCtx->metadata, "artist", nullptr, 0);
+  if (tag && tag->value)
+    m_metadata.artist = tag->value;
+  tag = av_dict_get(m_formatCtx->metadata, "album", nullptr, 0);
+  if (tag && tag->value)
+    m_metadata.album = tag->value;
+  TagLib::FileRef f(path.c_str());
+  if (!f.isNull() && f.tag()) {
+    if (m_metadata.title.empty())
+      m_metadata.title = f.tag()->title().to8Bit(true);
+    if (m_metadata.artist.empty())
+      m_metadata.artist = f.tag()->artist().to8Bit(true);
+    if (m_metadata.album.empty())
+      m_metadata.album = f.tag()->album().to8Bit(true);
+    if (f.audioProperties() && m_metadata.duration == 0.0)
+      m_metadata.duration = f.audioProperties()->length();
+  }
+  if (m_metadata.title.empty())
+    m_metadata.title = std::filesystem::path(path).filename().string();
   m_audioClock = 0.0;
   m_videoClock = 0.0;
   m_audioPackets.clear();

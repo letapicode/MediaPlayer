@@ -6,6 +6,7 @@
 
 #include "AudioDecoder.h"
 #include "AudioOutput.h"
+#include "MediaMetadata.h"
 #include "NullAudioOutput.h"
 #include "NullVideoOutput.h"
 #include "PacketQueue.h"
@@ -42,6 +43,7 @@ public:
   void setVolume(double volume); // 0.0 - 1.0
   double volume() const;
   double position() const; // seconds
+  const MediaMetadata &metadata() const { return m_metadata; }
   int readAudio(uint8_t *buffer, int bufferSize);
   int readVideo(uint8_t *buffer, int bufferSize);
 
@@ -73,6 +75,7 @@ private:
   PlaybackCallbacks m_callbacks;
   PlaylistManager m_playlist;
   double m_volume{1.0};
+  MediaMetadata m_metadata;
 };
 
 } // namespace mediaplayer
