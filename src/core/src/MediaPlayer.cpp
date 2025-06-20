@@ -11,6 +11,7 @@ MediaPlayer::MediaPlayer() {
   avformat_network_init();
   m_output = std::make_unique<NullAudioOutput>();
   m_videoOutput = std::make_unique<NullVideoOutput>();
+  m_eof = false;
 }
 
 MediaPlayer::~MediaPlayer() {
@@ -21,6 +22,8 @@ MediaPlayer::~MediaPlayer() {
   if (m_videoOutput) {
     m_videoOutput->shutdown();
   }
+  m_audioPackets.clear();
+  m_videoPackets.clear();
   avformat_network_deinit();
 }
 
@@ -64,6 +67,9 @@ bool MediaPlayer::open(const std::string &path) {
   }
   m_audioClock = 0.0;
   m_videoClock = 0.0;
+  m_audioPackets.clear();
+  m_videoPackets.clear();
+  m_eof = false;
   std::cout << "Opened " << path << '\n';
   return true;
 }
@@ -76,35 +82,42 @@ double MediaPlayer::position() const {
 }
 
 int MediaPlayer::readAudio(uint8_t *buffer, int bufferSize) {
-  if (!m_formatCtx || m_audioStream < 0) {
-    return 0;
-  }
-  AVPacket pkt;
-  av_init_packet(&pkt);
-  while (av_read_frame(m_formatCtx, &pkt) >= 0) {
-    if (pkt.stream_index == m_audioStream) {
-      int ret = m_audioDecoder.decode(&pkt, buffer, bufferSize);
-      av_packet_unref(&pkt);
-      return ret;
-    }
-    av_packet_unref(&pkt);
+  fillQueues();
+  AVPacket *pkt = nullptr;
+  if (m_audioPackets.pop(pkt)) {
+    int ret = m_audioDecoder.decode(pkt, buffer, bufferSize);
+    av_packet_free(&pkt);
+    return ret;
   }
   return 0;
 }
 
-int MediaPlayer::readVideo(uint8_t *buffer, int bufferSize) {
-  if (!m_formatCtx || m_videoStream < 0) {
-    return 0;
-  }
+void MediaPlayer::fillQueues() {
+  if (!m_formatCtx)
+    return;
+
   AVPacket pkt;
-  av_init_packet(&pkt);
-  while (av_read_frame(m_formatCtx, &pkt) >= 0) {
-    if (pkt.stream_index == m_videoStream) {
-      int ret = m_videoDecoder.decode(&pkt, buffer, bufferSize);
-      av_packet_unref(&pkt);
-      return ret;
+  while (!m_audioPackets.full() || !m_videoPackets.full()) {
+    if (av_read_frame(m_formatCtx, &pkt) < 0) {
+      m_eof = true;
+      break;
+    }
+    if (pkt.stream_index == m_audioStream && !m_audioPackets.full()) {
+      m_audioPackets.push(&pkt);
+    } else if (pkt.stream_index == m_videoStream && !m_videoPackets.full()) {
+      m_videoPackets.push(&pkt);
     }
     av_packet_unref(&pkt);
+  }
+}
+
+int MediaPlayer::readVideo(uint8_t *buffer, int bufferSize) {
+  fillQueues();
+  AVPacket *pkt = nullptr;
+  if (m_videoPackets.pop(pkt)) {
+    int ret = m_videoDecoder.decode(pkt, buffer, bufferSize);
+    av_packet_free(&pkt);
+    return ret;
   }
   return 0;
 }
@@ -145,7 +158,6 @@ void MediaPlayer::play() {
                            : 0;
     std::vector<uint8_t> videoBuffer(videoBufferSize);
     uint8_t audioBuffer[4096];
-    AVPacket pkt;
     while (true) {
       {
         std::unique_lock<std::mutex> tlock(m_mutex);
@@ -153,16 +165,24 @@ void MediaPlayer::play() {
         if (m_stopRequested)
           break;
       }
-      if (av_read_frame(m_formatCtx, &pkt) < 0)
-        break;
-      if (pkt.stream_index == m_audioStream) {
-        int bytes = m_audioDecoder.decode(&pkt, audioBuffer, sizeof(audioBuffer));
+
+      fillQueues();
+
+      bool handled = false;
+      AVPacket *pkt = nullptr;
+      if (m_audioPackets.pop(pkt)) {
+        int bytes = m_audioDecoder.decode(pkt, audioBuffer, sizeof(audioBuffer));
+        av_packet_free(&pkt);
         if (bytes > 0 && m_output) {
           m_audioClock = m_audioDecoder.lastPts();
           m_output->write(audioBuffer, bytes);
         }
-      } else if (pkt.stream_index == m_videoStream) {
-        int bytes = m_videoDecoder.decode(&pkt, videoBuffer.data(), videoBufferSize);
+        handled = true;
+      }
+
+      if (m_videoPackets.pop(pkt)) {
+        int bytes = m_videoDecoder.decode(pkt, videoBuffer.data(), videoBufferSize);
+        av_packet_free(&pkt);
         if (bytes > 0 && m_videoOutput) {
           m_videoClock = m_videoDecoder.lastPts();
           double master =
@@ -172,8 +192,14 @@ void MediaPlayer::play() {
             std::this_thread::sleep_for(std::chrono::duration<double>(delay));
           m_videoOutput->displayFrame(videoBuffer.data(), m_videoDecoder.width() * 4);
         }
+        handled = true;
       }
-      av_packet_unref(&pkt);
+
+      if (!handled) {
+        if (m_eof)
+          break;
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+      }
     }
     if (m_output)
       m_output->shutdown();
@@ -207,6 +233,8 @@ void MediaPlayer::stop() {
     m_output->shutdown();
   if (m_videoOutput)
     m_videoOutput->shutdown();
+  m_audioPackets.clear();
+  m_videoPackets.clear();
 }
 
 void MediaPlayer::seek(double seconds) {
