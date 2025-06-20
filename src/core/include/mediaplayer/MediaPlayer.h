@@ -8,6 +8,7 @@
 #include "AudioOutput.h"
 #include "NullAudioOutput.h"
 #include "NullVideoOutput.h"
+#include "PacketQueue.h"
 #include "VideoDecoder.h"
 #include "VideoOutput.h"
 
@@ -34,6 +35,7 @@ public:
   double position() const; // seconds
   int readAudio(uint8_t *buffer, int bufferSize);
   int readVideo(uint8_t *buffer, int bufferSize);
+  void fillQueues();
 
 private:
   AVFormatContext *m_formatCtx{nullptr};
@@ -52,6 +54,9 @@ private:
   bool m_stopRequested{false};
   int m_audioStream{-1};
   int m_videoStream{-1};
+  PacketQueue m_audioPackets;
+  PacketQueue m_videoPackets;
+  bool m_eof{false};
 };
 
 } // namespace mediaplayer

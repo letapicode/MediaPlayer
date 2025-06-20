@@ -12,7 +12,7 @@
 | 6 | Implement Audio Decoding (FFmpeg) | done | relevant |
 | 7 | Implement Video Decoding (FFmpeg) | done | relevant |
 | 8 | Audio/Video Synchronization | done | relevant |
-| 9 | Buffering and Caching Logic | open | relevant |
+| 9 | Buffering and Caching Logic | done | relevant |
 | 10 | Threading and Locking | open | relevant |
 | 11 | Hardware Decoding Support (Optional) | open | relevant |
 | 12 | Abstract Audio Output Interface | done | relevant |
