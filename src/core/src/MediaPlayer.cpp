@@ -29,6 +29,11 @@ MediaPlayer::~MediaPlayer() {
 }
 
 bool MediaPlayer::open(const std::string &path) {
+  if (m_formatCtx) {
+    avformat_close_input(&m_formatCtx);
+    m_audioStream = -1;
+    m_videoStream = -1;
+  }
   if (avformat_open_input(&m_formatCtx, path.c_str(), nullptr, nullptr) < 0) {
     std::cerr << "Failed to open media: " << path << '\n';
     return false;
@@ -194,6 +199,36 @@ void MediaPlayer::seek(double seconds) {
   m_videoDecoder.flush();
   m_audioClock = seconds;
   m_videoClock = seconds;
+}
+
+void MediaPlayer::setPlaylist(const std::vector<std::string> &paths) {
+  std::lock_guard<std::mutex> lock(m_mutex);
+  m_playlist.set(paths);
+}
+
+void MediaPlayer::addToPlaylist(const std::string &path) {
+  std::lock_guard<std::mutex> lock(m_mutex);
+  m_playlist.add(path);
+}
+
+void MediaPlayer::clearPlaylist() {
+  std::lock_guard<std::mutex> lock(m_mutex);
+  m_playlist.clear();
+}
+
+bool MediaPlayer::nextTrack() {
+  std::string path;
+  {
+    std::lock_guard<std::mutex> lock(m_mutex);
+    if (m_playlist.empty())
+      return false;
+    path = m_playlist.next();
+  }
+  stop();
+  if (!open(path))
+    return false;
+  play();
+  return true;
 }
 
 void MediaPlayer::demuxLoop() {
