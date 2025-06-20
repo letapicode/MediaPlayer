@@ -16,6 +16,9 @@ public:
 
   bool open(AVFormatContext *fmtCtx, int streamIndex);
   int decode(AVPacket *pkt, uint8_t *outBuffer, int outBufferSize);
+  void flush();
+  int sampleRate() const;
+  int channels() const;
 
 private:
   AVCodecContext *m_codecCtx{nullptr};

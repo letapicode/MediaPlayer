@@ -17,6 +17,7 @@ public:
   bool open(AVFormatContext *fmtCtx, int streamIndex) override;
   // Decode packet and write RGBA data into outBuffer. Returns bytes written.
   int decode(AVPacket *pkt, uint8_t *outBuffer, int outBufferSize) override;
+  void flush() override;
 
 private:
   AVCodecContext *m_codecCtx{nullptr};

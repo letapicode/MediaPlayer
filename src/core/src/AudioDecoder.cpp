@@ -71,4 +71,14 @@ int AudioDecoder::decode(AVPacket *pkt, uint8_t *outBuffer, int outBufferSize) {
   return total;
 }
 
+void AudioDecoder::flush() {
+  if (m_codecCtx) {
+    avcodec_flush_buffers(m_codecCtx);
+  }
+}
+
+int AudioDecoder::sampleRate() const { return m_codecCtx ? m_codecCtx->sample_rate : 0; }
+
+int AudioDecoder::channels() const { return m_codecCtx ? m_codecCtx->channels : 0; }
+
 } // namespace mediaplayer
