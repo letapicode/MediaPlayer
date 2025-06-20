@@ -35,15 +35,19 @@ public:
   double position() const; // seconds
   int readAudio(uint8_t *buffer, int bufferSize);
   int readVideo(uint8_t *buffer, int bufferSize);
-  void fillQueues();
 
 private:
+  void demuxLoop();
+  void audioLoop();
+  void videoLoop();
   AVFormatContext *m_formatCtx{nullptr};
   AudioDecoder m_audioDecoder;
   VideoDecoder m_videoDecoder;
   std::unique_ptr<AudioOutput> m_output;
   std::unique_ptr<VideoOutput> m_videoOutput;
-  std::thread m_playThread;
+  std::thread m_demuxThread;
+  std::thread m_audioThread;
+  std::thread m_videoThread;
   mutable std::mutex m_mutex;
   std::condition_variable m_cv;
   std::atomic<bool> m_running{false};
