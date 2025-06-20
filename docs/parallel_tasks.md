@@ -31,7 +31,7 @@
 | 25 | Video Output Integration | done | relevant |
 | 26 | Implement Play/Pause/Seek Logic | done | relevant |
 | 27 | Track and Playlist Management (Core) | open | relevant |
-| 28 | Playback State Notifications | open | relevant |
+| 28 | Playback State Notifications | done | relevant |
 | 29 | Volume and Audio Effects | open | relevant |
 | 30 | Media Metadata Extraction | open | relevant |
 | 31 | Audio Format Conversion Utility | open | relevant |
