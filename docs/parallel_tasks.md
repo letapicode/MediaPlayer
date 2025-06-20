@@ -57,9 +57,9 @@
 
 | # | Task | Status | Notes |
 |-:|------|--------|-------|
-| 49 | Integrate SQLite Database | open | relevant |
-| 50 | Define DB Schema | open | relevant |
-| 51 | Implement Library Scanning | open | relevant |
+| 49 | Integrate SQLite Database | done | relevant |
+| 50 | Define DB Schema | done | relevant |
+| 51 | Implement Library Scanning | done | relevant |
 | 52 | Metadata Extraction | open | relevant |
 | 53 | Update/Remove Entries | open | relevant |
 | 54 | Basic Playlist Management | open | relevant |

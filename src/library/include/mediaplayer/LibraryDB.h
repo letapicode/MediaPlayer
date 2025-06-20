@@ -14,6 +14,11 @@ public:
   bool open();
   void close();
   bool initSchema();
+  bool scanDirectory(const std::string &directory);
+
+private:
+  bool insertMedia(const std::string &path, const std::string &title, const std::string &artist,
+                   const std::string &album);
 
 private:
   std::string m_path;
