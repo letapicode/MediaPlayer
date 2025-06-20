@@ -1,32 +1,20 @@
-add_library(mediaplayer_core
-    src/MediaPlayer.cpp
-    src/AudioDecoder.cpp
-    src/VideoDecoder.cpp
-    src/PlaylistManager.cpp
-    src/AudioOutputPulse.cpp
-    src/PacketQueue.cpp
-)
+add_library(mediaplayer_core src / MediaPlayer.cpp src / AudioDecoder.cpp src /
+            VideoDecoder.cpp src / PlaylistManager.cpp src / AudioOutputPulse.cpp src /
+            PacketQueue.cpp)
 
-find_package(PkgConfig)
-pkg_check_modules(FFMPEG REQUIRED IMPORTED_TARGET
-    libavformat libavcodec libavutil libswresample libswscale)
+    find_package(PkgConfig) pkg_check_modules(
+        FFMPEG REQUIRED IMPORTED_TARGET libavformat libavcodec libavutil libswresample libswscale)
+        pkg_check_modules(TAGLIB REQUIRED IMPORTED_TARGET taglib)
 
-target_include_directories(mediaplayer_core PUBLIC
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-    $<INSTALL_INTERFACE:include>
-    ${FFMPEG_INCLUDE_DIRS}
-)
+            target_include_directories(
+                mediaplayer_core PUBLIC $<BUILD_INTERFACE : ${CMAKE_CURRENT_SOURCE_DIR} / include>
+                    $<INSTALL_INTERFACE : include>
+                        ${FFMPEG_INCLUDE_DIRS} ${TAGLIB_INCLUDE_DIRS})
 
-find_library(PULSE_SIMPLE_LIB pulse-simple)
-find_library(PULSE_LIB pulse)
+                find_library(PULSE_SIMPLE_LIB pulse - simple) find_library(PULSE_LIB pulse)
 
-target_link_libraries(mediaplayer_core
-    PkgConfig::FFMPEG
-    ${PULSE_SIMPLE_LIB}
-    ${PULSE_LIB}
-)
+                    target_link_libraries(mediaplayer_core PkgConfig::FFMPEG PkgConfig::TAGLIB ${
+                        PULSE_SIMPLE_LIB} ${PULSE_LIB})
 
-set_target_properties(mediaplayer_core PROPERTIES
-    CXX_STANDARD 17
-    CXX_STANDARD_REQUIRED ON
-)
+                        set_target_properties(
+                            mediaplayer_core PROPERTIES CXX_STANDARD 17 CXX_STANDARD_REQUIRED ON)
