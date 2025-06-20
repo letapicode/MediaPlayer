@@ -3,6 +3,7 @@ add_library(mediaplayer_core
     src/AudioDecoder.cpp
     src/VideoDecoder.cpp
     src/PlaylistManager.cpp
+    src/AudioOutputPulse.cpp
 )
 
 find_package(PkgConfig)
@@ -15,8 +16,13 @@ target_include_directories(mediaplayer_core PUBLIC
     ${FFMPEG_INCLUDE_DIRS}
 )
 
+find_library(PULSE_SIMPLE_LIB pulse-simple)
+find_library(PULSE_LIB pulse)
+
 target_link_libraries(mediaplayer_core
     PkgConfig::FFMPEG
+    ${PULSE_SIMPLE_LIB}
+    ${PULSE_LIB}
 )
 
 set_target_properties(mediaplayer_core PROPERTIES

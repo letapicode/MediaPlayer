@@ -10,15 +10,15 @@
 | 4 | Build & Integration CI Setup | done | relevant |
 | 5 | Integrate FFmpeg for Demuxing | done | relevant |
 | 6 | Implement Audio Decoding (FFmpeg) | done | relevant |
-| 7 | Implement Video Decoding (FFmpeg) | open | relevant |
+| 7 | Implement Video Decoding (FFmpeg) | done | relevant |
 | 8 | Audio/Video Synchronization | open | relevant |
 | 9 | Buffering and Caching Logic | open | relevant |
 | 10 | Threading and Locking | open | relevant |
 | 11 | Hardware Decoding Support (Optional) | open | relevant |
-| 12 | Abstract Audio Output Interface | open | relevant |
+| 12 | Abstract Audio Output Interface | done | relevant |
 | 13 | Audio Output – Windows (WASAPI) | open | relevant |
 | 14 | Audio Output – macOS (CoreAudio) | open | relevant |
-| 15 | Audio Output – Linux (PulseAudio/ALSA) | open | relevant |
+| 15 | Audio Output – Linux (PulseAudio/ALSA) | done | relevant |
 | 16 | Audio Output – Android (OpenSL ES or AAudio) | open | relevant |
 | 17 | Audio Output – iOS (AVAudio) | open | relevant |
 | 18 | Audio Buffering & Mixing | open | relevant |
