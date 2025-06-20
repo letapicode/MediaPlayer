@@ -12,7 +12,7 @@ class MediaDecoder {
 public:
   virtual ~MediaDecoder() = default;
   virtual bool open(AVFormatContext *fmtCtx, int streamIndex) = 0;
-  virtual int decode(AVPacket *pkt) = 0;
+  virtual int decode(AVPacket *pkt, uint8_t *outBuffer, int outBufferSize) = 0;
 };
 
 } // namespace mediaplayer
