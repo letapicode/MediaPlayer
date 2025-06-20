@@ -10,6 +10,7 @@
 #include "NullVideoOutput.h"
 #include "PacketQueue.h"
 #include "PlaybackCallbacks.h"
+#include "PlaylistManager.h"
 #include "VideoDecoder.h"
 #include "VideoOutput.h"
 
@@ -31,6 +32,10 @@ public:
   void pause();
   void stop();
   void seek(double seconds);
+  void setPlaylist(const std::vector<std::string> &paths);
+  void addToPlaylist(const std::string &path);
+  void clearPlaylist();
+  bool nextTrack();
   void setAudioOutput(std::unique_ptr<AudioOutput> output);
   void setVideoOutput(std::unique_ptr<VideoOutput> output);
   void setCallbacks(PlaybackCallbacks callbacks);
@@ -64,6 +69,7 @@ private:
   PacketQueue m_videoPackets;
   bool m_eof{false};
   PlaybackCallbacks m_callbacks;
+  PlaylistManager m_playlist;
 };
 
 } // namespace mediaplayer

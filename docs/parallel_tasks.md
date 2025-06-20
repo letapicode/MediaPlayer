@@ -30,7 +30,7 @@
 | 24 | Frame Renderer – iOS (Metal/GL ES) | open | relevant |
 | 25 | Video Output Integration | done | relevant |
 | 26 | Implement Play/Pause/Seek Logic | done | relevant |
-| 27 | Track and Playlist Management (Core) | open | relevant |
+| 27 | Track and Playlist Management (Core) | done | relevant |
 | 28 | Playback State Notifications | done | relevant |
 | 29 | Volume and Audio Effects | open | relevant |
 | 30 | Media Metadata Extraction | open | relevant |
