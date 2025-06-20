@@ -1,5 +1,6 @@
 #include "mediaplayer/MediaPlayer.h"
 #include <chrono>
+#include <cstdint>
 #include <iostream>
 #include <libavformat/avformat.h>
 #include <libavutil/imgutils.h>
@@ -126,6 +127,20 @@ void MediaPlayer::setVideoOutput(std::unique_ptr<VideoOutput> output) {
 void MediaPlayer::setCallbacks(PlaybackCallbacks callbacks) {
   std::lock_guard<std::mutex> lock(m_mutex);
   m_callbacks = std::move(callbacks);
+}
+
+void MediaPlayer::setVolume(double volume) {
+  std::lock_guard<std::mutex> lock(m_mutex);
+  if (volume < 0.0)
+    volume = 0.0;
+  if (volume > 1.0)
+    volume = 1.0;
+  m_volume = volume;
+}
+
+double MediaPlayer::volume() const {
+  std::lock_guard<std::mutex> lock(m_mutex);
+  return m_volume;
 }
 
 void MediaPlayer::play() {
@@ -270,6 +285,23 @@ void MediaPlayer::audioLoop() {
       av_packet_free(&pkt);
       if (bytes > 0 && m_output) {
         m_audioClock = m_audioDecoder.lastPts();
+        double vol;
+        {
+          std::lock_guard<std::mutex> lock(m_mutex);
+          vol = m_volume;
+        }
+        if (vol < 0.999) {
+          int16_t *samples = reinterpret_cast<int16_t *>(audioBuffer);
+          int sampleCount = bytes / sizeof(int16_t);
+          for (int i = 0; i < sampleCount; ++i) {
+            int32_t s = static_cast<int32_t>(samples[i] * vol);
+            if (s < -32768)
+              s = -32768;
+            else if (s > 32767)
+              s = 32767;
+            samples[i] = static_cast<int16_t>(s);
+          }
+        }
         m_output->write(audioBuffer, bytes);
         if (m_callbacks.onPosition)
           m_callbacks.onPosition(m_audioClock);

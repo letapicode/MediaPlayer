@@ -39,6 +39,8 @@ public:
   void setAudioOutput(std::unique_ptr<AudioOutput> output);
   void setVideoOutput(std::unique_ptr<VideoOutput> output);
   void setCallbacks(PlaybackCallbacks callbacks);
+  void setVolume(double volume); // 0.0 - 1.0
+  double volume() const;
   double position() const; // seconds
   int readAudio(uint8_t *buffer, int bufferSize);
   int readVideo(uint8_t *buffer, int bufferSize);
@@ -70,6 +72,7 @@ private:
   bool m_eof{false};
   PlaybackCallbacks m_callbacks;
   PlaylistManager m_playlist;
+  double m_volume{1.0};
 };
 
 } // namespace mediaplayer

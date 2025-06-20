@@ -32,7 +32,7 @@
 | 26 | Implement Play/Pause/Seek Logic | done | relevant |
 | 27 | Track and Playlist Management (Core) | done | relevant |
 | 28 | Playback State Notifications | done | relevant |
-| 29 | Volume and Audio Effects | open | relevant |
+| 29 | Volume and Audio Effects | done | relevant |
 | 30 | Media Metadata Extraction | open | relevant |
 | 31 | Audio Format Conversion Utility | open | relevant |
 | 32 | Video Transcoding Utility | open | relevant |
