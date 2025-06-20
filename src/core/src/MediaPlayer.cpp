@@ -1,18 +1,24 @@
 #include "mediaplayer/MediaPlayer.h"
 #include <iostream>
 #include <libavformat/avformat.h>
+#include <libavutil/imgutils.h>
+#include <vector>
 
 namespace mediaplayer {
 
 MediaPlayer::MediaPlayer() {
   avformat_network_init();
   m_output = std::make_unique<NullAudioOutput>();
+  m_videoOutput = std::make_unique<NullVideoOutput>();
 }
 
 MediaPlayer::~MediaPlayer() {
   stop();
   if (m_formatCtx) {
     avformat_close_input(&m_formatCtx);
+  }
+  if (m_videoOutput) {
+    m_videoOutput->shutdown();
   }
   avformat_network_deinit();
 }
@@ -48,6 +54,10 @@ bool MediaPlayer::open(const std::string &path) {
   if (m_videoStream >= 0) {
     if (!m_videoDecoder.open(m_formatCtx, m_videoStream)) {
       std::cerr << "Failed to open video decoder\n";
+      return false;
+    }
+    if (m_videoOutput && !m_videoOutput->init(m_videoDecoder.width(), m_videoDecoder.height())) {
+      std::cerr << "Failed to init video output\n";
       return false;
     }
   }
@@ -99,6 +109,14 @@ void MediaPlayer::setAudioOutput(std::unique_ptr<AudioOutput> output) {
   m_output = std::move(output);
 }
 
+void MediaPlayer::setVideoOutput(std::unique_ptr<VideoOutput> output) {
+  std::lock_guard<std::mutex> lock(m_mutex);
+  if (m_videoOutput) {
+    m_videoOutput->shutdown();
+  }
+  m_videoOutput = std::move(output);
+}
+
 void MediaPlayer::play() {
   std::unique_lock<std::mutex> lock(m_mutex);
   if (m_running) {
@@ -112,7 +130,13 @@ void MediaPlayer::play() {
   m_running = true;
   m_output->resume();
   m_playThread = std::thread([this]() {
-    uint8_t buffer[4096];
+    const int videoBufferSize =
+        m_videoStream >= 0 ? av_image_get_buffer_size(AV_PIX_FMT_RGBA, m_videoDecoder.width(),
+                                                      m_videoDecoder.height(), 1)
+                           : 0;
+    std::vector<uint8_t> videoBuffer(videoBufferSize);
+    uint8_t audioBuffer[4096];
+    AVPacket pkt;
     while (true) {
       {
         std::unique_lock<std::mutex> tlock(m_mutex);
@@ -120,14 +144,23 @@ void MediaPlayer::play() {
         if (m_stopRequested)
           break;
       }
-      int bytes = readAudio(buffer, sizeof(buffer));
-      if (bytes <= 0)
+      if (av_read_frame(m_formatCtx, &pkt) < 0)
         break;
-      if (m_output)
-        m_output->write(buffer, bytes);
+      if (pkt.stream_index == m_audioStream) {
+        int bytes = m_audioDecoder.decode(&pkt, audioBuffer, sizeof(audioBuffer));
+        if (bytes > 0 && m_output)
+          m_output->write(audioBuffer, bytes);
+      } else if (pkt.stream_index == m_videoStream) {
+        int bytes = m_videoDecoder.decode(&pkt, videoBuffer.data(), videoBufferSize);
+        if (bytes > 0 && m_videoOutput)
+          m_videoOutput->displayFrame(videoBuffer.data(), m_videoDecoder.width() * 4);
+      }
+      av_packet_unref(&pkt);
     }
     if (m_output)
       m_output->shutdown();
+    if (m_videoOutput)
+      m_videoOutput->shutdown();
     m_running = false;
   });
 }
@@ -154,6 +187,8 @@ void MediaPlayer::stop() {
     m_playThread.join();
   if (m_output)
     m_output->shutdown();
+  if (m_videoOutput)
+    m_videoOutput->shutdown();
 }
 
 void MediaPlayer::seek(double seconds) {

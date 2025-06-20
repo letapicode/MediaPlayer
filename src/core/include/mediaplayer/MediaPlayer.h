@@ -7,7 +7,9 @@
 #include "AudioDecoder.h"
 #include "AudioOutput.h"
 #include "NullAudioOutput.h"
+#include "NullVideoOutput.h"
 #include "VideoDecoder.h"
+#include "VideoOutput.h"
 
 #include <atomic>
 #include <condition_variable>
@@ -28,6 +30,7 @@ public:
   void stop();
   void seek(double seconds);
   void setAudioOutput(std::unique_ptr<AudioOutput> output);
+  void setVideoOutput(std::unique_ptr<VideoOutput> output);
   double position() const; // seconds
   int readAudio(uint8_t *buffer, int bufferSize);
   int readVideo(uint8_t *buffer, int bufferSize);
@@ -37,6 +40,7 @@ private:
   AudioDecoder m_audioDecoder;
   VideoDecoder m_videoDecoder;
   std::unique_ptr<AudioOutput> m_output;
+  std::unique_ptr<VideoOutput> m_videoOutput;
   std::thread m_playThread;
   std::mutex m_mutex;
   std::condition_variable m_cv;

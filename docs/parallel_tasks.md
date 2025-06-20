@@ -22,13 +22,13 @@
 | 16 | Audio Output – Android (OpenSL ES or AAudio) | open | relevant |
 | 17 | Audio Output – iOS (AVAudio) | open | relevant |
 | 18 | Audio Buffering & Mixing | open | relevant |
-| 19 | Abstract Video Output Interface | open | relevant |
+| 19 | Abstract Video Output Interface | done | relevant |
 | 20 | Video Rendering – OpenGL (Desktop) | open | relevant |
 | 21 | Video Rendering – DirectX (Windows optional) | open | relevant |
 | 22 | Video Rendering – Metal (macOS) | open | relevant |
 | 23 | Frame Renderer – Android (OpenGL ES) | open | relevant |
 | 24 | Frame Renderer – iOS (Metal/GL ES) | open | relevant |
-| 25 | Video Output Integration | open | relevant |
+| 25 | Video Output Integration | done | relevant |
 | 26 | Implement Play/Pause/Seek Logic | done | relevant |
 | 27 | Track and Playlist Management (Core) | open | relevant |
 | 28 | Playback State Notifications | open | relevant |
