@@ -1,5 +1,6 @@
 #include "mediaplayer/VideoDecoder.h"
 #include <iostream>
+#include <libavutil/imgutils.h>
 
 namespace mediaplayer {
 
