@@ -6,7 +6,10 @@ extern "C" {
 }
 
 #include <cstddef>
+#include <mutex>
 #include <queue>
+
+#include <condition_variable>
 
 namespace mediaplayer {
 
@@ -24,6 +27,8 @@ public:
 private:
   std::queue<AVPacket *> m_queue;
   size_t m_maxSize{0};
+  mutable std::mutex m_mutex;
+  std::condition_variable m_cv;
 };
 
 } // namespace mediaplayer

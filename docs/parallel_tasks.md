@@ -13,7 +13,7 @@
 | 7 | Implement Video Decoding (FFmpeg) | done | relevant |
 | 8 | Audio/Video Synchronization | done | relevant |
 | 9 | Buffering and Caching Logic | done | relevant |
-| 10 | Threading and Locking | open | relevant |
+| 10 | Threading and Locking | done | relevant |
 | 11 | Hardware Decoding Support (Optional) | open | relevant |
 | 12 | Abstract Audio Output Interface | done | relevant |
 | 13 | Audio Output – Windows (WASAPI) | open | relevant |

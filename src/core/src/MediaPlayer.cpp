@@ -1,4 +1,5 @@
 #include "mediaplayer/MediaPlayer.h"
+#include <chrono>
 #include <iostream>
 #include <libavformat/avformat.h>
 #include <libavutil/imgutils.h>
@@ -82,7 +83,6 @@ double MediaPlayer::position() const {
 }
 
 int MediaPlayer::readAudio(uint8_t *buffer, int bufferSize) {
-  fillQueues();
   AVPacket *pkt = nullptr;
   if (m_audioPackets.pop(pkt)) {
     int ret = m_audioDecoder.decode(pkt, buffer, bufferSize);
@@ -92,27 +92,7 @@ int MediaPlayer::readAudio(uint8_t *buffer, int bufferSize) {
   return 0;
 }
 
-void MediaPlayer::fillQueues() {
-  if (!m_formatCtx)
-    return;
-
-  AVPacket pkt;
-  while (!m_audioPackets.full() || !m_videoPackets.full()) {
-    if (av_read_frame(m_formatCtx, &pkt) < 0) {
-      m_eof = true;
-      break;
-    }
-    if (pkt.stream_index == m_audioStream && !m_audioPackets.full()) {
-      m_audioPackets.push(&pkt);
-    } else if (pkt.stream_index == m_videoStream && !m_videoPackets.full()) {
-      m_videoPackets.push(&pkt);
-    }
-    av_packet_unref(&pkt);
-  }
-}
-
 int MediaPlayer::readVideo(uint8_t *buffer, int bufferSize) {
-  fillQueues();
   AVPacket *pkt = nullptr;
   if (m_videoPackets.pop(pkt)) {
     int ret = m_videoDecoder.decode(pkt, buffer, bufferSize);
@@ -142,71 +122,22 @@ void MediaPlayer::play() {
   std::unique_lock<std::mutex> lock(m_mutex);
   if (m_running) {
     m_paused = false;
-    m_output->resume();
+    if (m_output)
+      m_output->resume();
     m_cv.notify_all();
     return;
   }
   m_stopRequested = false;
   m_paused = false;
   m_running = true;
-  m_output->resume();
-  m_playThread = std::thread([this]() {
-    m_startTime = av_gettime() / 1000000.0;
-    const int videoBufferSize =
-        m_videoStream >= 0 ? av_image_get_buffer_size(AV_PIX_FMT_RGBA, m_videoDecoder.width(),
-                                                      m_videoDecoder.height(), 1)
-                           : 0;
-    std::vector<uint8_t> videoBuffer(videoBufferSize);
-    uint8_t audioBuffer[4096];
-    while (true) {
-      {
-        std::unique_lock<std::mutex> tlock(m_mutex);
-        m_cv.wait(tlock, [this]() { return !m_paused || m_stopRequested; });
-        if (m_stopRequested)
-          break;
-      }
-
-      fillQueues();
-
-      bool handled = false;
-      AVPacket *pkt = nullptr;
-      if (m_audioPackets.pop(pkt)) {
-        int bytes = m_audioDecoder.decode(pkt, audioBuffer, sizeof(audioBuffer));
-        av_packet_free(&pkt);
-        if (bytes > 0 && m_output) {
-          m_audioClock = m_audioDecoder.lastPts();
-          m_output->write(audioBuffer, bytes);
-        }
-        handled = true;
-      }
-
-      if (m_videoPackets.pop(pkt)) {
-        int bytes = m_videoDecoder.decode(pkt, videoBuffer.data(), videoBufferSize);
-        av_packet_free(&pkt);
-        if (bytes > 0 && m_videoOutput) {
-          m_videoClock = m_videoDecoder.lastPts();
-          double master =
-              m_audioStream >= 0 ? m_audioClock : (av_gettime() / 1000000.0 - m_startTime);
-          double delay = m_videoClock - master;
-          if (delay > 0)
-            std::this_thread::sleep_for(std::chrono::duration<double>(delay));
-          m_videoOutput->displayFrame(videoBuffer.data(), m_videoDecoder.width() * 4);
-        }
-        handled = true;
-      }
-
-      if (!handled) {
-        if (m_eof)
-          break;
-        std::this_thread::sleep_for(std::chrono::milliseconds(10));
-      }
-    }
-    if (m_output)
-      m_output->shutdown();
-    if (m_videoOutput)
-      m_videoOutput->shutdown();
-    m_running = false;
-  });
+  if (m_output)
+    m_output->resume();
+  m_startTime = av_gettime() / 1000000.0;
+  m_demuxThread = std::thread(&MediaPlayer::demuxLoop, this);
+  if (m_audioStream >= 0)
+    m_audioThread = std::thread(&MediaPlayer::audioLoop, this);
+  if (m_videoStream >= 0)
+    m_videoThread = std::thread(&MediaPlayer::videoLoop, this);
 }
 
 void MediaPlayer::pause() {
@@ -227,14 +158,19 @@ void MediaPlayer::stop() {
     m_paused = false;
     m_cv.notify_all();
   }
-  if (m_playThread.joinable())
-    m_playThread.join();
+  if (m_demuxThread.joinable())
+    m_demuxThread.join();
+  if (m_audioThread.joinable())
+    m_audioThread.join();
+  if (m_videoThread.joinable())
+    m_videoThread.join();
   if (m_output)
     m_output->shutdown();
   if (m_videoOutput)
     m_videoOutput->shutdown();
   m_audioPackets.clear();
   m_videoPackets.clear();
+  m_running = false;
 }
 
 void MediaPlayer::seek(double seconds) {
@@ -246,6 +182,85 @@ void MediaPlayer::seek(double seconds) {
   m_videoDecoder.flush();
   m_audioClock = seconds;
   m_videoClock = seconds;
+}
+
+void MediaPlayer::demuxLoop() {
+  AVPacket pkt;
+  while (true) {
+    if (m_stopRequested)
+      break;
+    if (m_audioPackets.full() && m_videoPackets.full()) {
+      std::this_thread::sleep_for(std::chrono::milliseconds(10));
+      continue;
+    }
+    if (av_read_frame(m_formatCtx, &pkt) < 0) {
+      m_eof = true;
+      break;
+    }
+    if (pkt.stream_index == m_audioStream && !m_audioPackets.full()) {
+      m_audioPackets.push(&pkt);
+    } else if (pkt.stream_index == m_videoStream && !m_videoPackets.full()) {
+      m_videoPackets.push(&pkt);
+    }
+    av_packet_unref(&pkt);
+  }
+}
+
+void MediaPlayer::audioLoop() {
+  uint8_t audioBuffer[4096];
+  while (true) {
+    {
+      std::unique_lock<std::mutex> lock(m_mutex);
+      m_cv.wait(lock, [this]() { return (!m_paused && !m_stopRequested) || m_stopRequested; });
+      if (m_stopRequested && m_audioPackets.size() == 0)
+        break;
+    }
+    AVPacket *pkt = nullptr;
+    if (m_audioPackets.pop(pkt)) {
+      int bytes = m_audioDecoder.decode(pkt, audioBuffer, sizeof(audioBuffer));
+      av_packet_free(&pkt);
+      if (bytes > 0 && m_output) {
+        m_audioClock = m_audioDecoder.lastPts();
+        m_output->write(audioBuffer, bytes);
+      }
+    } else if (m_eof) {
+      break;
+    } else {
+      std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    }
+  }
+}
+
+void MediaPlayer::videoLoop() {
+  const int videoBufferSize =
+      av_image_get_buffer_size(AV_PIX_FMT_RGBA, m_videoDecoder.width(), m_videoDecoder.height(), 1);
+  std::vector<uint8_t> videoBuffer(videoBufferSize);
+  while (true) {
+    {
+      std::unique_lock<std::mutex> lock(m_mutex);
+      m_cv.wait(lock, [this]() { return (!m_paused && !m_stopRequested) || m_stopRequested; });
+      if (m_stopRequested && m_videoPackets.size() == 0)
+        break;
+    }
+    AVPacket *pkt = nullptr;
+    if (m_videoPackets.pop(pkt)) {
+      int bytes = m_videoDecoder.decode(pkt, videoBuffer.data(), videoBufferSize);
+      av_packet_free(&pkt);
+      if (bytes > 0 && m_videoOutput) {
+        m_videoClock = m_videoDecoder.lastPts();
+        double master =
+            m_audioStream >= 0 ? m_audioClock : (av_gettime() / 1000000.0 - m_startTime);
+        double delay = m_videoClock - master;
+        if (delay > 0)
+          std::this_thread::sleep_for(std::chrono::duration<double>(delay));
+        m_videoOutput->displayFrame(videoBuffer.data(), m_videoDecoder.width() * 4);
+      }
+    } else if (m_eof) {
+      break;
+    } else {
+      std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    }
+  }
 }
 
 } // namespace mediaplayer
