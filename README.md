@@ -29,10 +29,13 @@ cmake .. -DCMAKE_BUILD_TYPE=Release
 make
 ```
 
-This will build the `mediaplayer_core` library defined in `src/core`.
-The core library now links with FFmpeg and can open media files using
-`avformat_open_input`. It also builds `mediaplayer_subtitles`, a small
-library providing SRT subtitle parsing.
+This will build the `mediaplayer_core` library defined in `src/core`,
+`mediaplayer_subtitles` for SRT parsing and the
+`mediaplayer_conversion` library in `src/format_conversion`.
+The core library links with FFmpeg and can open media files using
+`avformat_open_input`. The conversion module provides a simple API to
+convert audio files between formats while the subtitles module parses
+SRT files.
 
 ## Continuous Integration
 

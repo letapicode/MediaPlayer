@@ -7,4 +7,6 @@ add_subdirectory(src/library)
 
 add_subdirectory(src/subtitles)
 
+add_subdirectory(src/format_conversion)
+
 # Optionally add other modules later
