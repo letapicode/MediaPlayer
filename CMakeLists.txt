@@ -1,8 +1,9 @@
-cmake_minimum_required(VERSION 3.15)
-project(MediaPlayer LANGUAGES CXX)
+cmake_minimum_required(VERSION 3.15) project(MediaPlayer LANGUAGES CXX)
 
-add_subdirectory(src/core)
+    add_subdirectory(src / core)
 
-add_subdirectory(src/library)
+        add_subdirectory(src / library)
 
-# Optionally add other modules later
+#Format conversion utilities
+            add_subdirectory(src / format_conversion)
+#Optionally add other modules later

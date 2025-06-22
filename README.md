@@ -1,4 +1,4 @@
-# MediaPlayer
+#MediaPlayer
 
 MediaPlayer is an open-source, cross-platform AI-enabled media player focused on speed and a polished user experience.
 High level design is described in [Masterplan.MD](Masterplan.MD) and a breakdown of work items is in [Tasks.MD](Tasks.MD).
@@ -23,15 +23,17 @@ A detailed breakdown of planned modules and tasks can be found in [Tasks.MD](Tas
 - Qt 6 development files
 
 ```
-# Example build steps
+#Example build steps
 mkdir build && cd build
 cmake .. -DCMAKE_BUILD_TYPE=Release
 make
 ```
 
-This will build the `mediaplayer_core` library defined in `src/core`.
-The core library now links with FFmpeg and can open media files using
-`avformat_open_input`.
+This will build the `mediaplayer_core` library defined in `src/core` and the
+`mediaplayer_conversion` library in `src/format_conversion`.
+The core library links with FFmpeg and can open media files using
+`avformat_open_input`. The conversion module provides a simple API to convert
+audio files between formats.
 
 ## Continuous Integration
 
