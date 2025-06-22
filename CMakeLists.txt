@@ -5,4 +5,6 @@ add_subdirectory(src/core)
 
 add_subdirectory(src/library)
 
+add_subdirectory(src/subtitles)
+
 # Optionally add other modules later

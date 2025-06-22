@@ -31,7 +31,8 @@ make
 
 This will build the `mediaplayer_core` library defined in `src/core`.
 The core library now links with FFmpeg and can open media files using
-`avformat_open_input`.
+`avformat_open_input`. It also builds `mediaplayer_subtitles`, a small
+library providing SRT subtitle parsing.
 
 ## Continuous Integration
 

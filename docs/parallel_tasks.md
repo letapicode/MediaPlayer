@@ -42,7 +42,7 @@
 | 36 | YouTube Integration (Optional) | open | relevant |
 | 37 | Streaming Protocols (HLS/DASH) | open | relevant |
 | 38 | Internet Radio Streams | open | relevant |
-| 39 | Subtitle Parser (SRT) | open | relevant |
+| 39 | Subtitle Parser (SRT) | done | relevant |
 | 40 | Subtitle Renderer/Provider | open | relevant |
 | 41 | Subtitle Sync Adjustment | open | relevant |
 | 42 | Subtitle Track Selection | open | relevant |
