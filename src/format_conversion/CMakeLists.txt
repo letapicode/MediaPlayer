@@ -1,19 +1,14 @@
-add_library(mediaplayer_conversion
-    src/AudioConverter.cpp
-)
+add_library(mediaplayer_conversion src / AudioConverter.cpp src / VideoConverter.cpp)
 
-find_package(PkgConfig)
-pkg_check_modules(FFMPEG REQUIRED IMPORTED_TARGET libavformat libavcodec libavutil libswresample)
+    find_package(PkgConfig) pkg_check_modules(
+        FFMPEG REQUIRED IMPORTED_TARGET libavformat libavcodec libavutil libswresample libswscale)
 
-target_include_directories(mediaplayer_conversion PUBLIC
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-    $<INSTALL_INTERFACE:include>
-    ${FFMPEG_INCLUDE_DIRS}
-)
+        target_include_directories(
+            mediaplayer_conversion PUBLIC $<BUILD_INTERFACE : ${CMAKE_CURRENT_SOURCE_DIR} / include>
+                $<INSTALL_INTERFACE : include>
+                    ${FFMPEG_INCLUDE_DIRS})
 
-target_link_libraries(mediaplayer_conversion PkgConfig::FFMPEG)
+            target_link_libraries(mediaplayer_conversion PkgConfig::FFMPEG)
 
-set_target_properties(mediaplayer_conversion PROPERTIES
-    CXX_STANDARD 17
-    CXX_STANDARD_REQUIRED ON
-)
+                set_target_properties(
+                    mediaplayer_conversion PROPERTIES CXX_STANDARD 17 CXX_STANDARD_REQUIRED ON)
