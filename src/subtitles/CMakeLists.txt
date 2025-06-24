@@ -1,5 +1,6 @@
 add_library(mediaplayer_subtitles
     src/SrtParser.cpp
+    src/SubtitleProvider.cpp
 )
 
 target_include_directories(mediaplayer_subtitles PUBLIC
