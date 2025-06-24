@@ -42,6 +42,8 @@ SRT files.
 All pushes and pull requests are built using GitHub Actions. The workflow
 config in `.github/workflows/build.yml` compiles the project on Linux,
 Windows and macOS with CMake to ensure the code builds across platforms.
+The CI defines `SKIP_OFFLINE_TESTS=true` so optional tests that require
+network access won't run in restricted environments.
 
 ## Usage
 
