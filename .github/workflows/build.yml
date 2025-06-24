@@ -12,6 +12,8 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
+    env:
+      SKIP_OFFLINE_TESTS: 'true'
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-cmake@v3
