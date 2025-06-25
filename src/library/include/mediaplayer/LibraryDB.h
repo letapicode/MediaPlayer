@@ -16,6 +16,17 @@ public:
   bool initSchema();
   bool scanDirectory(const std::string &directory);
 
+  // Insert a media entry directly. Useful for tests or manual additions.
+  bool addMedia(const std::string &path, const std::string &title, const std::string &artist,
+                const std::string &album);
+
+  // Update metadata for an existing media entry identified by path.
+  bool updateMedia(const std::string &path, const std::string &title, const std::string &artist,
+                   const std::string &album);
+
+  // Remove a media item from the database by path.
+  bool removeMedia(const std::string &path);
+
 private:
   bool insertMedia(const std::string &path, const std::string &title, const std::string &artist,
                    const std::string &album);
