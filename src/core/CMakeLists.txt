@@ -9,7 +9,13 @@ add_library(mediaplayer_core
 )
 
 find_package(PkgConfig)
-pkg_check_modules(FFMPEG REQUIRED IMPORTED_TARGET libavformat libavcodec libavutil libswresample libswscale)
+pkg_check_modules(FFMPEG REQUIRED IMPORTED_TARGET
+    libavformat
+    libavcodec
+    libavutil
+    libswresample
+    libswscale
+)
 pkg_check_modules(TAGLIB REQUIRED IMPORTED_TARGET taglib)
 find_package(OpenGL REQUIRED)
 find_package(glfw3 REQUIRED)
