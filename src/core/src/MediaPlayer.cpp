@@ -15,7 +15,11 @@ namespace mediaplayer {
 MediaPlayer::MediaPlayer() {
   avformat_network_init();
   m_output = std::make_unique<NullAudioOutput>();
+#ifdef MEDIAPLAYER_DESKTOP
+  m_videoOutput = std::make_unique<OpenGLVideoOutput>();
+#else
   m_videoOutput = std::make_unique<NullVideoOutput>();
+#endif
   m_eof = false;
 }
 

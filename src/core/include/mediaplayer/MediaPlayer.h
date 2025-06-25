@@ -9,6 +9,7 @@
 #include "MediaMetadata.h"
 #include "NullAudioOutput.h"
 #include "NullVideoOutput.h"
+#include "OpenGLVideoOutput.h"
 #include "PacketQueue.h"
 #include "PlaybackCallbacks.h"
 #include "PlaylistManager.h"

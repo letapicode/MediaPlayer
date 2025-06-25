@@ -21,6 +21,7 @@ A detailed breakdown of planned modules and tasks can be found in [Tasks.MD](Tas
 - Compiler with C++17 support
 - FFmpeg development libraries
 - Qt 6 development files
+- OpenGL headers and GLFW 3
 
 ```
 # Example build steps
