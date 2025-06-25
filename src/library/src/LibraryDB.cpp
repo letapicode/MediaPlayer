@@ -1,6 +1,7 @@
 #include "mediaplayer/LibraryDB.h"
 #include <filesystem>
 #include <iostream>
+#include <libavformat/avformat.h>
 #include <taglib/fileref.h>
 #include <taglib/tag.h>
 
@@ -32,6 +33,9 @@ bool LibraryDB::initSchema() {
                     "title TEXT,"
                     "artist TEXT,"
                     "album TEXT,"
+                    "duration INTEGER DEFAULT 0,"
+                    "width INTEGER DEFAULT 0,"
+                    "height INTEGER DEFAULT 0,"
                     "play_count INTEGER DEFAULT 0,"
                     "last_played INTEGER"
                     ");";
@@ -45,9 +49,11 @@ bool LibraryDB::initSchema() {
 }
 
 bool LibraryDB::insertMedia(const std::string &path, const std::string &title,
-                            const std::string &artist, const std::string &album) {
-  const char *sql = "INSERT OR IGNORE INTO MediaItem (path, title, artist, album)"
-                    " VALUES (?1, ?2, ?3, ?4);";
+                            const std::string &artist, const std::string &album, int duration,
+                            int width, int height) {
+  const char *sql =
+      "INSERT OR IGNORE INTO MediaItem (path, title, artist, album, duration, width, height)"
+      " VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7);";
   sqlite3_stmt *stmt = nullptr;
   if (sqlite3_prepare_v2(m_db, sql, -1, &stmt, nullptr) != SQLITE_OK) {
     return false;
@@ -56,6 +62,9 @@ bool LibraryDB::insertMedia(const std::string &path, const std::string &title,
   sqlite3_bind_text(stmt, 2, title.c_str(), -1, SQLITE_TRANSIENT);
   sqlite3_bind_text(stmt, 3, artist.c_str(), -1, SQLITE_TRANSIENT);
   sqlite3_bind_text(stmt, 4, album.c_str(), -1, SQLITE_TRANSIENT);
+  sqlite3_bind_int(stmt, 5, duration);
+  sqlite3_bind_int(stmt, 6, width);
+  sqlite3_bind_int(stmt, 7, height);
   bool ok = sqlite3_step(stmt) == SQLITE_DONE;
   sqlite3_finalize(stmt);
   return ok;
@@ -76,7 +85,27 @@ bool LibraryDB::scanDirectory(const std::string &directory) {
       std::string album = f.tag()->album().to8Bit(true);
       if (title.empty())
         title = entry.path().filename().string();
-      insertMedia(pathStr, title, artist, album);
+
+      int duration = 0;
+      int width = 0;
+      int height = 0;
+      AVFormatContext *ctx = nullptr;
+      if (avformat_open_input(&ctx, pathStr.c_str(), nullptr, nullptr) == 0) {
+        if (avformat_find_stream_info(ctx, nullptr) >= 0) {
+          if (ctx->duration > 0)
+            duration = static_cast<int>(ctx->duration / AV_TIME_BASE);
+          for (unsigned i = 0; i < ctx->nb_streams; ++i) {
+            AVStream *st = ctx->streams[i];
+            if (st->codecpar->codec_type == AVMEDIA_TYPE_VIDEO) {
+              width = st->codecpar->width;
+              height = st->codecpar->height;
+              break;
+            }
+          }
+        }
+        avformat_close_input(&ctx);
+      }
+      insertMedia(pathStr, title, artist, album, duration, width, height);
     }
   }
   return true;
@@ -86,7 +115,7 @@ bool LibraryDB::addMedia(const std::string &path, const std::string &title,
                          const std::string &artist, const std::string &album) {
   if (!m_db)
     return false;
-  return insertMedia(path, title, artist, album);
+  return insertMedia(path, title, artist, album, 0, 0, 0);
 }
 
 bool LibraryDB::updateMedia(const std::string &path, const std::string &title,
