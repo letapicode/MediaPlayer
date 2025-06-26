@@ -115,6 +115,7 @@ bool MediaPlayer::open(const std::string &path) {
   m_audioPackets.clear();
   m_videoPackets.clear();
   m_eof = false;
+  m_playRecorded = false;
   std::cout << "Opened " << path << '\n';
   return true;
 }
@@ -162,6 +163,11 @@ void MediaPlayer::setVideoOutput(std::unique_ptr<VideoOutput> output) {
   m_videoOutput = std::move(output);
 }
 
+void MediaPlayer::setLibrary(LibraryDB *db) {
+  std::lock_guard<std::mutex> lock(m_mutex);
+  m_library = db;
+}
+
 void MediaPlayer::setCallbacks(PlaybackCallbacks callbacks) {
   std::lock_guard<std::mutex> lock(m_mutex);
   m_callbacks = std::move(callbacks);
@@ -201,6 +207,10 @@ void MediaPlayer::play() {
     m_audioThread = std::thread(&MediaPlayer::audioLoop, this);
   if (m_videoStream >= 0)
     m_videoThread = std::thread(&MediaPlayer::videoLoop, this);
+  if (!m_playRecorded && m_library) {
+    m_library->recordPlayback(m_metadata.path);
+    m_playRecorded = true;
+  }
   lock.unlock();
   if (m_callbacks.onPlay)
     m_callbacks.onPlay();

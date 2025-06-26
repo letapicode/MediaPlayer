@@ -68,7 +68,7 @@
 | 57 | AI Recommendations Hook | open | relevant |
 | 58 | Search Functionality | done | relevant |
 | 59 | Rating System | open | relevant |
-| 60 | Library-Core Integration | open | relevant |
+| 60 | Library-Core Integration | done | relevant |
 | 61 | Expose Library API to UI | open | relevant |
 | 62 | Threading for DB | open | relevant |
 | 63 | Smart Playlist Evaluation | open | relevant |
