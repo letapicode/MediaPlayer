@@ -62,7 +62,7 @@
 | 51 | Implement Library Scanning | done | relevant |
 | 52 | Metadata Extraction | open | relevant |
 | 53 | Update/Remove Entries | open | relevant |
-| 54 | Basic Playlist Management | open | relevant |
+| 54 | Basic Playlist Management | done | relevant |
 | 55 | Smart Playlist Criteria | open | relevant |
 | 56 | Auto Playlists (Recent, Frequent) | open | relevant |
 | 57 | AI Recommendations Hook | open | relevant |
