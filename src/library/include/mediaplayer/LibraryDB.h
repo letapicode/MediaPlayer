@@ -33,6 +33,9 @@ public:
   // string. Case-insensitive according to SQLite's LIKE operator.
   std::vector<MediaMetadata> search(const std::string &query);
 
+  // Increment play count and update last played timestamp for a media item.
+  bool recordPlayback(const std::string &path);
+
 private:
   bool insertMedia(const std::string &path, const std::string &title, const std::string &artist,
                    const std::string &album, int duration = 0, int width = 0, int height = 0);

@@ -6,6 +6,7 @@
 
 #include "AudioDecoder.h"
 #include "AudioOutput.h"
+#include "LibraryDB.h"
 #include "MediaMetadata.h"
 #include "NullAudioOutput.h"
 #include "NullVideoOutput.h"
@@ -41,6 +42,7 @@ public:
   void setAudioOutput(std::unique_ptr<AudioOutput> output);
   void setVideoOutput(std::unique_ptr<VideoOutput> output);
   void setCallbacks(PlaybackCallbacks callbacks);
+  void setLibrary(LibraryDB *db);
   void setVolume(double volume); // 0.0 - 1.0
   double volume() const;
   double position() const; // seconds
@@ -75,6 +77,8 @@ private:
   bool m_eof{false};
   PlaybackCallbacks m_callbacks;
   PlaylistManager m_playlist;
+  LibraryDB *m_library{nullptr};
+  bool m_playRecorded{false};
   double m_volume{1.0};
   MediaMetadata m_metadata;
 };

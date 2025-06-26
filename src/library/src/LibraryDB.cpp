@@ -183,4 +183,19 @@ std::vector<MediaMetadata> LibraryDB::search(const std::string &query) {
   return results;
 }
 
+bool LibraryDB::recordPlayback(const std::string &path) {
+  if (!m_db)
+    return false;
+  const char *sql =
+      "UPDATE MediaItem SET play_count = play_count + 1, last_played = ?2 WHERE path=?1;";
+  sqlite3_stmt *stmt = nullptr;
+  if (sqlite3_prepare_v2(m_db, sql, -1, &stmt, nullptr) != SQLITE_OK)
+    return false;
+  sqlite3_bind_text(stmt, 1, path.c_str(), -1, SQLITE_TRANSIENT);
+  sqlite3_bind_int64(stmt, 2, static_cast<sqlite3_int64>(time(nullptr)));
+  bool ok = sqlite3_step(stmt) == SQLITE_DONE;
+  sqlite3_finalize(stmt);
+  return ok;
+}
+
 } // namespace mediaplayer
