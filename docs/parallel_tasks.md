@@ -67,7 +67,7 @@
 | 56 | Auto Playlists (Recent, Frequent) | open | relevant |
 | 57 | AI Recommendations Hook | open | relevant |
 | 58 | Search Functionality | done | relevant |
-| 59 | Rating System | open | relevant |
+| 59 | Rating System | done | relevant |
 | 60 | Library-Core Integration | done | relevant |
 | 61 | Expose Library API to UI | open | relevant |
 | 62 | Threading for DB | open | relevant |
