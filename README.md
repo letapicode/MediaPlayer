@@ -37,8 +37,8 @@ The core library links with FFmpeg and can open media files using
 `avformat_open_input`. The conversion module provides a simple API to
 convert audio files between formats while the subtitles module parses
 SRT files.
-The SQLite-based library tracks media metadata and updates play counts when
-items are played through the core engine.
+The SQLite-based library tracks media metadata, including an optional rating
+field, and updates play counts when items are played through the core engine.
 
 ## Continuous Integration
 

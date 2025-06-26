@@ -36,6 +36,7 @@ bool LibraryDB::initSchema() {
                     "duration INTEGER DEFAULT 0,"
                     "width INTEGER DEFAULT 0,"
                     "height INTEGER DEFAULT 0,"
+                    "rating INTEGER DEFAULT 0,"
                     "play_count INTEGER DEFAULT 0,"
                     "last_played INTEGER"
                     ");"
@@ -61,10 +62,10 @@ bool LibraryDB::initSchema() {
 
 bool LibraryDB::insertMedia(const std::string &path, const std::string &title,
                             const std::string &artist, const std::string &album, int duration,
-                            int width, int height) {
-  const char *sql =
-      "INSERT OR IGNORE INTO MediaItem (path, title, artist, album, duration, width, height)"
-      " VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7);";
+                            int width, int height, int rating) {
+  const char *sql = "INSERT OR IGNORE INTO MediaItem (path, title, artist, album, duration, width, "
+                    "height, rating)"
+                    " VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8);";
   sqlite3_stmt *stmt = nullptr;
   if (sqlite3_prepare_v2(m_db, sql, -1, &stmt, nullptr) != SQLITE_OK) {
     return false;
@@ -76,6 +77,7 @@ bool LibraryDB::insertMedia(const std::string &path, const std::string &title,
   sqlite3_bind_int(stmt, 5, duration);
   sqlite3_bind_int(stmt, 6, width);
   sqlite3_bind_int(stmt, 7, height);
+  sqlite3_bind_int(stmt, 8, rating);
   bool ok = sqlite3_step(stmt) == SQLITE_DONE;
   sqlite3_finalize(stmt);
   return ok;
@@ -116,7 +118,7 @@ bool LibraryDB::scanDirectory(const std::string &directory) {
         }
         avformat_close_input(&ctx);
       }
-      insertMedia(pathStr, title, artist, album, duration, width, height);
+      insertMedia(pathStr, title, artist, album, duration, width, height, 0);
     }
   }
   return true;
@@ -126,7 +128,7 @@ bool LibraryDB::addMedia(const std::string &path, const std::string &title,
                          const std::string &artist, const std::string &album) {
   if (!m_db)
     return false;
-  return insertMedia(path, title, artist, album, 0, 0, 0);
+  return insertMedia(path, title, artist, album, 0, 0, 0, 0);
 }
 
 bool LibraryDB::updateMedia(const std::string &path, const std::string &title,
@@ -328,6 +330,39 @@ std::vector<MediaMetadata> LibraryDB::playlistItems(const std::string &name) {
   }
   sqlite3_finalize(stmt);
   return items;
+}
+
+bool LibraryDB::setRating(const std::string &path, int rating) {
+  if (!m_db)
+    return false;
+  if (rating < 0)
+    rating = 0;
+  if (rating > 5)
+    rating = 5;
+  const char *sql = "UPDATE MediaItem SET rating=?2 WHERE path=?1;";
+  sqlite3_stmt *stmt = nullptr;
+  if (sqlite3_prepare_v2(m_db, sql, -1, &stmt, nullptr) != SQLITE_OK)
+    return false;
+  sqlite3_bind_text(stmt, 1, path.c_str(), -1, SQLITE_TRANSIENT);
+  sqlite3_bind_int(stmt, 2, rating);
+  bool ok = sqlite3_step(stmt) == SQLITE_DONE;
+  sqlite3_finalize(stmt);
+  return ok;
+}
+
+int LibraryDB::rating(const std::string &path) const {
+  if (!m_db)
+    return 0;
+  const char *sql = "SELECT rating FROM MediaItem WHERE path=?1;";
+  sqlite3_stmt *stmt = nullptr;
+  if (sqlite3_prepare_v2(m_db, sql, -1, &stmt, nullptr) != SQLITE_OK)
+    return 0;
+  sqlite3_bind_text(stmt, 1, path.c_str(), -1, SQLITE_TRANSIENT);
+  int r = 0;
+  if (sqlite3_step(stmt) == SQLITE_ROW)
+    r = sqlite3_column_int(stmt, 0);
+  sqlite3_finalize(stmt);
+  return r;
 }
 
 } // namespace mediaplayer

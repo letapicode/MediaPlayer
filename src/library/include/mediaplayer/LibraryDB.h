@@ -36,6 +36,10 @@ public:
   // Increment play count and update last played timestamp for a media item.
   bool recordPlayback(const std::string &path);
 
+  // Rating management (0-5). Values outside range will be clamped.
+  bool setRating(const std::string &path, int rating);
+  int rating(const std::string &path) const;
+
   // Playlist management
   bool createPlaylist(const std::string &name);
   bool deletePlaylist(const std::string &name);
@@ -45,7 +49,8 @@ public:
 
 private:
   bool insertMedia(const std::string &path, const std::string &title, const std::string &artist,
-                   const std::string &album, int duration = 0, int width = 0, int height = 0);
+                   const std::string &album, int duration = 0, int width = 0, int height = 0,
+                   int rating = 0);
   int playlistId(const std::string &name) const;
 
 private:
