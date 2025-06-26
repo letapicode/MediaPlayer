@@ -16,7 +16,12 @@ bool LibraryDB::open() {
     std::cerr << "Failed to open DB: " << sqlite3_errmsg(m_db) << '\n';
     return false;
   }
-  return initSchema();
+  if (!initSchema()) {
+    sqlite3_close(m_db);
+    m_db = nullptr;
+    return false;
+  }
+  return true;
 }
 
 void LibraryDB::close() {
