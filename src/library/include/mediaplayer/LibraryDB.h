@@ -1,8 +1,10 @@
 #ifndef MEDIAPLAYER_LIBRARYDB_H
 #define MEDIAPLAYER_LIBRARYDB_H
 
+#include "mediaplayer/MediaMetadata.h"
 #include <sqlite3.h>
 #include <string>
+#include <vector>
 
 namespace mediaplayer {
 
@@ -26,6 +28,10 @@ public:
 
   // Remove a media item from the database by path.
   bool removeMedia(const std::string &path);
+
+  // Search library for items where title, artist or album contain the query
+  // string. Case-insensitive according to SQLite's LIKE operator.
+  std::vector<MediaMetadata> search(const std::string &query);
 
 private:
   bool insertMedia(const std::string &path, const std::string &title, const std::string &artist,
