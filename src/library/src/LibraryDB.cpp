@@ -148,4 +148,39 @@ bool LibraryDB::removeMedia(const std::string &path) {
   return ok;
 }
 
+std::vector<MediaMetadata> LibraryDB::search(const std::string &query) {
+  std::vector<MediaMetadata> results;
+  if (!m_db)
+    return results;
+  std::string pattern = "%" + query + "%";
+  const char *sql = "SELECT path,title,artist,album,duration,width,height FROM MediaItem "
+                    "WHERE title LIKE ?1 OR artist LIKE ?1 OR album LIKE ?1 ORDER BY title;";
+  sqlite3_stmt *stmt = nullptr;
+  if (sqlite3_prepare_v2(m_db, sql, -1, &stmt, nullptr) != SQLITE_OK)
+    return results;
+  sqlite3_bind_text(stmt, 1, pattern.c_str(), -1, SQLITE_TRANSIENT);
+  while (sqlite3_step(stmt) == SQLITE_ROW) {
+    MediaMetadata m{};
+    const unsigned char *txt = nullptr;
+    txt = sqlite3_column_text(stmt, 0);
+    if (txt)
+      m.path = reinterpret_cast<const char *>(txt);
+    txt = sqlite3_column_text(stmt, 1);
+    if (txt)
+      m.title = reinterpret_cast<const char *>(txt);
+    txt = sqlite3_column_text(stmt, 2);
+    if (txt)
+      m.artist = reinterpret_cast<const char *>(txt);
+    txt = sqlite3_column_text(stmt, 3);
+    if (txt)
+      m.album = reinterpret_cast<const char *>(txt);
+    m.duration = sqlite3_column_int(stmt, 4);
+    m.width = sqlite3_column_int(stmt, 5);
+    m.height = sqlite3_column_int(stmt, 6);
+    results.push_back(std::move(m));
+  }
+  sqlite3_finalize(stmt);
+  return results;
+}
+
 } // namespace mediaplayer

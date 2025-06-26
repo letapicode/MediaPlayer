@@ -13,6 +13,7 @@ target_include_directories(mediaplayer_library PUBLIC
     ${SQLITE3_INCLUDE_DIRS}
     ${TAGLIB_INCLUDE_DIRS}
     ${FFMPEG_INCLUDE_DIRS}
+    ${CMAKE_SOURCE_DIR}/src/core/include
 )
 
 target_link_libraries(mediaplayer_library

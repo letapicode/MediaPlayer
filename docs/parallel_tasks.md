@@ -66,7 +66,7 @@
 | 55 | Smart Playlist Criteria | open | relevant |
 | 56 | Auto Playlists (Recent, Frequent) | open | relevant |
 | 57 | AI Recommendations Hook | open | relevant |
-| 58 | Search Functionality | open | relevant |
+| 58 | Search Functionality | done | relevant |
 | 59 | Rating System | open | relevant |
 | 60 | Library-Core Integration | open | relevant |
 | 61 | Expose Library API to UI | open | relevant |
