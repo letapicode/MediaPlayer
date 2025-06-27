@@ -1,9 +1,12 @@
 #include "mediaplayer/MediaPlayer.h"
-#ifdef __APPLE__
+#ifdef _WIN32
+#include "mediaplayer/AudioOutputWASAPI.h"
+#elif defined(__APPLE__)
 #include "mediaplayer/AudioOutputCoreAudio.h"
 #elif defined(__linux__)
 #include "mediaplayer/AudioOutputPulse.h"
 #endif
+#include "mediaplayer/NetworkStream.h"
 #include <chrono>
 #include <cstdint>
 #include <filesystem>
@@ -19,7 +22,9 @@ namespace mediaplayer {
 
 MediaPlayer::MediaPlayer() {
   avformat_network_init();
-#ifdef __APPLE__
+#ifdef _WIN32
+  m_output = std::make_unique<AudioOutputWASAPI>();
+#elif defined(__APPLE__)
   m_output = std::make_unique<AudioOutputCoreAudio>();
 #elif defined(__linux__)
   m_output = std::make_unique<AudioOutputPulse>();
@@ -47,13 +52,23 @@ MediaPlayer::~MediaPlayer() {
   avformat_network_deinit();
 }
 
+static bool isUrl(const std::string &path) {
+  return path.rfind("http://", 0) == 0 || path.rfind("https://", 0) == 0;
+}
+
 bool MediaPlayer::open(const std::string &path) {
   if (m_formatCtx) {
     avformat_close_input(&m_formatCtx);
     m_audioStream = -1;
     m_videoStream = -1;
   }
-  if (avformat_open_input(&m_formatCtx, path.c_str(), nullptr, nullptr) < 0) {
+  if (isUrl(path)) {
+    NetworkStream stream;
+    if (!stream.open(path)) {
+      return false;
+    }
+    m_formatCtx = stream.release();
+  } else if (avformat_open_input(&m_formatCtx, path.c_str(), nullptr, nullptr) < 0) {
     std::cerr << "Failed to open media: " << path << '\n';
     return false;
   }
@@ -108,16 +123,18 @@ bool MediaPlayer::open(const std::string &path) {
   tag = av_dict_get(m_formatCtx->metadata, "album", nullptr, 0);
   if (tag && tag->value)
     m_metadata.album = tag->value;
-  TagLib::FileRef f(path.c_str());
-  if (!f.isNull() && f.tag()) {
-    if (m_metadata.title.empty())
-      m_metadata.title = f.tag()->title().to8Bit(true);
-    if (m_metadata.artist.empty())
-      m_metadata.artist = f.tag()->artist().to8Bit(true);
-    if (m_metadata.album.empty())
-      m_metadata.album = f.tag()->album().to8Bit(true);
-    if (f.audioProperties() && m_metadata.duration == 0.0)
-      m_metadata.duration = f.audioProperties()->length();
+  if (!isUrl(path)) {
+    TagLib::FileRef f(path.c_str());
+    if (!f.isNull() && f.tag()) {
+      if (m_metadata.title.empty())
+        m_metadata.title = f.tag()->title().to8Bit(true);
+      if (m_metadata.artist.empty())
+        m_metadata.artist = f.tag()->artist().to8Bit(true);
+      if (m_metadata.album.empty())
+        m_metadata.album = f.tag()->album().to8Bit(true);
+      if (f.audioProperties() && m_metadata.duration == 0.0)
+        m_metadata.duration = f.audioProperties()->length();
+    }
   }
   if (m_metadata.title.empty())
     m_metadata.title = std::filesystem::path(path).filename().string();

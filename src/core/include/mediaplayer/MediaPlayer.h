@@ -8,6 +8,7 @@
 #include "AudioOutput.h"
 #include "LibraryDB.h"
 #include "MediaMetadata.h"
+#include "NetworkStream.h"
 #include "NullAudioOutput.h"
 #include "NullVideoOutput.h"
 #include "OpenGLVideoOutput.h"
