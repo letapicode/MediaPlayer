@@ -3,7 +3,6 @@ add_library(mediaplayer_core
     src/AudioDecoder.cpp
     src/VideoDecoder.cpp
     src/PlaylistManager.cpp
-    src/AudioOutputPulse.cpp
     src/PacketQueue.cpp
     src/OpenGLVideoOutput.cpp
 )
@@ -26,18 +25,24 @@ target_include_directories(mediaplayer_core PUBLIC
     ${FFMPEG_INCLUDE_DIRS}
     ${TAGLIB_INCLUDE_DIRS}
 )
-
-find_library(PULSE_SIMPLE_LIB pulse-simple)
-find_library(PULSE_LIB pulse)
-
 target_link_libraries(mediaplayer_core
     PkgConfig::FFMPEG
     PkgConfig::TAGLIB
     OpenGL::GL
     glfw
-    ${PULSE_SIMPLE_LIB}
-    ${PULSE_LIB}
 )
+
+if (WIN32)
+  target_sources(mediaplayer_core PRIVATE src/AudioOutputWASAPI.cpp)
+  target_link_libraries(mediaplayer_core ole32)
+else()
+  target_sources(mediaplayer_core PRIVATE src/AudioOutputPulse.cpp)
+  find_library(PULSE_SIMPLE_LIB pulse-simple)
+  find_library(PULSE_LIB pulse)
+  target_link_libraries(mediaplayer_core ${PULSE_SIMPLE_LIB} ${PULSE_LIB})
+endif()
+
+
 
 set_target_properties(mediaplayer_core PROPERTIES
     CXX_STANDARD 17

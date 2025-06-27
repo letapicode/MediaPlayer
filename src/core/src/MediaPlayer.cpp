@@ -12,9 +12,16 @@
 
 namespace mediaplayer {
 
+#ifdef _WIN32
+#define DEFAULT_AUDIO_OUTPUT std::make_unique<AudioOutputWASAPI>()
+#else
+#define DEFAULT_AUDIO_OUTPUT std::make_unique<NullAudioOutput>()
+#endif
+
 MediaPlayer::MediaPlayer() {
   avformat_network_init();
-  m_output = std::make_unique<NullAudioOutput>();
+  m_output = DEFAULT_AUDIO_OUTPUT;
+#undef DEFAULT_AUDIO_OUTPUT
 #ifdef MEDIAPLAYER_DESKTOP
   m_videoOutput = std::make_unique<OpenGLVideoOutput>();
 #else

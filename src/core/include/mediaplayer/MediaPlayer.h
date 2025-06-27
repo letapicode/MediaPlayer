@@ -9,6 +9,9 @@
 #include "LibraryDB.h"
 #include "MediaMetadata.h"
 #include "NullAudioOutput.h"
+#ifdef _WIN32
+#include "AudioOutputWASAPI.h"
+#endif
 #include "NullVideoOutput.h"
 #include "OpenGLVideoOutput.h"
 #include "PacketQueue.h"
