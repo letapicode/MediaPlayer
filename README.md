@@ -23,6 +23,9 @@ A detailed breakdown of planned modules and tasks can be found in [Tasks.MD](Tas
 - Qt 6 development files
 - OpenGL headers and GLFW 3
 
+See [docs/building.md](docs/building.md) for a complete build walkthrough,
+including how to compile the sample test programs.
+
 ```
 # Example build steps
 mkdir build && cd build
