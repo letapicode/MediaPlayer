@@ -1,4 +1,5 @@
 #include "mediaplayer/MediaPlayer.h"
+#include "mediaplayer/NetworkStream.h"
 #include <chrono>
 #include <cstdint>
 #include <filesystem>
@@ -36,13 +37,23 @@ MediaPlayer::~MediaPlayer() {
   avformat_network_deinit();
 }
 
+static bool isUrl(const std::string &path) {
+  return path.rfind("http://", 0) == 0 || path.rfind("https://", 0) == 0;
+}
+
 bool MediaPlayer::open(const std::string &path) {
   if (m_formatCtx) {
     avformat_close_input(&m_formatCtx);
     m_audioStream = -1;
     m_videoStream = -1;
   }
-  if (avformat_open_input(&m_formatCtx, path.c_str(), nullptr, nullptr) < 0) {
+  if (isUrl(path)) {
+    NetworkStream stream;
+    if (!stream.open(path)) {
+      return false;
+    }
+    m_formatCtx = stream.release();
+  } else if (avformat_open_input(&m_formatCtx, path.c_str(), nullptr, nullptr) < 0) {
     std::cerr << "Failed to open media: " << path << '\n';
     return false;
   }
@@ -97,19 +108,21 @@ bool MediaPlayer::open(const std::string &path) {
   tag = av_dict_get(m_formatCtx->metadata, "album", nullptr, 0);
   if (tag && tag->value)
     m_metadata.album = tag->value;
-  TagLib::FileRef f(path.c_str());
-  if (!f.isNull() && f.tag()) {
+  if (!isUrl(path)) {
+    TagLib::FileRef f(path.c_str());
+    if (!f.isNull() && f.tag()) {
+      if (m_metadata.title.empty())
+        m_metadata.title = f.tag()->title().to8Bit(true);
+      if (m_metadata.artist.empty())
+        m_metadata.artist = f.tag()->artist().to8Bit(true);
+      if (m_metadata.album.empty())
+        m_metadata.album = f.tag()->album().to8Bit(true);
+      if (f.audioProperties() && m_metadata.duration == 0.0)
+        m_metadata.duration = f.audioProperties()->length();
+    }
     if (m_metadata.title.empty())
-      m_metadata.title = f.tag()->title().to8Bit(true);
-    if (m_metadata.artist.empty())
-      m_metadata.artist = f.tag()->artist().to8Bit(true);
-    if (m_metadata.album.empty())
-      m_metadata.album = f.tag()->album().to8Bit(true);
-    if (f.audioProperties() && m_metadata.duration == 0.0)
-      m_metadata.duration = f.audioProperties()->length();
+      m_metadata.title = std::filesystem::path(path).filename().string();
   }
-  if (m_metadata.title.empty())
-    m_metadata.title = std::filesystem::path(path).filename().string();
   m_audioClock = 0.0;
   m_videoClock = 0.0;
   m_audioPackets.clear();

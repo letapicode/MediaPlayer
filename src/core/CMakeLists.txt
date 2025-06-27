@@ -33,6 +33,7 @@ find_library(PULSE_LIB pulse)
 target_link_libraries(mediaplayer_core
     PkgConfig::FFMPEG
     PkgConfig::TAGLIB
+    mediaplayer_network
     OpenGL::GL
     glfw
     ${PULSE_SIMPLE_LIB}
