@@ -34,8 +34,8 @@ void AudioOutputPulse::shutdown() {
 int AudioOutputPulse::write(const uint8_t *data, int len) {
   if (!m_pa || m_paused)
     return 0;
-  int error = pa_simple_write(m_pa, data, static_cast<size_t>(len), nullptr);
-  if (error < 0) {
+  int error = 0;
+  if (pa_simple_write(m_pa, data, static_cast<size_t>(len), &error) < 0) {
     std::cerr << "PulseAudio write failed: " << pa_strerror(error) << "\n";
     return -1;
   }
