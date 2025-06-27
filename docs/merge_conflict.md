@@ -62,18 +62,18 @@ The repository occasionally receives a giant PR that contains all tasks at once,
 
 ### `pullrequest_merge_conflict.md`
 
-#### \ud83d\udccc Purpose
+#### 📌 Purpose
 
 This guide outlines the standard process to handle pull request (PR) conflicts when both a giant PR and individual task PRs are generated for the same set of tasks. It helps the AI identify and resolve merge conflicts while ensuring no functionality is lost.
 
-#### \u2705 Assumptions
+#### ✅ Assumptions
 
 * The **giant PR** includes all tasks as a single code change.
 * The **individual PRs** contain each task done separately.
 * The **giant PR is already merged** into the main branch.
 * **Merge conflicts are expected** when trying to merge individual PRs.
 
-#### \ud83e\udde0 AI Responsibilities
+#### 🧠 AI Responsibilities
 
 1. **Clone the public repository** (if access is available).
 2. **Check out the latest `main` branch**, which includes the merged giant PR.
@@ -87,7 +87,7 @@ This guide outlines the standard process to handle pull request (PR) conflicts w
    * Any improved code or logic that should be preserved.
 6. This unified task will then be handed to Codex to **regenerate one final PR** that safely integrates everything without merge conflicts.
 
-#### \ud83d\udee0\ufe0f Example Workflow
+#### 🛠️ Example Workflow
 
 1. AI sees that `main` contains the giant PR.
 2. It checks individual PRs like:
@@ -99,7 +99,7 @@ This guide outlines the standard process to handle pull request (PR) conflicts w
    * "Regenerate full code with improved error handling from `task-b` and refactor from `task-c`..."
 5. Codex now works on that one final PR.
 
-#### \ud83d\udd01 Why This Works
+#### 🔁 Why This Works
 
 * Faster initial merging (giant PR).
 * Safety net to catch missed details (individual PR comparison).
