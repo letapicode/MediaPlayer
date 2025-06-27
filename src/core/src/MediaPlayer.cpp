@@ -1,4 +1,9 @@
 #include "mediaplayer/MediaPlayer.h"
+#ifdef __APPLE__
+#include "mediaplayer/AudioOutputCoreAudio.h"
+#elif defined(__linux__)
+#include "mediaplayer/AudioOutputPulse.h"
+#endif
 #include <chrono>
 #include <cstdint>
 #include <filesystem>
@@ -14,7 +19,13 @@ namespace mediaplayer {
 
 MediaPlayer::MediaPlayer() {
   avformat_network_init();
+#ifdef __APPLE__
+  m_output = std::make_unique<AudioOutputCoreAudio>();
+#elif defined(__linux__)
+  m_output = std::make_unique<AudioOutputPulse>();
+#else
   m_output = std::make_unique<NullAudioOutput>();
+#endif
 #ifdef MEDIAPLAYER_DESKTOP
   m_videoOutput = std::make_unique<OpenGLVideoOutput>();
 #else

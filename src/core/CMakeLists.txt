@@ -1,12 +1,19 @@
-add_library(mediaplayer_core
+set(CORE_SOURCES
     src/MediaPlayer.cpp
     src/AudioDecoder.cpp
     src/VideoDecoder.cpp
     src/PlaylistManager.cpp
-    src/AudioOutputPulse.cpp
     src/PacketQueue.cpp
     src/OpenGLVideoOutput.cpp
 )
+
+if(APPLE)
+    list(APPEND CORE_SOURCES src/AudioOutputCoreAudio.mm)
+elseif(UNIX)
+    list(APPEND CORE_SOURCES src/AudioOutputPulse.cpp)
+endif()
+
+add_library(mediaplayer_core ${CORE_SOURCES})
 
 find_package(PkgConfig)
 pkg_check_modules(FFMPEG REQUIRED IMPORTED_TARGET
@@ -27,17 +34,24 @@ target_include_directories(mediaplayer_core PUBLIC
     ${TAGLIB_INCLUDE_DIRS}
 )
 
-find_library(PULSE_SIMPLE_LIB pulse-simple)
-find_library(PULSE_LIB pulse)
-
 target_link_libraries(mediaplayer_core
     PkgConfig::FFMPEG
     PkgConfig::TAGLIB
     OpenGL::GL
     glfw
-    ${PULSE_SIMPLE_LIB}
-    ${PULSE_LIB}
 )
+
+if(APPLE)
+    target_link_libraries(mediaplayer_core
+        "-framework AudioToolbox"
+        "-framework CoreAudio")
+else()
+    find_library(PULSE_SIMPLE_LIB pulse-simple)
+    find_library(PULSE_LIB pulse)
+    target_link_libraries(mediaplayer_core
+        ${PULSE_SIMPLE_LIB}
+        ${PULSE_LIB})
+endif()
 
 set_target_properties(mediaplayer_core PROPERTIES
     CXX_STANDARD 17
