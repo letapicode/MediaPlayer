@@ -6,7 +6,6 @@
 #elif defined(__linux__)
 #include "mediaplayer/AudioOutputPulse.h"
 #endif
-#include "mediaplayer/NetworkStream.h"
 #include <chrono>
 #include <cstdint>
 #include <filesystem>
@@ -36,14 +35,10 @@ MediaPlayer::MediaPlayer() {
 #else
   m_videoOutput = std::make_unique<NullVideoOutput>();
 #endif
-  m_eof = false;
 }
 
 MediaPlayer::~MediaPlayer() {
   stop();
-  if (m_formatCtx) {
-    avformat_close_input(&m_formatCtx);
-  }
   if (m_videoOutput) {
     m_videoOutput->shutdown();
   }
@@ -57,36 +52,12 @@ static bool isUrl(const std::string &path) {
 }
 
 bool MediaPlayer::open(const std::string &path) {
-  if (m_formatCtx) {
-    avformat_close_input(&m_formatCtx);
-    m_audioStream = -1;
-    m_videoStream = -1;
-  }
-  if (isUrl(path)) {
-    NetworkStream stream;
-    if (!stream.open(path)) {
-      return false;
-    }
-    m_formatCtx = stream.release();
-  } else if (avformat_open_input(&m_formatCtx, path.c_str(), nullptr, nullptr) < 0) {
-    std::cerr << "Failed to open media: " << path << '\n';
+  if (!m_demuxer.open(path)) {
     return false;
   }
-  if (avformat_find_stream_info(m_formatCtx, nullptr) < 0) {
-    std::cerr << "Failed to retrieve stream info\n";
-    avformat_close_input(&m_formatCtx);
-    return false;
-  }
-  for (unsigned i = 0; i < m_formatCtx->nb_streams; ++i) {
-    if (m_formatCtx->streams[i]->codecpar->codec_type == AVMEDIA_TYPE_AUDIO && m_audioStream < 0) {
-      m_audioStream = i;
-    } else if (m_formatCtx->streams[i]->codecpar->codec_type == AVMEDIA_TYPE_VIDEO &&
-               m_videoStream < 0) {
-      m_videoStream = i;
-    }
-  }
-  if (m_audioStream >= 0) {
-    if (!m_audioDecoder.open(m_formatCtx, m_audioStream)) {
+  AVFormatContext *fmtCtx = m_demuxer.context();
+  if (m_demuxer.audioStream() >= 0) {
+    if (!m_audioDecoder.open(fmtCtx, m_demuxer.audioStream())) {
       std::cerr << "Failed to open audio decoder\n";
       return false;
     }
@@ -95,8 +66,8 @@ bool MediaPlayer::open(const std::string &path) {
       return false;
     }
   }
-  if (m_videoStream >= 0) {
-    if (!m_videoDecoder.open(m_formatCtx, m_videoStream)) {
+  if (m_demuxer.videoStream() >= 0) {
+    if (!m_videoDecoder.open(fmtCtx, m_demuxer.videoStream())) {
       std::cerr << "Failed to open video decoder\n";
       return false;
     }
@@ -108,19 +79,19 @@ bool MediaPlayer::open(const std::string &path) {
   // Extract metadata
   m_metadata = {};
   m_metadata.path = path;
-  if (m_formatCtx->duration != AV_NOPTS_VALUE)
-    m_metadata.duration = m_formatCtx->duration / (double)AV_TIME_BASE;
-  if (m_videoStream >= 0) {
+  if (fmtCtx->duration != AV_NOPTS_VALUE)
+    m_metadata.duration = fmtCtx->duration / (double)AV_TIME_BASE;
+  if (m_demuxer.videoStream() >= 0) {
     m_metadata.width = m_videoDecoder.width();
     m_metadata.height = m_videoDecoder.height();
   }
-  AVDictionaryEntry *tag = av_dict_get(m_formatCtx->metadata, "title", nullptr, 0);
+  AVDictionaryEntry *tag = av_dict_get(fmtCtx->metadata, "title", nullptr, 0);
   if (tag && tag->value)
     m_metadata.title = tag->value;
-  tag = av_dict_get(m_formatCtx->metadata, "artist", nullptr, 0);
+  tag = av_dict_get(fmtCtx->metadata, "artist", nullptr, 0);
   if (tag && tag->value)
     m_metadata.artist = tag->value;
-  tag = av_dict_get(m_formatCtx->metadata, "album", nullptr, 0);
+  tag = av_dict_get(fmtCtx->metadata, "album", nullptr, 0);
   if (tag && tag->value)
     m_metadata.album = tag->value;
   if (!isUrl(path)) {
@@ -142,7 +113,6 @@ bool MediaPlayer::open(const std::string &path) {
   m_videoClock = 0.0;
   m_audioPackets.clear();
   m_videoPackets.clear();
-  m_eof = false;
   m_playRecorded = false;
   std::cout << "Opened " << path << '\n';
   return true;
@@ -150,7 +120,7 @@ bool MediaPlayer::open(const std::string &path) {
 
 double MediaPlayer::position() const {
   std::lock_guard<std::mutex> lock(m_mutex);
-  if (m_audioStream >= 0)
+  if (m_demuxer.audioStream() >= 0)
     return m_audioClock;
   return m_videoClock;
 }
@@ -231,9 +201,9 @@ void MediaPlayer::play() {
     m_output->resume();
   m_startTime = av_gettime() / 1000000.0;
   m_demuxThread = std::thread(&MediaPlayer::demuxLoop, this);
-  if (m_audioStream >= 0)
+  if (m_demuxer.audioStream() >= 0)
     m_audioThread = std::thread(&MediaPlayer::audioLoop, this);
-  if (m_videoStream >= 0)
+  if (m_demuxer.videoStream() >= 0)
     m_videoThread = std::thread(&MediaPlayer::videoLoop, this);
   if (!m_playRecorded && m_library) {
     m_library->recordPlayback(m_metadata.path);
@@ -282,10 +252,10 @@ void MediaPlayer::stop() {
 }
 
 void MediaPlayer::seek(double seconds) {
-  if (!m_formatCtx)
+  if (!m_demuxer.context())
     return;
   int64_t ts = static_cast<int64_t>(seconds * AV_TIME_BASE);
-  av_seek_frame(m_formatCtx, -1, ts, AVSEEK_FLAG_BACKWARD);
+  av_seek_frame(m_demuxer.context(), -1, ts, AVSEEK_FLAG_BACKWARD);
   m_audioDecoder.flush();
   m_videoDecoder.flush();
   m_audioClock = seconds;
@@ -331,15 +301,14 @@ void MediaPlayer::demuxLoop() {
       std::this_thread::sleep_for(std::chrono::milliseconds(10));
       continue;
     }
-    if (av_read_frame(m_formatCtx, &pkt) < 0) {
-      m_eof = true;
+    if (!m_demuxer.readPacket(pkt)) {
       if (m_callbacks.onFinished)
         m_callbacks.onFinished();
       break;
     }
-    if (pkt.stream_index == m_audioStream && !m_audioPackets.full()) {
+    if (pkt.stream_index == m_demuxer.audioStream() && !m_audioPackets.full()) {
       m_audioPackets.push(&pkt);
-    } else if (pkt.stream_index == m_videoStream && !m_videoPackets.full()) {
+    } else if (pkt.stream_index == m_demuxer.videoStream() && !m_videoPackets.full()) {
       m_videoPackets.push(&pkt);
     }
     av_packet_unref(&pkt);
@@ -382,7 +351,7 @@ void MediaPlayer::audioLoop() {
         if (m_callbacks.onPosition)
           m_callbacks.onPosition(m_audioClock);
       }
-    } else if (m_eof) {
+    } else if (m_demuxer.eof()) {
       break;
     } else {
       std::this_thread::sleep_for(std::chrono::milliseconds(10));
@@ -408,7 +377,7 @@ void MediaPlayer::videoLoop() {
       if (bytes > 0 && m_videoOutput) {
         m_videoClock = m_videoDecoder.lastPts();
         double master =
-            m_audioStream >= 0 ? m_audioClock : (av_gettime() / 1000000.0 - m_startTime);
+            m_demuxer.audioStream() >= 0 ? m_audioClock : (av_gettime() / 1000000.0 - m_startTime);
         double delay = m_videoClock - master;
         if (delay > 0)
           std::this_thread::sleep_for(std::chrono::duration<double>(delay));
@@ -416,7 +385,7 @@ void MediaPlayer::videoLoop() {
         if (m_callbacks.onPosition)
           m_callbacks.onPosition(m_videoClock);
       }
-    } else if (m_eof) {
+    } else if (m_demuxer.eof()) {
       break;
     } else {
       std::this_thread::sleep_for(std::chrono::milliseconds(10));

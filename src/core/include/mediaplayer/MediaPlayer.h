@@ -1,14 +1,13 @@
 #ifndef MEDIAPLAYER_MEDIAPLAYER_H
 #define MEDIAPLAYER_MEDIAPLAYER_H
 
-#include <libavformat/avformat.h>
 #include <string>
 
 #include "AudioDecoder.h"
 #include "AudioOutput.h"
 #include "LibraryDB.h"
+#include "MediaDemuxer.h"
 #include "MediaMetadata.h"
-#include "NetworkStream.h"
 #include "NullAudioOutput.h"
 #include "NullVideoOutput.h"
 #include "OpenGLVideoOutput.h"
@@ -55,7 +54,7 @@ private:
   void demuxLoop();
   void audioLoop();
   void videoLoop();
-  AVFormatContext *m_formatCtx{nullptr};
+  MediaDemuxer m_demuxer;
   AudioDecoder m_audioDecoder;
   VideoDecoder m_videoDecoder;
   std::unique_ptr<AudioOutput> m_output;
@@ -71,11 +70,8 @@ private:
   double m_videoClock{0.0};
   double m_startTime{0.0};
   bool m_stopRequested{false};
-  int m_audioStream{-1};
-  int m_videoStream{-1};
   PacketQueue m_audioPackets;
   PacketQueue m_videoPackets;
-  bool m_eof{false};
   PlaybackCallbacks m_callbacks;
   PlaylistManager m_playlist;
   LibraryDB *m_library{nullptr};
