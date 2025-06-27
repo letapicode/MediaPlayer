@@ -288,6 +288,11 @@ void MediaPlayer::seek(double seconds) {
   av_seek_frame(m_formatCtx, -1, ts, AVSEEK_FLAG_BACKWARD);
   m_audioDecoder.flush();
   m_videoDecoder.flush();
+  {
+    std::lock_guard<std::mutex> lock(m_mutex);
+    m_audioPackets.clear();
+    m_videoPackets.clear();
+  }
   m_audioClock = seconds;
   m_videoClock = seconds;
 }
