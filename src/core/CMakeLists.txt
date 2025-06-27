@@ -4,6 +4,7 @@ set(CORE_SOURCES
     src/VideoDecoder.cpp
     src/PlaylistManager.cpp
     src/PacketQueue.cpp
+    src/MediaDemuxer.cpp
     src/OpenGLVideoOutput.cpp
 )
 
