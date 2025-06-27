@@ -218,7 +218,7 @@
 
 | # | Task | Status |
 |-:|------|--------|
-| 170 | Dockerfile for Core/C++ | open | relevant |
+| 170 | Dockerfile for Core/C++ | done | Dockerfile.core added |
 | 171 | Dockerfile for Qt | open | relevant |
 | 172 | Android Build Environment | open | relevant |
 | 173 | iOS Build Setup | open | relevant |
