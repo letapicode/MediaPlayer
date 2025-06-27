@@ -9,6 +9,8 @@ set(CORE_SOURCES
 
 if(APPLE)
     list(APPEND CORE_SOURCES src/AudioOutputCoreAudio.mm)
+elseif(WIN32)
+    list(APPEND CORE_SOURCES src/AudioOutputWASAPI.cpp)
 elseif(UNIX)
     list(APPEND CORE_SOURCES src/AudioOutputPulse.cpp)
 endif()
@@ -37,6 +39,7 @@ target_include_directories(mediaplayer_core PUBLIC
 target_link_libraries(mediaplayer_core
     PkgConfig::FFMPEG
     PkgConfig::TAGLIB
+    mediaplayer_network
     OpenGL::GL
     glfw
 )
@@ -45,6 +48,8 @@ if(APPLE)
     target_link_libraries(mediaplayer_core
         "-framework AudioToolbox"
         "-framework CoreAudio")
+elseif(WIN32)
+    target_link_libraries(mediaplayer_core ole32)
 else()
     find_library(PULSE_SIMPLE_LIB pulse-simple)
     find_library(PULSE_LIB pulse)

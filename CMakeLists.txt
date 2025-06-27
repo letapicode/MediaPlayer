@@ -3,6 +3,8 @@ project(MediaPlayer LANGUAGES CXX)
 
 add_subdirectory(src/core)
 
+add_subdirectory(src/network)
+
 add_subdirectory(src/library)
 
 add_subdirectory(src/subtitles)
