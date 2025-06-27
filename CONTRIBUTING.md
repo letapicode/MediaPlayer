@@ -5,6 +5,7 @@ Thank you for your interest in improving MediaPlayer. This document outlines how
 ## 1. Environment Setup
 
 The project targets Windows, macOS, Linux, Android and iOS. Below are minimal setup instructions for each platform. The general prerequisites are a C++17 compiler, CMake, Git and FFmpeg development headers.
+For a step-by-step build example, including how to compile and run the test programs, see [docs/building.md](docs/building.md).
 
 ### Linux (Ubuntu 22.04)
 - Install development tools and libraries:
