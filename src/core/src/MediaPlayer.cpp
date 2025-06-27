@@ -224,7 +224,7 @@ void MediaPlayer::play() {
     m_cv.notify_all();
     return;
   }
-  m_stopRequested = false;
+  m_stopRequested.store(false);
   m_paused = false;
   m_running = true;
   if (m_output)
@@ -260,7 +260,7 @@ void MediaPlayer::stop() {
     std::lock_guard<std::mutex> lock(m_mutex);
     if (!m_running)
       return;
-    m_stopRequested = true;
+    m_stopRequested.store(true);
     m_paused = false;
     m_cv.notify_all();
   }
@@ -325,7 +325,7 @@ bool MediaPlayer::nextTrack() {
 void MediaPlayer::demuxLoop() {
   AVPacket pkt;
   while (true) {
-    if (m_stopRequested)
+    if (m_stopRequested.load())
       break;
     if (m_audioPackets.full() && m_videoPackets.full()) {
       std::this_thread::sleep_for(std::chrono::milliseconds(10));
@@ -351,8 +351,10 @@ void MediaPlayer::audioLoop() {
   while (true) {
     {
       std::unique_lock<std::mutex> lock(m_mutex);
-      m_cv.wait(lock, [this]() { return (!m_paused && !m_stopRequested) || m_stopRequested; });
-      if (m_stopRequested && m_audioPackets.size() == 0)
+      m_cv.wait(lock, [this]() {
+        return (!m_paused && !m_stopRequested.load()) || m_stopRequested.load();
+      });
+      if (m_stopRequested.load() && m_audioPackets.size() == 0)
         break;
     }
     AVPacket *pkt = nullptr;
@@ -397,8 +399,10 @@ void MediaPlayer::videoLoop() {
   while (true) {
     {
       std::unique_lock<std::mutex> lock(m_mutex);
-      m_cv.wait(lock, [this]() { return (!m_paused && !m_stopRequested) || m_stopRequested; });
-      if (m_stopRequested && m_videoPackets.size() == 0)
+      m_cv.wait(lock, [this]() {
+        return (!m_paused && !m_stopRequested.load()) || m_stopRequested.load();
+      });
+      if (m_stopRequested.load() && m_videoPackets.size() == 0)
         break;
     }
     AVPacket *pkt = nullptr;

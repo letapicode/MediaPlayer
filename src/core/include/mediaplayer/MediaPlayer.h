@@ -70,7 +70,7 @@ private:
   double m_audioClock{0.0};
   double m_videoClock{0.0};
   double m_startTime{0.0};
-  bool m_stopRequested{false};
+  std::atomic<bool> m_stopRequested{false};
   int m_audioStream{-1};
   int m_videoStream{-1};
   PacketQueue m_audioPackets;
