@@ -5,11 +5,11 @@ extern "C" {
 #include <libavcodec/avcodec.h>
 }
 
+#include <condition_variable>
 #include <cstddef>
+#include <functional>
 #include <mutex>
 #include <queue>
-
-#include <condition_variable>
 
 namespace mediaplayer {
 
@@ -19,7 +19,7 @@ public:
   ~PacketQueue();
 
   bool push(const AVPacket *pkt);
-  bool pop(AVPacket *&pkt);
+  bool pop(AVPacket *&pkt, const std::function<bool()> &waitPredicate = [] { return false; });
   void clear();
   size_t size() const;
   bool full() const;

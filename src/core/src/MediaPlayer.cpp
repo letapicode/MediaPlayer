@@ -356,7 +356,7 @@ void MediaPlayer::audioLoop() {
         break;
     }
     AVPacket *pkt = nullptr;
-    if (m_audioPackets.pop(pkt)) {
+    if (m_audioPackets.pop(pkt, [this]() { return m_stopRequested || m_eof; })) {
       int bytes = m_audioDecoder.decode(pkt, audioBuffer, sizeof(audioBuffer));
       av_packet_free(&pkt);
       if (bytes > 0 && m_output) {
@@ -382,10 +382,8 @@ void MediaPlayer::audioLoop() {
         if (m_callbacks.onPosition)
           m_callbacks.onPosition(m_audioClock);
       }
-    } else if (m_eof) {
-      break;
     } else {
-      std::this_thread::sleep_for(std::chrono::milliseconds(10));
+      break;
     }
   }
 }
@@ -402,7 +400,7 @@ void MediaPlayer::videoLoop() {
         break;
     }
     AVPacket *pkt = nullptr;
-    if (m_videoPackets.pop(pkt)) {
+    if (m_videoPackets.pop(pkt, [this]() { return m_stopRequested || m_eof; })) {
       int bytes = m_videoDecoder.decode(pkt, videoBuffer.data(), videoBufferSize);
       av_packet_free(&pkt);
       if (bytes > 0 && m_videoOutput) {
@@ -416,10 +414,8 @@ void MediaPlayer::videoLoop() {
         if (m_callbacks.onPosition)
           m_callbacks.onPosition(m_videoClock);
       }
-    } else if (m_eof) {
-      break;
     } else {
-      std::this_thread::sleep_for(std::chrono::milliseconds(10));
+      break;
     }
   }
 }

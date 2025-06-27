@@ -21,8 +21,9 @@ bool PacketQueue::push(const AVPacket *pkt) {
   return true;
 }
 
-bool PacketQueue::pop(AVPacket *&pkt) {
+bool PacketQueue::pop(AVPacket *&pkt, const std::function<bool()> &waitPredicate) {
   std::unique_lock<std::mutex> lock(m_mutex);
+  m_cv.wait(lock, [this, &waitPredicate]() { return !m_queue.empty() || waitPredicate(); });
   if (m_queue.empty())
     return false;
   pkt = m_queue.front();
