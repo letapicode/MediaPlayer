@@ -35,15 +35,21 @@ bool VideoDecoder::open(AVFormatContext *fmtCtx, int streamIndex) {
     return false;
   }
   if (avcodec_parameters_to_context(m_codecCtx, stream->codecpar) < 0) {
+    avcodec_free_context(&m_codecCtx);
     return false;
   }
   if (avcodec_open2(m_codecCtx, dec, nullptr) < 0) {
+    avcodec_free_context(&m_codecCtx);
     return false;
   }
   m_swsCtx =
       sws_getContext(m_codecCtx->width, m_codecCtx->height, m_codecCtx->pix_fmt, m_codecCtx->width,
                      m_codecCtx->height, AV_PIX_FMT_RGBA, SWS_BILINEAR, nullptr, nullptr, nullptr);
-  return m_swsCtx != nullptr;
+  if (!m_swsCtx) {
+    avcodec_free_context(&m_codecCtx);
+    return false;
+  }
+  return true;
 }
 
 int VideoDecoder::decode(AVPacket *pkt, uint8_t *outBuffer, int outBufferSize) {

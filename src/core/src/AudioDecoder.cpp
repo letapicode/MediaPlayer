@@ -34,16 +34,24 @@ bool AudioDecoder::open(AVFormatContext *fmtCtx, int streamIndex) {
     return false;
   }
   if (avcodec_parameters_to_context(m_codecCtx, stream->codecpar) < 0) {
+    avcodec_free_context(&m_codecCtx);
     return false;
   }
   if (avcodec_open2(m_codecCtx, dec, nullptr) < 0) {
+    avcodec_free_context(&m_codecCtx);
     return false;
   }
   m_swrCtx = swr_alloc_set_opts(nullptr, AV_CH_LAYOUT_STEREO, AV_SAMPLE_FMT_S16,
                                 m_codecCtx->sample_rate, m_codecCtx->channel_layout,
                                 m_codecCtx->sample_fmt, m_codecCtx->sample_rate, 0, nullptr);
-  if (!m_swrCtx || swr_init(m_swrCtx) < 0) {
+  if (!m_swrCtx) {
+    avcodec_free_context(&m_codecCtx);
+    return false;
+  }
+  if (swr_init(m_swrCtx) < 0) {
     std::cerr << "Failed to init resampler" << std::endl;
+    swr_free(&m_swrCtx);
+    avcodec_free_context(&m_codecCtx);
     return false;
   }
   return true;
