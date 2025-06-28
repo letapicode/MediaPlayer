@@ -2,6 +2,7 @@
 #define MEDIAPLAYER_AUDIOOUTPUTPULSE_H
 
 #include "AudioOutput.h"
+#include "RingBuffer.h"
 #include <pulse/error.h>
 #include <pulse/simple.h>
 #include <string>
@@ -26,6 +27,7 @@ private:
   pa_sample_spec m_spec{};
   bool m_paused = false;
   double m_volume{1.0};
+  RingBuffer m_buffer{16384};
 };
 
 } // namespace mediaplayer

@@ -2,6 +2,7 @@
 #define MEDIAPLAYER_AUDIOOUTPUTWASAPI_H
 
 #include "AudioOutput.h"
+#include "RingBuffer.h"
 #ifdef _WIN32
 #include <Audioclient.h>
 #include <Mmdeviceapi.h>
@@ -31,6 +32,7 @@ private:
   UINT32 m_bufferFrames{0};
   bool m_paused{false};
   double m_volume{1.0};
+  RingBuffer m_buffer{16384};
 };
 #endif
 
