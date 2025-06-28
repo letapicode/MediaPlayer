@@ -165,6 +165,8 @@ void MediaPlayer::setAudioOutput(std::unique_ptr<AudioOutput> output) {
     m_output->shutdown();
   }
   m_output = std::move(output);
+  if (m_output)
+    m_output->setVolume(m_volume);
 }
 
 void MediaPlayer::setVideoOutput(std::unique_ptr<VideoOutput> output) {
@@ -197,6 +199,8 @@ void MediaPlayer::setVolume(double volume) {
   if (volume > 1.0)
     volume = 1.0;
   m_volume = volume;
+  if (m_output)
+    m_output->setVolume(volume);
 }
 
 double MediaPlayer::volume() const {

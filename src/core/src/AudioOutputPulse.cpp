@@ -46,4 +46,14 @@ void AudioOutputPulse::pause() { m_paused = true; }
 
 void AudioOutputPulse::resume() { m_paused = false; }
 
+void AudioOutputPulse::setVolume(double volume) {
+  if (volume < 0.0)
+    volume = 0.0;
+  else if (volume > 1.0)
+    volume = 1.0;
+  m_volume = volume;
+}
+
+double AudioOutputPulse::volume() const { return m_volume; }
+
 } // namespace mediaplayer
