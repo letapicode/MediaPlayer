@@ -2,6 +2,7 @@
 #define MEDIAPLAYER_AUDIOOUTPUTANDROID_H
 
 #include "AudioOutput.h"
+#include "RingBuffer.h"
 #ifdef __ANDROID__
 #include <SLES/OpenSLES.h>
 #include <SLES/OpenSLES_Android.h>
@@ -41,6 +42,7 @@ private:
   SLPlayItf m_player{nullptr};
   SLAndroidSimpleBufferQueueItf m_bufferQueue{nullptr};
   SLVolumeItf m_volumeItf{nullptr};
+  RingBuffer m_buffer{16384};
 };
 
 } // namespace mediaplayer

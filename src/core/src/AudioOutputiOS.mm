@@ -1,8 +1,37 @@
 #include "mediaplayer/AudioOutputiOS.h"
+#include <cstring>
+#include <vector>
 
 #import <AVFoundation/AVFoundation.h>
 
 namespace mediaplayer {
+
+static const uint32_t kIOSBufferFrames = 1024;
+
+void AudioOutputiOS::scheduleNextBuffer() {
+  @autoreleasepool {
+    if (!m_player || !m_format)
+      return;
+    AVAudioFormat *format = (__bridge AVAudioFormat *)m_format;
+    uint32_t channels = format.channelCount;
+    AVAudioPCMBuffer *buffer = [[AVAudioPCMBuffer alloc] initWithPCMFormat:format
+                                                             frameCapacity:kIOSBufferFrames];
+    size_t toRead = kIOSBufferFrames * channels;
+    std::vector<int16_t> temp(toRead);
+    size_t n = m_buffer.read(temp.data(), toRead);
+    if (n < toRead)
+      std::memset(temp.data() + n, 0, (toRead - n) * sizeof(int16_t));
+    std::memcpy(buffer.int16ChannelData[0], temp.data(), toRead * sizeof(int16_t));
+    buffer.frameLength = kIOSBufferFrames;
+    __weak AudioOutputiOS *weakSelf = this;
+    [(__bridge AVAudioPlayerNode *)m_player scheduleBuffer:buffer
+                                         completionHandler:^{
+                                           AudioOutputiOS *strongSelf = weakSelf;
+                                           if (strongSelf)
+                                             strongSelf->scheduleNextBuffer();
+                                         }];
+  }
+}
 
 AudioOutputiOS::AudioOutputiOS() = default;
 
@@ -29,6 +58,8 @@ bool AudioOutputiOS::init(int sampleRate, int channels) {
     [(__bridge AVAudioPlayerNode *)m_player play];
     m_paused = false;
     m_volume = 1.0;
+    for (int i = 0; i < 4; ++i)
+      scheduleNextBuffer();
     return true;
   }
 }
@@ -54,14 +85,9 @@ int AudioOutputiOS::write(const uint8_t *data, int len) {
   @autoreleasepool {
     if (!m_engine || !m_player || m_paused)
       return 0;
-    AVAudioFormat *format = (__bridge AVAudioFormat *)m_format;
-    NSUInteger frameSize = format.streamDescription->mBytesPerFrame;
-    NSUInteger frames = len / frameSize;
-    AVAudioPCMBuffer *buffer = [[AVAudioPCMBuffer alloc] initWithPCMFormat:format
-                                                             frameCapacity:frames];
-    buffer.frameLength = frames;
-    memcpy(buffer.int16ChannelData[0], data, len);
-    [(__bridge AVAudioPlayerNode *)m_player scheduleBuffer:buffer completionHandler:nil];
+    size_t samples = static_cast<size_t>(len) / sizeof(int16_t);
+    const int16_t *input = reinterpret_cast<const int16_t *>(data);
+    m_buffer.mix(input, samples);
     return len;
   }
 }
