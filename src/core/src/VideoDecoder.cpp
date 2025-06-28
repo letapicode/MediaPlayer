@@ -83,8 +83,13 @@ bool VideoDecoder::open(AVFormatContext *fmtCtx, int streamIndex,
           break;
         }
       }
+      const char *deviceArg = nullptr;
+#if defined(__linux__) && !defined(__ANDROID__)
+      if (type == AV_HWDEVICE_TYPE_VAAPI)
+        deviceArg = "/dev/dri/renderD128";
+#endif
       if (m_hwPixFmt != AV_PIX_FMT_NONE &&
-          av_hwdevice_ctx_create(&m_hwDeviceCtx, type, nullptr, nullptr, 0) >= 0) {
+          av_hwdevice_ctx_create(&m_hwDeviceCtx, type, deviceArg, nullptr, 0) >= 0) {
         AVBufferRef *framesRef = av_hwframe_ctx_alloc(m_hwDeviceCtx);
         if (framesRef) {
           AVHWFramesContext *framesCtx = (AVHWFramesContext *)framesRef->data;

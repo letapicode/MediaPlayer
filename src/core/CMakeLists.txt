@@ -50,6 +50,23 @@ target_link_libraries(mediaplayer_core
     glfw
 )
 
+if(ENABLE_HW_DECODING)
+    if(WIN32)
+        target_link_libraries(mediaplayer_core dxva2 d3d11 dxgi)
+    elseif(APPLE)
+        target_link_libraries(mediaplayer_core
+            "-framework VideoToolbox"
+            "-framework CoreVideo")
+    elseif(ANDROID)
+        find_library(ANDROID_LOG_LIB log)
+        find_library(JNIGRAPHICS_LIB jnigraphics)
+        target_link_libraries(mediaplayer_core ${ANDROID_LOG_LIB} ${JNIGRAPHICS_LIB})
+    elseif(UNIX)
+        pkg_check_modules(LIBVA REQUIRED IMPORTED_TARGET libva)
+        target_link_libraries(mediaplayer_core PkgConfig::LIBVA)
+    endif()
+endif()
+
 if(APPLE)
     target_link_libraries(mediaplayer_core
         "-framework AudioToolbox"

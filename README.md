@@ -45,15 +45,17 @@ field, and updates play counts when items are played through the core engine.
 
 ## Hardware Decoding
 
-Hardware accelerated video decoding is supported on major desktop platforms when
-FFmpeg is built with the appropriate backends. Make sure FFmpeg was configured
-with `--enable-hwaccels` and the relevant device options. The default device
-used can be overridden at runtime via `MediaPlayer::setPreferredHardwareDevice()`.
-Pass `-DENABLE_HW_DECODING=OFF` to CMake to force software decoding.
+Hardware accelerated video decoding is supported when FFmpeg is built with the
+appropriate backends. Use `MediaPlayer::setPreferredHardwareDevice()` to select
+the device at runtime. Pass `-DENABLE_HW_DECODING=OFF` to CMake to force
+software decoding.
+Supported device names are `dxva2`, `d3d11va`, `videotoolbox`, `vaapi` and
+`mediacodec` depending on the platform.
 
-- **Windows**: DXVA2
-- **macOS**: VideoToolbox
+- **Windows**: DXVA2 or D3D11
+- **macOS/iOS**: VideoToolbox
 - **Linux**: VAAPI
+- **Android**: MediaCodec (via JNI)
 
 ## Continuous Integration
 
