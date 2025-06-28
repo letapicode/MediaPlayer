@@ -1,4 +1,4 @@
-# MediaPlayer
+#MediaPlayer
 
 MediaPlayer is an open-source, cross-platform AI-enabled media player focused on speed and a polished user experience.
 High level design is described in [Masterplan.MD](Masterplan.MD) and a breakdown of work items is in [Tasks.MD](Tasks.MD).
@@ -27,7 +27,7 @@ See [docs/building.md](docs/building.md) for a complete build walkthrough,
 including how to compile the sample test programs.
 
 ```
-# Example build steps
+#Example build steps
 mkdir build && cd build
 cmake .. -DCMAKE_BUILD_TYPE=Release
 make
@@ -46,8 +46,10 @@ field, and updates play counts when items are played through the core engine.
 ## Hardware Decoding
 
 Hardware accelerated video decoding is supported on major desktop platforms when
-FFmpeg is built with the appropriate backends. The default device used can be
-overridden at runtime via `MediaPlayer::setPreferredHardwareDevice()`.
+FFmpeg is built with the appropriate backends. Make sure FFmpeg was configured
+with `--enable-hwaccels` and the relevant device options. The default device
+used can be overridden at runtime via `MediaPlayer::setPreferredHardwareDevice()`.
+Pass `-DENABLE_HW_DECODING=OFF` to CMake to force software decoding.
 
 - **Windows**: DXVA2
 - **macOS**: VideoToolbox
