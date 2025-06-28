@@ -2,6 +2,7 @@
 #define MEDIAPLAYER_AUDIOOUTPUTWASAPI_H
 
 #include "AudioOutput.h"
+#include "ComPtr.h"
 #include "RingBuffer.h"
 #ifdef _WIN32
 #include <Audioclient.h>
@@ -25,10 +26,10 @@ public:
   double volume() const override;
 
 private:
-  IMMDevice *m_device{nullptr};
-  IAudioClient *m_client{nullptr};
-  IAudioRenderClient *m_render{nullptr};
-  WAVEFORMATEX *m_format{nullptr};
+  ComPtr<IMMDevice> m_device;
+  ComPtr<IAudioClient> m_client;
+  ComPtr<IAudioRenderClient> m_render;
+  std::unique_ptr<WAVEFORMATEX, void (*)(void *)> m_format{nullptr, CoTaskMemFree};
   UINT32 m_bufferFrames{0};
   bool m_paused{false};
   double m_volume{1.0};
