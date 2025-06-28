@@ -1,7 +1,6 @@
 # Core Media Engine
 
-This directory contains the cross‑platform playback engine. The initial
-implementation is a minimal skeleton built with CMake.
+This directory contains the cross‑platform playback engine built with CMake.
 
 ```
 mkdir build && cd build
@@ -9,8 +8,11 @@ cmake ..
 make
 ```
 
-The resulting `mediaplayer_core` library is currently a stub and does not yet
-perform any decoding.
+The resulting `mediaplayer_core` library provides working demuxing and decoding
+using FFmpeg. `MediaDemuxer` opens media files or network streams and
+enumerates the available audio, video and subtitle tracks. `AudioDecoder` and
+`VideoDecoder` convert packets to raw PCM samples and RGBA frames. Hardware
+acceleration can be enabled when supported by the platform and FFmpeg build.
 
-`MediaDemuxer` uses FFmpeg to open media files and enumerate audio, video and
-subtitle streams. Decoding and playback will be added in future modules.
+Demuxing and decoding run on dedicated threads. Packet queues buffer data to
+keep playback smooth even when reading from slow sources.
