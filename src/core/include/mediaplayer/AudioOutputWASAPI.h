@@ -34,6 +34,7 @@ private:
   bool m_paused{false};
   double m_volume{1.0};
   RingBuffer m_buffer{16384};
+  bool m_comInit{false};
 };
 #endif
 
