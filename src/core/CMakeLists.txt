@@ -16,6 +16,8 @@ elseif(UNIX)
     list(APPEND CORE_SOURCES src/AudioOutputPulse.cpp)
 endif()
 
+option(ENABLE_HW_DECODING "Enable hardware accelerated video decoding" ON)
+
 add_library(mediaplayer_core ${CORE_SOURCES})
 
 find_package(PkgConfig)
@@ -64,4 +66,6 @@ set_target_properties(mediaplayer_core PROPERTIES
     CXX_STANDARD_REQUIRED ON
 )
 
-target_compile_definitions(mediaplayer_core PUBLIC MEDIAPLAYER_DESKTOP)
+target_compile_definitions(mediaplayer_core PUBLIC MEDIAPLAYER_DESKTOP
+    $<$<BOOL:${ENABLE_HW_DECODING}>:MEDIAPLAYER_HW_DECODING>)
+
