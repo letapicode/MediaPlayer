@@ -2,6 +2,7 @@
 #define MEDIAPLAYER_AUDIOOUTPUTIOS_H
 
 #include "AudioOutput.h"
+#include "RingBuffer.h"
 
 namespace mediaplayer {
 
@@ -24,6 +25,8 @@ private:
   void *m_format{nullptr};
   bool m_paused{false};
   double m_volume{1.0};
+  void scheduleNextBuffer();
+  RingBuffer m_buffer{16384};
 };
 
 } // namespace mediaplayer

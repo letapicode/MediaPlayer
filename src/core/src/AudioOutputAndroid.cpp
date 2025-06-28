@@ -50,14 +50,32 @@ void AudioOutputAndroid::shutdown() {
 int AudioOutputAndroid::write(const uint8_t *data, int len) {
 #if __ANDROID_API__ >= 26
   if (m_useAAudio && m_stream) {
-    aaudio_result_t written = AAudioStream_write(m_stream, data, len / 2, 0); // 16-bit samples
-    if (written < 0)
-      return 0;
-    return static_cast<int>(written * 2);
+    size_t samples = static_cast<size_t>(len) / sizeof(int16_t);
+    const int16_t *input = reinterpret_cast<const int16_t *>(data);
+    m_buffer.mix(input, samples);
+
+    int channelCount = AAudioStream_getChannelCount(m_stream);
+    int16_t temp[1024];
+    while (m_buffer.available() >= 1024) {
+      size_t n = m_buffer.read(temp, 1024);
+      aaudio_result_t written =
+          AAudioStream_write(m_stream, temp, static_cast<int>(n / channelCount), 0);
+      if (written < 0)
+        break;
+    }
+    return len;
   }
 #endif
   if (m_bufferQueue) {
-    (*m_bufferQueue)->Enqueue(m_bufferQueue, data, static_cast<SLuint32>(len));
+    size_t samples = static_cast<size_t>(len) / sizeof(int16_t);
+    const int16_t *input = reinterpret_cast<const int16_t *>(data);
+    m_buffer.mix(input, samples);
+
+    int16_t temp[1024];
+    while (m_buffer.available() >= 1024) {
+      size_t n = m_buffer.read(temp, 1024);
+      (*m_bufferQueue)->Enqueue(m_bufferQueue, temp, static_cast<SLuint32>(n * sizeof(int16_t)));
+    }
     return len;
   }
   return 0;
