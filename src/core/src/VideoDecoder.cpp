@@ -5,7 +5,25 @@
 
 namespace mediaplayer {
 
-VideoDecoder::VideoDecoder() { m_frame = av_frame_alloc(); }
+#ifdef MEDIAPLAYER_HW_DECODING
+enum AVPixelFormat VideoDecoder::get_hw_format(AVCodecContext *ctx,
+                                               const enum AVPixelFormat *fmts) {
+  auto *self = static_cast<VideoDecoder *>(ctx->opaque);
+  for (const enum AVPixelFormat *p = fmts; *p != AV_PIX_FMT_NONE; p++) {
+    if (*p == self->m_hwPixFmt)
+      return *p;
+  }
+  return fmts[0];
+}
+#endif
+
+VideoDecoder::VideoDecoder() {
+  m_frame = av_frame_alloc();
+#ifdef MEDIAPLAYER_HW_DECODING
+  m_swFrame = nullptr;
+  m_hwPixFmt = AV_PIX_FMT_NONE;
+#endif
+}
 
 VideoDecoder::~VideoDecoder() {
   if (m_codecCtx) {
@@ -14,6 +32,11 @@ VideoDecoder::~VideoDecoder() {
   if (m_swsCtx) {
     sws_freeContext(m_swsCtx);
   }
+#ifdef MEDIAPLAYER_HW_DECODING
+  if (m_swFrame) {
+    av_frame_free(&m_swFrame);
+  }
+#endif
   if (m_frame) {
     av_frame_free(&m_frame);
   }
@@ -45,11 +68,41 @@ bool VideoDecoder::open(AVFormatContext *fmtCtx, int streamIndex,
     return false;
   }
 #ifdef MEDIAPLAYER_HW_DECODING
+  // Try to initialize hardware decoding. If any step fails we simply
+  // continue with software decoding.
+  m_codecCtx->opaque = this;
   if (!preferredHwDevice.empty()) {
     AVHWDeviceType type = av_hwdevice_find_type_by_name(preferredHwDevice.c_str());
     if (type != AV_HWDEVICE_TYPE_NONE) {
-      if (av_hwdevice_ctx_create(&m_hwDeviceCtx, type, nullptr, nullptr, 0) == 0) {
-        m_codecCtx->hw_device_ctx = av_buffer_ref(m_hwDeviceCtx);
+      for (int i = 0;; i++) {
+        const AVCodecHWConfig *cfg = avcodec_get_hw_config(dec, i);
+        if (!cfg)
+          break;
+        if ((cfg->methods & AV_CODEC_HW_CONFIG_METHOD_HW_DEVICE_CTX) && cfg->device_type == type) {
+          m_hwPixFmt = cfg->pix_fmt;
+          break;
+        }
+      }
+      if (m_hwPixFmt != AV_PIX_FMT_NONE &&
+          av_hwdevice_ctx_create(&m_hwDeviceCtx, type, nullptr, nullptr, 0) >= 0) {
+        AVBufferRef *framesRef = av_hwframe_ctx_alloc(m_hwDeviceCtx);
+        if (framesRef) {
+          AVHWFramesContext *framesCtx = (AVHWFramesContext *)framesRef->data;
+          framesCtx->format = m_hwPixFmt;
+          framesCtx->sw_format = m_codecCtx->pix_fmt;
+          framesCtx->width = m_codecCtx->width;
+          framesCtx->height = m_codecCtx->height;
+          if (av_hwframe_ctx_init(framesRef) >= 0) {
+            m_codecCtx->hw_frames_ctx = av_buffer_ref(framesRef);
+            m_codecCtx->get_format = get_hw_format;
+          }
+          av_buffer_unref(&framesRef);
+        }
+        if (!m_codecCtx->hw_frames_ctx) {
+          av_buffer_unref(&m_hwDeviceCtx);
+          m_hwDeviceCtx = nullptr;
+          m_hwPixFmt = AV_PIX_FMT_NONE;
+        }
       }
     }
   }
@@ -82,8 +135,25 @@ int VideoDecoder::decode(AVPacket *pkt, uint8_t *outBuffer, int outBufferSize) {
     }
     uint8_t *dstData[4] = {outBuffer + total, nullptr, nullptr, nullptr};
     int dstLinesize[4] = {m_codecCtx->width * 4, 0, 0, 0};
+#ifdef MEDIAPLAYER_HW_DECODING
+    // Decode may return frames stored in GPU memory. When that happens we copy
+    // them back to a regular AVFrame for scaling.
+    AVFrame *src = m_frame;
+    if (m_hwPixFmt != AV_PIX_FMT_NONE && m_frame->format == m_hwPixFmt) {
+      if (!m_swFrame)
+        m_swFrame = av_frame_alloc();
+      av_frame_unref(m_swFrame);
+      if (av_hwframe_transfer_data(m_swFrame, m_frame, 0) < 0) {
+        std::cerr << "Failed to transfer hw frame\n";
+        continue;
+      }
+      src = m_swFrame;
+    }
+    sws_scale(m_swsCtx, src->data, src->linesize, 0, m_codecCtx->height, dstData, dstLinesize);
+#else
     sws_scale(m_swsCtx, m_frame->data, m_frame->linesize, 0, m_codecCtx->height, dstData,
               dstLinesize);
+#endif
     total += frameBytes;
   }
   return total;

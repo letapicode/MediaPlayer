@@ -30,6 +30,10 @@ public:
   int height() const { return m_codecCtx ? m_codecCtx->height : 0; }
   double lastPts() const;
 
+#ifdef MEDIAPLAYER_HW_DECODING
+  static enum AVPixelFormat get_hw_format(AVCodecContext *ctx, const enum AVPixelFormat *fmts);
+#endif
+
 private:
   AVCodecContext *m_codecCtx{nullptr};
   SwsContext *m_swsCtx{nullptr};
@@ -38,6 +42,8 @@ private:
   int64_t m_lastPts{AV_NOPTS_VALUE};
 #ifdef MEDIAPLAYER_HW_DECODING
   AVBufferRef *m_hwDeviceCtx{nullptr};
+  AVPixelFormat m_hwPixFmt{AV_PIX_FMT_NONE};
+  AVFrame *m_swFrame{nullptr};
 #endif
 };
 

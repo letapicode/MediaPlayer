@@ -17,6 +17,8 @@ elseif(UNIX)
     list(APPEND CORE_SOURCES src/AudioOutputPulse.cpp)
 endif()
 
+# Hardware decoding requires FFmpeg to be built with `--enable-hwaccels` and
+# the relevant device backends (e.g. `--enable-vaapi`).
 option(ENABLE_HW_DECODING "Enable hardware accelerated video decoding" ON)
 
 add_library(mediaplayer_core ${CORE_SOURCES})
