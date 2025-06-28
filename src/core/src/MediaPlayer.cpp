@@ -52,6 +52,7 @@ static bool isUrl(const std::string &path) {
 }
 
 bool MediaPlayer::open(const std::string &path) {
+  m_demuxer.setBufferSize(m_networkBufferSize);
   if (!m_demuxer.open(path)) {
     return false;
   }
@@ -183,6 +184,16 @@ void MediaPlayer::setVolume(double volume) {
 double MediaPlayer::volume() const {
   std::lock_guard<std::mutex> lock(m_mutex);
   return m_volume;
+}
+
+void MediaPlayer::setNetworkBufferSize(size_t size) {
+  std::lock_guard<std::mutex> lock(m_mutex);
+  m_networkBufferSize = size;
+}
+
+size_t MediaPlayer::networkBufferSize() const {
+  std::lock_guard<std::mutex> lock(m_mutex);
+  return m_networkBufferSize;
 }
 
 void MediaPlayer::play() {
