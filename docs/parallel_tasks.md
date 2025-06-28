@@ -16,8 +16,8 @@
 | 10 | Threading and Locking | done | relevant |
 | 11 | Hardware Decoding Support (Optional) | open | relevant |
 | 12 | Abstract Audio Output Interface | done | relevant |
-| 13 | Audio Output – Windows (WASAPI) | open | relevant |
-| 14 | Audio Output – macOS (CoreAudio) | open | relevant |
+| 13 | Audio Output – Windows (WASAPI) | done | relevant |
+| 14 | Audio Output – macOS (CoreAudio) | done | relevant |
 | 15 | Audio Output – Linux (PulseAudio/ALSA) | done | relevant |
 | 16 | Audio Output – Android (OpenSL ES or AAudio) | open | relevant |
 | 17 | Audio Output – iOS (AVAudio) | open | relevant |
