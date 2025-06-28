@@ -35,6 +35,15 @@ MediaPlayer::MediaPlayer() {
 #else
   m_videoOutput = std::make_unique<NullVideoOutput>();
 #endif
+#ifdef MEDIAPLAYER_HW_DECODING
+#ifdef _WIN32
+  m_hwDevice = "dxva2";
+#elif defined(__APPLE__)
+  m_hwDevice = "videotoolbox";
+#elif defined(__linux__)
+  m_hwDevice = "vaapi";
+#endif
+#endif
 }
 
 MediaPlayer::~MediaPlayer() {
@@ -68,7 +77,11 @@ bool MediaPlayer::open(const std::string &path) {
     }
   }
   if (m_demuxer.videoStream() >= 0) {
+#ifdef MEDIAPLAYER_HW_DECODING
+    if (!m_videoDecoder.open(fmtCtx, m_demuxer.videoStream(), m_hwDevice)) {
+#else
     if (!m_videoDecoder.open(fmtCtx, m_demuxer.videoStream())) {
+#endif
       std::cerr << "Failed to open video decoder\n";
       return false;
     }
@@ -160,6 +173,11 @@ void MediaPlayer::setVideoOutput(std::unique_ptr<VideoOutput> output) {
     m_videoOutput->shutdown();
   }
   m_videoOutput = std::move(output);
+}
+
+void MediaPlayer::setPreferredHardwareDevice(const std::string &device) {
+  std::lock_guard<std::mutex> lock(m_mutex);
+  m_hwDevice = device;
 }
 
 void MediaPlayer::setLibrary(LibraryDB *db) {

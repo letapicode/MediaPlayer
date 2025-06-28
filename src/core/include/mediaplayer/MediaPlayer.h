@@ -41,6 +41,7 @@ public:
   bool nextTrack();
   void setAudioOutput(std::unique_ptr<AudioOutput> output);
   void setVideoOutput(std::unique_ptr<VideoOutput> output);
+  void setPreferredHardwareDevice(const std::string &device);
   void setCallbacks(PlaybackCallbacks callbacks);
   void setLibrary(LibraryDB *db);
   void setVolume(double volume); // 0.0 - 1.0
@@ -81,6 +82,7 @@ private:
   bool m_playRecorded{false};
   double m_volume{1.0};
   MediaMetadata m_metadata;
+  std::string m_hwDevice;
 };
 
 } // namespace mediaplayer

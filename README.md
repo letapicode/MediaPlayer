@@ -43,6 +43,16 @@ SRT files.
 The SQLite-based library tracks media metadata, including an optional rating
 field, and updates play counts when items are played through the core engine.
 
+## Hardware Decoding
+
+Hardware accelerated video decoding is supported on major desktop platforms when
+FFmpeg is built with the appropriate backends. The default device used can be
+overridden at runtime via `MediaPlayer::setPreferredHardwareDevice()`.
+
+- **Windows**: DXVA2
+- **macOS**: VideoToolbox
+- **Linux**: VAAPI
+
 ## Continuous Integration
 
 All pushes and pull requests are built using GitHub Actions. The workflow

@@ -17,9 +17,15 @@ VideoDecoder::~VideoDecoder() {
   if (m_frame) {
     av_frame_free(&m_frame);
   }
+#ifdef MEDIAPLAYER_HW_DECODING
+  if (m_hwDeviceCtx) {
+    av_buffer_unref(&m_hwDeviceCtx);
+  }
+#endif
 }
 
-bool VideoDecoder::open(AVFormatContext *fmtCtx, int streamIndex) {
+bool VideoDecoder::open(AVFormatContext *fmtCtx, int streamIndex,
+                        const std::string &preferredHwDevice) {
   if (streamIndex < 0 || streamIndex >= static_cast<int>(fmtCtx->nb_streams)) {
     return false;
   }
@@ -38,6 +44,16 @@ bool VideoDecoder::open(AVFormatContext *fmtCtx, int streamIndex) {
     avcodec_free_context(&m_codecCtx);
     return false;
   }
+#ifdef MEDIAPLAYER_HW_DECODING
+  if (!preferredHwDevice.empty()) {
+    AVHWDeviceType type = av_hwdevice_find_type_by_name(preferredHwDevice.c_str());
+    if (type != AV_HWDEVICE_TYPE_NONE) {
+      if (av_hwdevice_ctx_create(&m_hwDeviceCtx, type, nullptr, nullptr, 0) == 0) {
+        m_codecCtx->hw_device_ctx = av_buffer_ref(m_hwDeviceCtx);
+      }
+    }
+  }
+#endif
   if (avcodec_open2(m_codecCtx, dec, nullptr) < 0) {
     avcodec_free_context(&m_codecCtx);
     return false;
