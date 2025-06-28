@@ -4,7 +4,7 @@
 
 namespace mediaplayer {
 
-MediaDemuxer::MediaDemuxer() = default;
+MediaDemuxer::MediaDemuxer() { m_subtitleStream = -1; }
 
 MediaDemuxer::~MediaDemuxer() { close(); }
 
@@ -18,6 +18,7 @@ void MediaDemuxer::close() {
   }
   m_audioStream = -1;
   m_videoStream = -1;
+  m_subtitleStream = -1;
   m_eof = false;
 }
 
@@ -43,6 +44,9 @@ bool MediaDemuxer::open(const std::string &path) {
       m_audioStream = i;
     } else if (m_ctx->streams[i]->codecpar->codec_type == AVMEDIA_TYPE_VIDEO && m_videoStream < 0) {
       m_videoStream = i;
+    } else if (m_ctx->streams[i]->codecpar->codec_type == AVMEDIA_TYPE_SUBTITLE &&
+               m_subtitleStream < 0) {
+      m_subtitleStream = i;
     }
   }
   m_eof = false;
