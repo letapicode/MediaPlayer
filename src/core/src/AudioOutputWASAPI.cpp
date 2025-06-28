@@ -6,7 +6,7 @@
 
 namespace mediaplayer {
 
-AudioOutputWASAPI::AudioOutputWASAPI() = default;
+AudioOutputWASAPI::AudioOutputWASAPI() : m_comInit(false) {}
 
 AudioOutputWASAPI::~AudioOutputWASAPI() { shutdown(); }
 
@@ -16,6 +16,7 @@ bool AudioOutputWASAPI::init(int sampleRate, int channels) {
     std::cerr << "CoInitializeEx failed: 0x" << std::hex << hr << '\n';
     return false;
   }
+  m_comInit = SUCCEEDED(hr);
 
   ComPtr<IMMDeviceEnumerator> enumerator;
   hr = CoCreateInstance(__uuidof(MMDeviceEnumerator), nullptr, CLSCTX_ALL,
@@ -97,7 +98,10 @@ void AudioOutputWASAPI::shutdown() {
   m_client.reset();
   m_device.reset();
   m_format.reset();
-  CoUninitialize();
+  if (m_comInit) {
+    CoUninitialize();
+    m_comInit = false;
+  }
 }
 
 int AudioOutputWASAPI::write(const uint8_t *data, int len) {
