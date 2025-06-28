@@ -19,9 +19,9 @@
 | 13 | Audio Output – Windows (WASAPI) | done | relevant |
 | 14 | Audio Output – macOS (CoreAudio) | done | relevant |
 | 15 | Audio Output – Linux (PulseAudio/ALSA) | done | relevant |
-| 16 | Audio Output – Android (OpenSL ES or AAudio) | open | relevant |
-| 17 | Audio Output – iOS (AVAudio) | open | relevant |
-| 18 | Audio Buffering & Mixing | open | relevant |
+| 16 | Audio Output – Android (OpenSL ES or AAudio) | done | implemented in `AudioOutputAndroid.cpp` |
+| 17 | Audio Output – iOS (AVAudio) | done | implemented in `AudioOutputiOS.mm` |
+| 18 | Audio Buffering & Mixing | done | ring buffer mixing implemented |
 | 19 | Abstract Video Output Interface | done | relevant |
 | 20 | Video Rendering – OpenGL (Desktop) | open | relevant |
 | 21 | Video Rendering – DirectX (Windows optional) | open | relevant |
