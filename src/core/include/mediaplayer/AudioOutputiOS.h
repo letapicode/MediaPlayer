@@ -1,17 +1,14 @@
-#ifndef MEDIAPLAYER_AUDIOOUTPUTPULSE_H
-#define MEDIAPLAYER_AUDIOOUTPUTPULSE_H
+#ifndef MEDIAPLAYER_AUDIOOUTPUTIOS_H
+#define MEDIAPLAYER_AUDIOOUTPUTIOS_H
 
 #include "AudioOutput.h"
-#include <pulse/error.h>
-#include <pulse/simple.h>
-#include <string>
 
 namespace mediaplayer {
 
-class AudioOutputPulse : public AudioOutput {
+class AudioOutputiOS : public AudioOutput {
 public:
-  AudioOutputPulse();
-  ~AudioOutputPulse() override;
+  AudioOutputiOS();
+  ~AudioOutputiOS() override;
 
   bool init(int sampleRate, int channels) override;
   void shutdown() override;
@@ -22,12 +19,13 @@ public:
   double volume() const override;
 
 private:
-  pa_simple *m_pa = nullptr;
-  pa_sample_spec m_spec{};
-  bool m_paused = false;
+  void *m_engine{nullptr};
+  void *m_player{nullptr};
+  void *m_format{nullptr};
+  bool m_paused{false};
   double m_volume{1.0};
 };
 
 } // namespace mediaplayer
 
-#endif // MEDIAPLAYER_AUDIOOUTPUTPULSE_H
+#endif // MEDIAPLAYER_AUDIOOUTPUTIOS_H

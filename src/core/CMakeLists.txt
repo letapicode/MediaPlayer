@@ -9,7 +9,9 @@ set(CORE_SOURCES
     src/OpenGLVideoOutput.cpp
 )
 
-if(APPLE)
+if(CMAKE_SYSTEM_NAME STREQUAL "iOS")
+    list(APPEND CORE_SOURCES src/AudioOutputiOS.mm)
+elseif(APPLE)
     list(APPEND CORE_SOURCES src/AudioOutputCoreAudio.mm)
 elseif(WIN32)
     list(APPEND CORE_SOURCES src/AudioOutputWASAPI.cpp)
@@ -67,7 +69,11 @@ if(ENABLE_HW_DECODING)
     endif()
 endif()
 
-if(APPLE)
+if(CMAKE_SYSTEM_NAME STREQUAL "iOS")
+    target_link_libraries(mediaplayer_core
+        "-framework AVFoundation"
+        "-framework AudioToolbox")
+elseif(APPLE)
     target_link_libraries(mediaplayer_core
         "-framework AudioToolbox"
         "-framework CoreAudio")

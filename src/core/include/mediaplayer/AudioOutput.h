@@ -13,6 +13,8 @@ public:
   virtual int write(const uint8_t *data, int len) = 0;
   virtual void pause() = 0;
   virtual void resume() = 0;
+  virtual void setVolume(double volume) = 0;
+  virtual double volume() const = 0;
 };
 
 } // namespace mediaplayer

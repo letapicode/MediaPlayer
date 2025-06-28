@@ -33,6 +33,7 @@ bool AudioOutputCoreAudio::init(int sampleRate, int channels) {
     m_queue = nullptr;
     return false;
   }
+  AudioQueueSetParameter(m_queue, kAudioQueueParam_Volume, static_cast<Float32>(m_volume));
   m_started = true;
   return true;
 }
@@ -74,5 +75,17 @@ void AudioOutputCoreAudio::resume() {
     m_paused = false;
   }
 }
+
+void AudioOutputCoreAudio::setVolume(double volume) {
+  if (volume < 0.0)
+    volume = 0.0;
+  else if (volume > 1.0)
+    volume = 1.0;
+  m_volume = volume;
+  if (m_queue)
+    AudioQueueSetParameter(m_queue, kAudioQueueParam_Volume, static_cast<Float32>(volume));
+}
+
+double AudioOutputCoreAudio::volume() const { return m_volume; }
 
 } // namespace mediaplayer
