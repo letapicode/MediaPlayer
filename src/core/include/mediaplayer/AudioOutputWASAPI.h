@@ -20,6 +20,8 @@ public:
   int write(const uint8_t *data, int len) override;
   void pause() override;
   void resume() override;
+  void setVolume(double volume) override;
+  double volume() const override;
 
 private:
   IMMDevice *m_device{nullptr};
@@ -28,6 +30,7 @@ private:
   WAVEFORMATEX *m_format{nullptr};
   UINT32 m_bufferFrames{0};
   bool m_paused{false};
+  double m_volume{1.0};
 };
 #endif
 

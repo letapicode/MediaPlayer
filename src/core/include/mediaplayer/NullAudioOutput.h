@@ -18,6 +18,11 @@ public:
   }
   void pause() override {}
   void resume() override {}
+  void setVolume(double volume) override;
+  double volume() const override;
+
+private:
+  double m_volume{1.0};
 };
 
 } // namespace mediaplayer

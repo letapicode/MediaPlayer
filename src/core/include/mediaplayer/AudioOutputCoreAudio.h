@@ -16,12 +16,15 @@ public:
   int write(const uint8_t *data, int len) override;
   void pause() override;
   void resume() override;
+  void setVolume(double volume) override;
+  double volume() const override;
 
 private:
   AudioQueueRef m_queue{nullptr};
   AudioStreamBasicDescription m_format{};
   bool m_started{false};
   bool m_paused{false};
+  double m_volume{1.0};
 };
 
 } // namespace mediaplayer

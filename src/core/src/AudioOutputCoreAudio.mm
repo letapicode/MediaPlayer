@@ -75,4 +75,8 @@ void AudioOutputCoreAudio::resume() {
   }
 }
 
+void AudioOutputCoreAudio::setVolume(double volume) { m_volume = volume; }
+
+double AudioOutputCoreAudio::volume() const { return m_volume; }
+
 } // namespace mediaplayer

@@ -6,6 +6,7 @@ set(CORE_SOURCES
     src/PacketQueue.cpp
     src/MediaDemuxer.cpp
     src/BufferedReader.cpp
+    src/NullAudioOutput.cpp
     src/OpenGLVideoOutput.cpp
 )
 

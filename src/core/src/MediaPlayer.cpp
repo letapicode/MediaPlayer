@@ -197,6 +197,8 @@ void MediaPlayer::setVolume(double volume) {
   if (volume > 1.0)
     volume = 1.0;
   m_volume = volume;
+  if (m_output)
+    m_output->setVolume(m_volume);
 }
 
 double MediaPlayer::volume() const {

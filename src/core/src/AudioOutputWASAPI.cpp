@@ -124,5 +124,9 @@ void AudioOutputWASAPI::resume() {
   }
 }
 
+void AudioOutputWASAPI::setVolume(double volume) { m_volume = volume; }
+
+double AudioOutputWASAPI::volume() const { return m_volume; }
+
 } // namespace mediaplayer
 #endif
