@@ -22,6 +22,41 @@ sudo apt-get install -y build-essential cmake git \
     libsqlite3-dev libtag1-dev libpulse-dev libpulse-simple-dev
 ```
 
+## Audio Output Backends
+
+MediaPlayer includes several platform specific audio modules. The correct
+backend is compiled automatically based on the target system, but
+additional SDKs or packages are required for each one.
+
+### Linux – PulseAudio
+
+- Packages: `libpulse-dev` and `libpulse-simple-dev`
+- CMake builds `AudioOutputPulse` when `CMAKE_SYSTEM_NAME` is `Linux`
+- Runtime variables like `PULSE_SERVER` can be used to select a remote
+  server
+
+### Windows – WASAPI
+
+- Requires the Windows SDK available with Visual Studio
+- The WASAPI backend is chosen automatically when building with MSVC
+
+### macOS – CoreAudio
+
+- Requires Xcode and the macOS SDK providing `AudioToolbox` and
+  `CoreAudio` frameworks
+- No extra flags are needed; the backend is built on macOS
+
+### Android – OpenSL ES / AAudio
+
+- Requires the Android NDK (`ANDROID_NDK_HOME` should point to the NDK
+  root)
+- `AudioOutputAndroid` is compiled when using the Android toolchain
+
+### iOS – AVAudio
+
+- Requires Xcode with the iOS SDK installed
+- CMake selects `AudioOutputiOS` when `CMAKE_SYSTEM_NAME` is `iOS`
+
 ## Building the libraries
 
 Create a build directory and run CMake:
