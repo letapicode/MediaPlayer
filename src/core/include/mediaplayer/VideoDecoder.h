@@ -5,6 +5,9 @@
 #include <string>
 #ifdef MEDIAPLAYER_HW_DECODING
 #include <libavutil/hwcontext.h>
+#if defined(__ANDROID__)
+#include <jni.h>
+#endif
 #endif
 
 extern "C" {
@@ -22,6 +25,8 @@ public:
   bool open(AVFormatContext *fmtCtx, int streamIndex) override {
     return open(fmtCtx, streamIndex, "");
   }
+  // `preferredHwDevice` can be one of "dxva2", "d3d11va", "videotoolbox",
+  // "vaapi" or "mediacodec" depending on the platform.
   bool open(AVFormatContext *fmtCtx, int streamIndex, const std::string &preferredHwDevice);
   // Decode packet and write RGBA data into outBuffer. Returns bytes written.
   int decode(AVPacket *pkt, uint8_t *outBuffer, int outBufferSize) override;
