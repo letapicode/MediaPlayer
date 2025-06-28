@@ -5,7 +5,11 @@
 namespace mediaplayer {
 
 static void BufferCallback(void *userData, AudioQueueRef inAQ, AudioQueueBufferRef inBuffer) {
-  AudioQueueFreeBuffer(inAQ, inBuffer);
+  auto *self = static_cast<AudioOutputCoreAudio *>(userData);
+  size_t samples = self->m_buffer.read(reinterpret_cast<int16_t *>(inBuffer->mAudioData),
+                                       inBuffer->mAudioDataBytesCapacity / sizeof(int16_t));
+  inBuffer->mAudioDataByteSize = static_cast<UInt32>(samples * sizeof(int16_t));
+  AudioQueueEnqueueBuffer(inAQ, inBuffer, 0, nullptr);
 }
 
 AudioOutputCoreAudio::AudioOutputCoreAudio() = default;
@@ -27,6 +31,17 @@ bool AudioOutputCoreAudio::init(int sampleRate, int channels) {
       AudioQueueNewOutput(&m_format, BufferCallback, this, nullptr, nullptr, 0, &m_queue);
   if (status != noErr)
     return false;
+
+  const UInt32 bufferSize = 4096;
+  for (int i = 0; i < 4; ++i) {
+    AudioQueueBufferRef buf;
+    if (AudioQueueAllocateBuffer(m_queue, bufferSize, &buf) != noErr)
+      return false;
+    std::memset(buf->mAudioData, 0, bufferSize);
+    buf->mAudioDataByteSize = bufferSize;
+    AudioQueueEnqueueBuffer(m_queue, buf, 0, nullptr);
+  }
+
   status = AudioQueueStart(m_queue, nullptr);
   if (status != noErr) {
     AudioQueueDispose(m_queue, true);
@@ -50,15 +65,10 @@ void AudioOutputCoreAudio::shutdown() {
 int AudioOutputCoreAudio::write(const uint8_t *data, int len) {
   if (!m_queue || m_paused)
     return 0;
-  AudioQueueBufferRef buffer;
-  if (AudioQueueAllocateBuffer(m_queue, len, &buffer) != noErr)
-    return -1;
-  std::memcpy(buffer->mAudioData, data, len);
-  buffer->mAudioDataByteSize = static_cast<UInt32>(len);
-  if (AudioQueueEnqueueBuffer(m_queue, buffer, 0, nullptr) != noErr) {
-    AudioQueueFreeBuffer(m_queue, buffer);
-    return -1;
-  }
+
+  size_t samples = static_cast<size_t>(len) / sizeof(int16_t);
+  const int16_t *input = reinterpret_cast<const int16_t *>(data);
+  m_buffer.mix(input, samples);
   return len;
 }
 
