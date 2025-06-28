@@ -7,6 +7,7 @@ set(CORE_SOURCES
     src/MediaDemuxer.cpp
     src/BufferedReader.cpp
     src/OpenGLVideoOutput.cpp
+    src/RingBuffer.cpp
 )
 
 if(APPLE)

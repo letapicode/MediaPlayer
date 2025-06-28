@@ -91,23 +91,30 @@ int AudioOutputWASAPI::write(const uint8_t *data, int len) {
   if (!m_render || m_paused)
     return 0;
 
-  UINT32 padding = 0;
-  if (FAILED(m_client->GetCurrentPadding(&padding)))
-    return 0;
+  size_t samples = static_cast<size_t>(len) / sizeof(int16_t);
+  const int16_t *input = reinterpret_cast<const int16_t *>(data);
+  m_buffer.mix(input, samples);
 
-  UINT32 frameSize = m_format->nBlockAlign;
-  UINT32 framesAvailable = m_bufferFrames - padding;
-  UINT32 framesToWrite = std::min(framesAvailable, static_cast<UINT32>(len / frameSize));
-  if (framesToWrite == 0)
-    return 0;
+  while (true) {
+    UINT32 padding = 0;
+    if (FAILED(m_client->GetCurrentPadding(&padding)))
+      break;
 
-  BYTE *buffer = nullptr;
-  if (FAILED(m_render->GetBuffer(framesToWrite, &buffer)))
-    return 0;
+    UINT32 framesAvailable = m_bufferFrames - padding;
+    if (framesAvailable == 0 || m_buffer.available() < framesAvailable * m_format->nChannels)
+      break;
 
-  std::memcpy(buffer, data, framesToWrite * frameSize);
-  m_render->ReleaseBuffer(framesToWrite, 0);
-  return static_cast<int>(framesToWrite * frameSize);
+    BYTE *buffer = nullptr;
+    if (FAILED(m_render->GetBuffer(framesAvailable, &buffer)))
+      break;
+
+    size_t toRead = framesAvailable * m_format->nChannels;
+    std::vector<int16_t> temp(toRead);
+    m_buffer.read(temp.data(), toRead);
+    std::memcpy(buffer, temp.data(), toRead * sizeof(int16_t));
+    m_render->ReleaseBuffer(framesAvailable, 0);
+  }
+  return len;
 }
 
 void AudioOutputWASAPI::pause() {

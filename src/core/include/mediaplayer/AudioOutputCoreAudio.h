@@ -2,6 +2,7 @@
 #define MEDIAPLAYER_AUDIOOUTPUTCOREAUDIO_H
 
 #include "AudioOutput.h"
+#include "RingBuffer.h"
 #include <AudioToolbox/AudioToolbox.h>
 
 namespace mediaplayer {
@@ -18,10 +19,12 @@ public:
   void resume() override;
 
 private:
+  friend void BufferCallback(void *, AudioQueueRef, AudioQueueBufferRef);
   AudioQueueRef m_queue{nullptr};
   AudioStreamBasicDescription m_format{};
   bool m_started{false};
   bool m_paused{false};
+  RingBuffer m_buffer{16384};
 };
 
 } // namespace mediaplayer

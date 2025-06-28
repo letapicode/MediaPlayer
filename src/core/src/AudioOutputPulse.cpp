@@ -34,10 +34,19 @@ void AudioOutputPulse::shutdown() {
 int AudioOutputPulse::write(const uint8_t *data, int len) {
   if (!m_pa || m_paused)
     return 0;
+
+  size_t samples = static_cast<size_t>(len) / sizeof(int16_t);
+  const int16_t *input = reinterpret_cast<const int16_t *>(data);
+  m_buffer.mix(input, samples);
+
+  int16_t temp[1024];
   int error = 0;
-  if (pa_simple_write(m_pa, data, static_cast<size_t>(len), &error) < 0) {
-    std::cerr << "PulseAudio write failed: " << pa_strerror(error) << "\n";
-    return -1;
+  while (m_buffer.available() >= 1024) {
+    size_t n = m_buffer.read(temp, 1024);
+    if (pa_simple_write(m_pa, temp, n * sizeof(int16_t), &error) < 0) {
+      std::cerr << "PulseAudio write failed: " << pa_strerror(error) << "\n";
+      return -1;
+    }
   }
   return len;
 }
