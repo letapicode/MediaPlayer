@@ -1,4 +1,5 @@
 #include "mediaplayer/MediaDemuxer.h"
+#include "mediaplayer/BufferedReader.h"
 #include "mediaplayer/NetworkStream.h"
 #include <iostream>
 
@@ -16,6 +17,10 @@ void MediaDemuxer::close() {
   if (m_ctx) {
     avformat_close_input(&m_ctx);
   }
+  if (m_bufferedReader) {
+    m_bufferedReader->close();
+    m_bufferedReader.reset();
+  }
   m_audioStream = -1;
   m_videoStream = -1;
   m_eof = false;
@@ -24,11 +29,20 @@ void MediaDemuxer::close() {
 bool MediaDemuxer::open(const std::string &path) {
   close();
   if (isUrl(path)) {
-    NetworkStream stream;
-    if (!stream.open(path)) {
-      return false;
+    if (m_bufferSize > 0) {
+      m_bufferedReader = std::make_unique<BufferedReader>();
+      if (!m_bufferedReader->open(path, m_bufferSize)) {
+        m_bufferedReader.reset();
+        return false;
+      }
+      m_ctx = m_bufferedReader->context();
+    } else {
+      NetworkStream stream;
+      if (!stream.open(path)) {
+        return false;
+      }
+      m_ctx = stream.release();
     }
-    m_ctx = stream.release();
   } else if (avformat_open_input(&m_ctx, path.c_str(), nullptr, nullptr) < 0) {
     std::cerr << "Failed to open media: " << path << '\n';
     return false;

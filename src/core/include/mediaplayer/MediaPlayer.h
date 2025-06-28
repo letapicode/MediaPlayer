@@ -46,6 +46,8 @@ public:
   void setVolume(double volume); // 0.0 - 1.0
   double volume() const;
   double position() const; // seconds
+  void setNetworkBufferSize(size_t size);
+  size_t networkBufferSize() const;
   const MediaMetadata &metadata() const { return m_metadata; }
   int readAudio(uint8_t *buffer, int bufferSize);
   int readVideo(uint8_t *buffer, int bufferSize);
@@ -69,6 +71,7 @@ private:
   double m_audioClock{0.0};
   double m_videoClock{0.0};
   double m_startTime{0.0};
+  size_t m_networkBufferSize{0};
   std::atomic<bool> m_stopRequested{false};
   PacketQueue m_audioPackets;
   PacketQueue m_videoPackets;
