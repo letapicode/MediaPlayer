@@ -10,6 +10,7 @@ extern "C" {
 #include <queue>
 
 #include <condition_variable>
+#include <functional>
 
 namespace mediaplayer {
 
@@ -19,7 +20,7 @@ public:
   ~PacketQueue();
 
   bool push(const AVPacket *pkt);
-  bool pop(AVPacket *&pkt);
+  bool pop(AVPacket *&pkt, const std::function<bool()> &waitPredicate = nullptr);
   void clear();
   size_t size() const;
   bool full() const;
