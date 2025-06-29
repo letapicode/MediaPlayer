@@ -66,6 +66,7 @@ Below, each module is detailed with its tasks. Each task listing includes a shor
   * *Task:* **Frame Renderer – Android (OpenGL ES)** – Implement rendering in Android using OpenGL ES. Likely, we render on a `SurfaceView` or `TextureView` via an OpenGL ES context. *Language:* C++ (NDK OpenGL ES), with JNI hooks to an Android `Surface`. *Libraries:* OpenGL ES 3.0, EGL. *Environment:* **Android NDK** with OpenGL support.
   * *Task:* **Frame Renderer – iOS (Metal/GL ES)** – On iOS, use either OpenGL ES or Metal. If using a unified approach, we can use OpenGL ES 3.0 on iOS as well via GLKit (though Apple prefers Metal). Implement an `AVSampleBufferDisplayLayer` alternative if not using custom GL. *Language:* Obj-C++/Swift. *Libraries:* OpenGL ES via GLKit, or Metal. *Environment:* **Xcode iOS** with appropriate frameworks.
   * *Task:* **Video Output Integration** – Connect the decoder thread to video output: copy or share decoded frames to the rendering component. Ensure thread safety and possibly use double-buffering or queue to avoid frame drops. *Language:* C++17. *Environment:* C++ dev.
+  * *Note:* A detailed breakdown of these rendering tasks is available in [docs/video_output_tasks.md](docs/video_output_tasks.md).
 
 * **Playback Control & Media Session:**
 
