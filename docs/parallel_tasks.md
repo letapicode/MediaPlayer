@@ -37,7 +37,7 @@
 | 31 | Audio Format Conversion Utility | done | implemented in `src/format_conversion` |
 | 32 | Video Transcoding Utility | done | implemented in `src/format_conversion` |
 | 33 | Conversion Task Management | done | asynchronous `FormatConverter` |
-| 34 | Integration in UI | open | relevant |
+| 34 | Integration in UI | done | CLI tool `mediaconvert` demonstrates usage |
 | 35 | Network Stream Input Support | open | relevant |
 | 36 | YouTube Integration (Optional) | open | relevant |
 | 37 | Streaming Protocols (HLS/DASH) | open | relevant |
