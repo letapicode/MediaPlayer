@@ -116,9 +116,9 @@ bool VideoDecoder::open(AVFormatContext *fmtCtx, int streamIndex,
     avcodec_free_context(&m_codecCtx);
     return false;
   }
-  m_swsCtx =
-      sws_getContext(m_codecCtx->width, m_codecCtx->height, m_codecCtx->pix_fmt, m_codecCtx->width,
-                     m_codecCtx->height, AV_PIX_FMT_RGBA, SWS_BILINEAR, nullptr, nullptr, nullptr);
+  m_swsCtx = sws_getContext(m_codecCtx->width, m_codecCtx->height, m_codecCtx->pix_fmt,
+                            m_codecCtx->width, m_codecCtx->height, AV_PIX_FMT_YUV420P, SWS_BILINEAR,
+                            nullptr, nullptr, nullptr);
   if (!m_swsCtx) {
     avcodec_free_context(&m_codecCtx);
     return false;
@@ -132,14 +132,16 @@ int VideoDecoder::decode(AVPacket *pkt, uint8_t *outBuffer, int outBufferSize) {
   }
   int total = 0;
   const int frameBytes =
-      av_image_get_buffer_size(AV_PIX_FMT_RGBA, m_codecCtx->width, m_codecCtx->height, 1);
+      av_image_get_buffer_size(AV_PIX_FMT_YUV420P, m_codecCtx->width, m_codecCtx->height, 1);
   while (avcodec_receive_frame(m_codecCtx, m_frame) == 0) {
     m_lastPts = m_frame->best_effort_timestamp;
     if (total + frameBytes > outBufferSize) {
       break;
     }
-    uint8_t *dstData[4] = {outBuffer + total, nullptr, nullptr, nullptr};
-    int dstLinesize[4] = {m_codecCtx->width * 4, 0, 0, 0};
+    uint8_t *dstData[4];
+    int dstLinesize[4];
+    av_image_fill_arrays(dstData, dstLinesize, outBuffer + total, AV_PIX_FMT_YUV420P,
+                         m_codecCtx->width, m_codecCtx->height, 1);
 #ifdef MEDIAPLAYER_HW_DECODING
     // Decode may return frames stored in GPU memory. When that happens we copy
     // them back to a regular AVFrame for scaling.

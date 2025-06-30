@@ -6,6 +6,7 @@
 #elif defined(__linux__)
 #include "mediaplayer/AudioOutputPulse.h"
 #endif
+#include "mediaplayer/VideoFrame.h"
 #include <chrono>
 #include <cstdint>
 #include <filesystem>
@@ -398,8 +399,8 @@ void MediaPlayer::audioLoop() {
 }
 
 void MediaPlayer::videoLoop() {
-  const int videoBufferSize =
-      av_image_get_buffer_size(AV_PIX_FMT_RGBA, m_videoDecoder.width(), m_videoDecoder.height(), 1);
+  const int videoBufferSize = av_image_get_buffer_size(AV_PIX_FMT_YUV420P, m_videoDecoder.width(),
+                                                       m_videoDecoder.height(), 1);
   std::vector<uint8_t> videoBuffer(videoBufferSize);
   while (true) {
     {
@@ -421,7 +422,16 @@ void MediaPlayer::videoLoop() {
         double delay = m_videoClock - master;
         if (delay > 0)
           std::this_thread::sleep_for(std::chrono::duration<double>(delay));
-        m_videoOutput->displayFrame(videoBuffer.data(), m_videoDecoder.width() * 4);
+        VideoFrame frame{};
+        frame.width = m_videoDecoder.width();
+        frame.height = m_videoDecoder.height();
+        frame.planes[0] = videoBuffer.data();
+        frame.linesize[0] = frame.width;
+        frame.planes[1] = frame.planes[0] + frame.linesize[0] * frame.height;
+        frame.linesize[1] = frame.width / 2;
+        frame.planes[2] = frame.planes[1] + frame.linesize[1] * (frame.height / 2);
+        frame.linesize[2] = frame.width / 2;
+        m_videoOutput->displayFrame(frame);
         if (m_callbacks.onPosition)
           m_callbacks.onPosition(m_videoClock);
       }
