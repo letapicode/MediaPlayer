@@ -47,6 +47,7 @@ target_include_directories(mediaplayer_core PUBLIC
     $<INSTALL_INTERFACE:include>
     ${FFMPEG_INCLUDE_DIRS}
     ${TAGLIB_INCLUDE_DIRS}
+    ${CMAKE_SOURCE_DIR}/src/library/include/mediaplayer
     $<$<PLATFORM_ID:Android>:${CMAKE_SOURCE_DIR}/src/android>
 )
 
@@ -54,6 +55,7 @@ target_link_libraries(mediaplayer_core
     PkgConfig::FFMPEG
     PkgConfig::TAGLIB
     mediaplayer_network
+    mediaplayer_conversion
     OpenGL::GL
     glfw
 )

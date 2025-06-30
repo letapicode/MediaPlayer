@@ -1,5 +1,6 @@
 #include "mediaplayer/BufferedReader.h"
 #include <algorithm>
+#include <cstring>
 #include <iostream>
 
 extern "C" {
