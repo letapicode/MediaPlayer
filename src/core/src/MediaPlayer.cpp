@@ -7,6 +7,7 @@
 #include "mediaplayer/AudioOutputPulse.h"
 #endif
 #include "mediaplayer/VideoFrame.h"
+#include <algorithm>
 #include <chrono>
 #include <cstdint>
 #include <cstring>
@@ -192,6 +193,18 @@ void MediaPlayer::setPreferredHardwareDevice(const std::string &device) {
 void MediaPlayer::setLibrary(LibraryDB *db) {
   std::lock_guard<std::mutex> lock(m_mutex);
   m_library = db;
+}
+
+void MediaPlayer::addAudioEffect(std::shared_ptr<AudioEffect> effect) {
+  std::lock_guard<std::mutex> lock(m_mutex);
+  if (effect)
+    m_audioEffects.push_back(std::move(effect));
+}
+
+void MediaPlayer::removeAudioEffect(std::shared_ptr<AudioEffect> effect) {
+  std::lock_guard<std::mutex> lock(m_mutex);
+  auto it = std::remove(m_audioEffects.begin(), m_audioEffects.end(), effect);
+  m_audioEffects.erase(it, m_audioEffects.end());
 }
 
 void MediaPlayer::setCallbacks(PlaybackCallbacks callbacks) {
@@ -393,9 +406,9 @@ void MediaPlayer::audioLoop() {
           std::lock_guard<std::mutex> lock(m_mutex);
           vol = m_volume;
         }
+        int16_t *samples = reinterpret_cast<int16_t *>(audioBuffer);
+        int sampleCount = bytes / sizeof(int16_t);
         if (vol < 0.999) {
-          int16_t *samples = reinterpret_cast<int16_t *>(audioBuffer);
-          int sampleCount = bytes / sizeof(int16_t);
           for (int i = 0; i < sampleCount; ++i) {
             int32_t s = static_cast<int32_t>(samples[i] * vol);
             if (s < -32768)
@@ -405,6 +418,13 @@ void MediaPlayer::audioLoop() {
             samples[i] = static_cast<int16_t>(s);
           }
         }
+        std::vector<std::shared_ptr<AudioEffect>> effects;
+        {
+          std::lock_guard<std::mutex> lock(m_mutex);
+          effects = m_audioEffects;
+        }
+        for (auto &effect : effects)
+          effect->process(samples, sampleCount);
         m_output->write(audioBuffer, bytes);
         if (m_callbacks.onPosition)
           m_callbacks.onPosition(m_audioClock);

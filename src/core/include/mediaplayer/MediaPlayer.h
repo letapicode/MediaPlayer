@@ -4,6 +4,7 @@
 #include <string>
 
 #include "AudioDecoder.h"
+#include "AudioEffect.h"
 #include "AudioOutput.h"
 #include "LibraryDB.h"
 #include "MediaDemuxer.h"
@@ -23,6 +24,7 @@
 #include <memory>
 #include <mutex>
 #include <thread>
+#include <vector>
 
 namespace mediaplayer {
 
@@ -47,6 +49,8 @@ public:
   void setPreferredHardwareDevice(const std::string &device);
   void setCallbacks(PlaybackCallbacks callbacks);
   void setLibrary(LibraryDB *db);
+  void addAudioEffect(std::shared_ptr<AudioEffect> effect);
+  void removeAudioEffect(std::shared_ptr<AudioEffect> effect);
   void setVolume(double volume); // 0.0 - 1.0
   double volume() const;
   double position() const; // seconds
@@ -81,6 +85,7 @@ private:
   PacketQueue m_videoPackets;
   VideoFrameQueue m_frameQueue;
   PlaybackCallbacks m_callbacks;
+  std::vector<std::shared_ptr<AudioEffect>> m_audioEffects;
   PlaylistManager m_playlist;
   LibraryDB *m_library{nullptr};
   bool m_playRecorded{false};
