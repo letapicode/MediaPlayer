@@ -5,6 +5,7 @@
 #include "mediaplayer/NetworkStream.h"
 #include <algorithm>
 #include <iostream>
+#include <libavcodec/avcodec.h>
 
 namespace mediaplayer {
 
@@ -27,6 +28,7 @@ void MediaDemuxer::close() {
   m_audioStream = -1;
   m_videoStream = -1;
   m_subtitleStream = -1;
+  m_subtitleTracks.clear();
   m_eof = false;
 }
 
@@ -75,13 +77,30 @@ bool MediaDemuxer::open(const std::string &path) {
       m_audioStream = i;
     } else if (m_ctx->streams[i]->codecpar->codec_type == AVMEDIA_TYPE_VIDEO && m_videoStream < 0) {
       m_videoStream = i;
-    } else if (m_ctx->streams[i]->codecpar->codec_type == AVMEDIA_TYPE_SUBTITLE &&
-               m_subtitleStream < 0) {
-      m_subtitleStream = i;
+    } else if (m_ctx->streams[i]->codecpar->codec_type == AVMEDIA_TYPE_SUBTITLE) {
+      SubtitleTrackInfo info{};
+      info.index = i;
+      AVDictionaryEntry *lang = av_dict_get(m_ctx->streams[i]->metadata, "language", nullptr, 0);
+      if (lang && lang->value)
+        info.language = lang->value;
+      info.codec = avcodec_get_name(m_ctx->streams[i]->codecpar->codec_id);
+      m_subtitleTracks.push_back(std::move(info));
+      if (m_subtitleStream < 0)
+        m_subtitleStream = i;
     }
   }
   m_eof = false;
   return true;
+}
+
+bool MediaDemuxer::setSubtitleStream(int index) {
+  for (const auto &info : m_subtitleTracks) {
+    if (info.index == index) {
+      m_subtitleStream = index;
+      return true;
+    }
+  }
+  return false;
 }
 
 bool MediaDemuxer::readPacket(AVPacket &pkt) {
