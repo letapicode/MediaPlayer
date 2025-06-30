@@ -38,10 +38,10 @@
 | 32 | Video Transcoding Utility | done | implemented in `src/format_conversion` |
 | 33 | Conversion Task Management | done | asynchronous `FormatConverter` |
 | 34 | Integration in UI | done | CLI tool `mediaconvert` and Qt signals via `FormatConverterQt` |
-| 35 | Network Stream Input Support | open | relevant |
-| 36 | YouTube Integration (Optional) | open | relevant |
-| 37 | Streaming Protocols (HLS/DASH) | open | relevant |
-| 38 | Internet Radio Streams | open | relevant |
+| 35 | Network Stream Input Support | done | implemented via `NetworkStream` |
+| 36 | YouTube Integration (Optional) | done | `YouTubeDL` helper resolves links |
+| 37 | Streaming Protocols (HLS/DASH) | done | handled by `HlsStream` and `DashStream` |
+| 38 | Internet Radio Streams | done | `InternetRadioStream` with ICY metadata |
 | 39 | Subtitle Parser (SRT) | done | relevant |
 | 40 | Subtitle Renderer/Provider | done | `SubtitleProvider` supplies cues |
 | 41 | Subtitle Sync Adjustment | done | `SubtitleProvider::setOffset` |
@@ -204,7 +204,7 @@
 | # | Task | Status | Notes |
 |-:|------|--------|-------|
 | 160 | Open URL UI | open | relevant |
-| 161 | YouTube DL Integration | open | relevant |
+| 161 | YouTube DL Integration | done | `YouTubeDL` helper in network module |
 | 162 | Local DLNA/UPnP Support | open | relevant |
 | 163 | HTTP Server for Remote Control | open | relevant |
 | 164 | Discovery (mDNS) | open | relevant |

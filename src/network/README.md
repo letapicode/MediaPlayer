@@ -58,3 +58,16 @@ radio.setMetadataCallback([](const std::string &title) {
 });
 radio.open("http://example.com/stream");
 ```
+
+## YouTubeDL Helper
+
+`YouTubeDL` provides a simple way to resolve YouTube links to direct stream URLs using the external `youtube-dl` tool.
+
+```cpp
+std::string direct;
+if (mediaplayer::YouTubeDL::getStreamUrl("https://youtube.com/watch?v=...", direct)) {
+  // open `direct` with MediaDemuxer
+}
+```
+
+The command `youtube-dl -g` must be available in the PATH (installable via `pip install youtube_dl`).

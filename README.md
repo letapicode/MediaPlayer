@@ -75,6 +75,13 @@ Run the resulting `mediaplayer` executable with a media file:
 
 The graphical interface allows you to open files and manage your library as features are implemented.
 
+### Network Streams
+
+MediaPlayer can open HTTP/HTTPS URLs and playlist formats like HLS (`.m3u8`) and
+DASH (`.mpd`). The `mediaplayer_network` module wraps FFmpeg's networking
+support and provides helpers for internet radio metadata and resolving YouTube
+links via `youtube-dl`. See `src/network/README.md` for examples.
+
 ## Contributing
 
 Please read our [Code of Conduct](CODE_OF_CONDUCT.md) before participating.
