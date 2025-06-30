@@ -40,6 +40,8 @@ public:
   void addToPlaylist(const std::string &path);
   void clearPlaylist();
   bool nextTrack();
+  void enableShuffle(bool enabled);
+  bool shuffleEnabled() const;
   void setAudioOutput(std::unique_ptr<AudioOutput> output);
   void setVideoOutput(std::unique_ptr<VideoOutput> output);
   void setPreferredHardwareDevice(const std::string &device);
