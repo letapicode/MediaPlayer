@@ -1,5 +1,6 @@
 add_library(mediaplayer_network
     src/NetworkStream.cpp
+    src/DashStream.cpp
 )
 
 find_package(PkgConfig)
