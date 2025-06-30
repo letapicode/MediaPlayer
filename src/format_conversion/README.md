@@ -7,3 +7,8 @@ from the extension of the output file.
 
 The `VideoConverter` class offers similar functionality for video files. It can
 transcode between formats and optionally resize or set a target bitrate.
+
+`FormatConverter` wraps these helpers to run conversions asynchronously. Its
+`convertAudioAsync` and `convertVideoAsync` methods execute on a background
+thread and provide progress callbacks (0-1 range) and a completion callback for
+UI integration.
