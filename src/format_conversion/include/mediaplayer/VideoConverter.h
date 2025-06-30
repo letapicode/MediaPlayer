@@ -11,7 +11,7 @@ namespace mediaplayer {
 class VideoConverter {
 public:
   // Convert input video to output path. If width/height are 0, keep input size.
-  // Bitrate is in bits per second.
+  // Use bitrate or constant rate factor (crf) as specified in options.
   bool convert(const std::string &inputPath, const std::string &outputPath,
                const VideoEncodeOptions &options = {}, std::function<void(float)> progress = {},
                std::atomic<bool> *cancelFlag = nullptr);

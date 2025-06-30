@@ -6,7 +6,8 @@ takes an input file path and an output file path. The output format is inferred
 from the extension of the output file.
 
 The `VideoConverter` class offers similar functionality for video files. It can
-transcode between formats and optionally resize or set a target bitrate.
+transcode between formats and optionally resize or set a target bitrate or
+constant rate factor (CRF) for encoders that support it.
 
 `FormatConverter` wraps these helpers to run conversions asynchronously. Its
 `convertAudioAsync` and `convertVideoAsync` methods execute on a background
@@ -46,8 +47,8 @@ provides easy access to the conversion functionality.
 mediaconvert <audio|video> <input> <output> [options]
 ```
 
-Options allow setting bitrate, codec and for video the output size. Progress is
-printed to the console.
+Options allow setting bitrate or `--crf` quality level, codec and for video the
+output size. Progress is printed to the console.
 
 ### Cancellation API
 

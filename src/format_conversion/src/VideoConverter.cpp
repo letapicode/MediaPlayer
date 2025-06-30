@@ -4,7 +4,9 @@ extern "C" {
 #include <libavcodec/avcodec.h>
 #include <libavformat/avformat.h>
 #include <libavutil/avutil.h>
+#include <libavutil/dict.h>
 #include <libavutil/imgutils.h>
+#include <libavutil/opt.h>
 #include <libswscale/swscale.h>
 }
 
@@ -81,17 +83,26 @@ bool VideoConverter::convert(const std::string &inputPath, const std::string &ou
   encCtx->height = height;
   encCtx->pix_fmt = enc->pix_fmts ? enc->pix_fmts[0] : AV_PIX_FMT_YUV420P;
   encCtx->time_base = {1, 25};
-  encCtx->bit_rate = options.bitrate > 0 ? options.bitrate : 1000000;
+  if (options.crf >= 0) {
+    encCtx->bit_rate = 0;
+  } else {
+    encCtx->bit_rate = options.bitrate > 0 ? options.bitrate : 1000000;
+  }
   outSt->time_base = encCtx->time_base;
   if (outCtx->oformat->flags & AVFMT_GLOBALHEADER)
     encCtx->flags |= AV_CODEC_FLAG_GLOBAL_HEADER;
-  if (avcodec_open2(encCtx, enc, nullptr) < 0) {
+  AVDictionary *openOpts = nullptr;
+  if (options.crf >= 0)
+    av_dict_set_int(&openOpts, "crf", options.crf, 0);
+  if (avcodec_open2(encCtx, enc, &openOpts) < 0) {
+    av_dict_free(&openOpts);
     avcodec_free_context(&encCtx);
     avformat_free_context(outCtx);
     avcodec_free_context(&decCtx);
     avformat_close_input(&inCtx);
     return false;
   }
+  av_dict_free(&openOpts);
   avcodec_parameters_from_context(outSt->codecpar, encCtx);
 
   if (!(outCtx->oformat->flags & AVFMT_NOFILE)) {
