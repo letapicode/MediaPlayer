@@ -11,3 +11,17 @@ if (stream.open("https://example.com/video.mp4")) {
   // pass ctx to MediaPlayer or custom processing
 }
 ```
+
+## InternetRadioStream
+
+`InternetRadioStream` uses libcurl to read ICY metadata from internet radio
+streams. When a `StreamTitle` change is detected, the provided callback is
+invoked with the new title.
+
+```cpp
+mediaplayer::InternetRadioStream radio;
+radio.setMetadataCallback([](const std::string &title) {
+  std::cout << "Now playing: " << title << std::endl;
+});
+radio.open("http://example.com/stream");
+```
