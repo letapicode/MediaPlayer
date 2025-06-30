@@ -29,7 +29,7 @@
 | 23 | Frame Renderer – Android (OpenGL ES) | done | implemented in `src/android/AndroidGLVideoOutput.cpp` |
 | 24 | Frame Renderer – iOS (Metal/GL ES) | done | implemented in `src/core/src/MetalVideoOutput.mm` |
 | 25 | Video Output Integration | done | relevant |
-| 26 | Implement Play/Pause/Seek Logic | done | reset EOF after seeking to resume demuxing |
+| 26 | Implement Play/Pause/Seek Logic | done | seek now calls `MediaDemuxer::resetEof` after `av_seek_frame` to resume demuxing |
 | 27 | Track and Playlist Management (Core) | done | relevant |
 | 28 | Playback State Notifications | done | relevant |
 | 29 | Volume and Audio Effects | done | relevant |

@@ -77,6 +77,4 @@ bool MediaDemuxer::readPacket(AVPacket &pkt) {
   return true;
 }
 
-void MediaDemuxer::resetEof() { m_eof = false; }
-
 } // namespace mediaplayer
