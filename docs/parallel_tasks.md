@@ -14,7 +14,7 @@
 | 8 | Audio/Video Synchronization | done | relevant |
 | 9 | Buffering and Caching Logic | done | relevant |
 | 10 | Threading and Locking | done | relevant |
-| 11 | Hardware Decoding Support (Optional) | open | relevant |
+| 11 | Hardware Decoding Support (Optional) | done | cross-platform hw decoder in `VideoDecoder` |
 | 12 | Abstract Audio Output Interface | done | relevant |
 | 13 | Audio Output – Windows (WASAPI) | done | relevant |
 | 14 | Audio Output – macOS (CoreAudio) | done | relevant |
@@ -43,8 +43,8 @@
 | 37 | Streaming Protocols (HLS/DASH) | open | relevant |
 | 38 | Internet Radio Streams | open | relevant |
 | 39 | Subtitle Parser (SRT) | done | relevant |
-| 40 | Subtitle Renderer/Provider | open | relevant |
-| 41 | Subtitle Sync Adjustment | open | relevant |
+| 40 | Subtitle Renderer/Provider | done | `SubtitleProvider` supplies cues |
+| 41 | Subtitle Sync Adjustment | done | `SubtitleProvider::setOffset` |
 | 42 | Subtitle Track Selection | open | relevant |
 | 43 | Audio Visualization Feed | open | relevant |
 | 44 | Visualization API Hook | open | relevant |
@@ -60,8 +60,8 @@
 | 49 | Integrate SQLite Database | done | relevant |
 | 50 | Define DB Schema | done | relevant |
 | 51 | Implement Library Scanning | done | relevant |
-| 52 | Metadata Extraction | open | relevant |
-| 53 | Update/Remove Entries | open | relevant |
+| 52 | Metadata Extraction | done | TagLib & FFmpeg in `LibraryDB` |
+| 53 | Update/Remove Entries | done | `updateMedia`/`removeMedia` APIs |
 | 54 | Basic Playlist Management | done | relevant |
 | 55 | Smart Playlist Criteria | open | relevant |
 | 56 | Auto Playlists (Recent, Frequent) | open | relevant |
