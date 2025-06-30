@@ -11,9 +11,9 @@ set(CORE_SOURCES
 )
 
 if(CMAKE_SYSTEM_NAME STREQUAL "iOS")
-    list(APPEND CORE_SOURCES src/AudioOutputiOS.mm)
+    list(APPEND CORE_SOURCES src/AudioOutputiOS.mm src/MetalVideoOutput.mm)
 elseif(APPLE)
-    list(APPEND CORE_SOURCES src/AudioOutputCoreAudio.mm)
+    list(APPEND CORE_SOURCES src/AudioOutputCoreAudio.mm src/MetalVideoOutput.mm)
 elseif(WIN32)
     list(APPEND CORE_SOURCES src/AudioOutputWASAPI.cpp)
 elseif(ANDROID)
@@ -75,11 +75,17 @@ endif()
 if(CMAKE_SYSTEM_NAME STREQUAL "iOS")
     target_link_libraries(mediaplayer_core
         "-framework AVFoundation"
-        "-framework AudioToolbox")
+        "-framework AudioToolbox"
+        "-framework Metal"
+        "-framework QuartzCore"
+        "-framework MetalKit")
 elseif(APPLE)
     target_link_libraries(mediaplayer_core
         "-framework AudioToolbox"
-        "-framework CoreAudio")
+        "-framework CoreAudio"
+        "-framework Metal"
+        "-framework QuartzCore"
+        "-framework MetalKit")
 elseif(WIN32)
     target_link_libraries(mediaplayer_core ole32)
 elseif(ANDROID)
