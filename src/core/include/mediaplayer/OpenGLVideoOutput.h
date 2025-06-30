@@ -5,6 +5,10 @@
 #include "VideoOutput.h"
 #include <GLFW/glfw3.h>
 
+extern "C" {
+#include <libswscale/swscale.h>
+}
+
 namespace mediaplayer {
 
 class OpenGLVideoOutput : public VideoOutput {
@@ -22,6 +26,7 @@ private:
   unsigned int m_texture{0};
   int m_width{0};
   int m_height{0};
+  SwsContext *m_swsCtx{nullptr};
 };
 
 } // namespace mediaplayer
