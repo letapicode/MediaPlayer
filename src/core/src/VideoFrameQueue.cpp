@@ -39,6 +39,7 @@ void VideoFrameQueue::clear() {
     delete f;
     m_queue.pop();
   }
+  m_cv.notify_all();
 }
 
 size_t VideoFrameQueue::size() const {
