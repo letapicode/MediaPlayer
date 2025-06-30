@@ -1,6 +1,9 @@
 #include "mediaplayer/MediaDemuxer.h"
 #include "mediaplayer/BufferedReader.h"
+#include "mediaplayer/DashStream.h"
+#include "mediaplayer/HlsStream.h"
 #include "mediaplayer/NetworkStream.h"
+#include <algorithm>
 #include <iostream>
 
 namespace mediaplayer {
@@ -38,11 +41,25 @@ bool MediaDemuxer::open(const std::string &path) {
       }
       m_ctx = m_bufferedReader->context();
     } else {
-      NetworkStream stream;
-      if (!stream.open(path)) {
-        return false;
+      std::string lower = path;
+      std::transform(lower.begin(), lower.end(), lower.begin(), ::tolower);
+      if (lower.rfind(".m3u8") != std::string::npos) {
+        HlsStream hls;
+        if (!hls.open(path))
+          return false;
+        m_ctx = hls.release();
+      } else if (lower.rfind(".mpd") != std::string::npos) {
+        DashStream dash;
+        if (!dash.open(path))
+          return false;
+        m_ctx = dash.release();
+      } else {
+        NetworkStream stream;
+        if (!stream.open(path)) {
+          return false;
+        }
+        m_ctx = stream.release();
       }
-      m_ctx = stream.release();
     }
   } else if (avformat_open_input(&m_ctx, path.c_str(), nullptr, nullptr) < 0) {
     std::cerr << "Failed to open media: " << path << '\n';
