@@ -13,6 +13,7 @@ public:
     return true;
   }
   void shutdown() override { std::cout << "NullVideoOutput shutdown\n"; }
+  void displayFrame(const uint8_t *, int) override {}
   void displayFrame(const VideoFrame &) override {}
 };
 

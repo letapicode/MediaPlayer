@@ -8,6 +8,7 @@ set(CORE_SOURCES
     src/BufferedReader.cpp
     src/OpenGLVideoOutput.cpp
     src/RingBuffer.cpp
+    src/VideoFrameQueue.cpp
 )
 
 if(CMAKE_SYSTEM_NAME STREQUAL "iOS")

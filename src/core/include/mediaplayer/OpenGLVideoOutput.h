@@ -12,18 +12,14 @@ public:
   OpenGLVideoOutput();
   ~OpenGLVideoOutput() override;
 
-  bool init(int width, int height) override { return init(width, height, nullptr); }
-  bool init(int width, int height, void *externalContext);
+  bool init(int width, int height) override;
   void shutdown() override;
+  void displayFrame(const uint8_t *rgba, int linesize) override;
   void displayFrame(const VideoFrame &frame) override;
 
 private:
   GLFWwindow *m_window{nullptr};
-  bool m_external{false};
-  unsigned int m_texY{0};
-  unsigned int m_texU{0};
-  unsigned int m_texV{0};
-  unsigned int m_program{0};
+  unsigned int m_texture{0};
   int m_width{0};
   int m_height{0};
 };

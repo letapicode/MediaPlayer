@@ -9,6 +9,7 @@
 #include "mediaplayer/VideoFrame.h"
 #include <chrono>
 #include <cstdint>
+#include <cstring>
 #include <filesystem>
 #include <iostream>
 #include <libavformat/avformat.h>
@@ -31,10 +32,14 @@ MediaPlayer::MediaPlayer() {
 #else
   m_output = std::make_unique<NullAudioOutput>();
 #endif
-#ifdef MEDIAPLAYER_DESKTOP
+#ifdef _WIN32
   m_videoOutput = std::make_unique<OpenGLVideoOutput>();
-#else
+#elif defined(__APPLE__)
+  m_videoOutput = std::make_unique<OpenGLVideoOutput>();
+#elif defined(ANDROID)
   m_videoOutput = std::make_unique<NullVideoOutput>();
+#else
+  m_videoOutput = std::make_unique<OpenGLVideoOutput>();
 #endif
 #ifdef MEDIAPLAYER_HW_DECODING
 #ifdef _WIN32
@@ -54,6 +59,7 @@ MediaPlayer::~MediaPlayer() {
   }
   m_audioPackets.clear();
   m_videoPackets.clear();
+  m_frameQueue.clear();
   avformat_network_deinit();
 }
 
@@ -280,6 +286,7 @@ void MediaPlayer::stop() {
     m_videoOutput->shutdown();
   m_audioPackets.clear();
   m_videoPackets.clear();
+  m_frameQueue.clear();
   m_running = false;
   if (m_callbacks.onStop)
     m_callbacks.onStop();
@@ -399,9 +406,33 @@ void MediaPlayer::audioLoop() {
 }
 
 void MediaPlayer::videoLoop() {
-  const int videoBufferSize = av_image_get_buffer_size(AV_PIX_FMT_YUV420P, m_videoDecoder.width(),
-                                                       m_videoDecoder.height(), 1);
-  std::vector<uint8_t> videoBuffer(videoBufferSize);
+
+  std::thread renderThread([this]() {
+    while (true) {
+      VideoFrame *frame = nullptr;
+      if (m_frameQueue.pop(frame, [this]() { return m_stopRequested.load(); })) {
+        if (!frame)
+          continue;
+        m_videoClock = frame->pts;
+        double master =
+            m_demuxer.audioStream() >= 0 ? m_audioClock : (av_gettime() / 1000000.0 - m_startTime);
+        double delay = m_videoClock - master;
+        if (delay > 0)
+          std::this_thread::sleep_for(std::chrono::duration<double>(delay));
+        if (m_videoOutput)
+          m_videoOutput->displayFrame(*frame);
+        if (m_callbacks.onPosition)
+          m_callbacks.onPosition(m_videoClock);
+        delete[] frame->data[0];
+        delete[] frame->data[1];
+        delete[] frame->data[2];
+        delete frame;
+      } else if (m_stopRequested.load()) {
+        break;
+      }
+    }
+  });
+
   while (true) {
     {
       std::unique_lock<std::mutex> lock(m_mutex);
@@ -413,32 +444,52 @@ void MediaPlayer::videoLoop() {
     }
     AVPacket *pkt = nullptr;
     if (m_videoPackets.pop(pkt, [this]() { return m_stopRequested.load() || m_demuxer.eof(); })) {
-      int bytes = m_videoDecoder.decode(pkt, videoBuffer.data(), videoBufferSize);
+      VideoFrame tmp{};
+      bool ok = m_videoDecoder.decodeYUV(pkt, tmp);
       av_packet_free(&pkt);
-      if (bytes > 0 && m_videoOutput) {
-        m_videoClock = m_videoDecoder.lastPts();
-        double master =
-            m_demuxer.audioStream() >= 0 ? m_audioClock : (av_gettime() / 1000000.0 - m_startTime);
-        double delay = m_videoClock - master;
-        if (delay > 0)
-          std::this_thread::sleep_for(std::chrono::duration<double>(delay));
-        VideoFrame frame{};
-        frame.width = m_videoDecoder.width();
-        frame.height = m_videoDecoder.height();
-        frame.planes[0] = videoBuffer.data();
-        frame.linesize[0] = frame.width;
-        frame.planes[1] = frame.planes[0] + frame.linesize[0] * frame.height;
-        frame.linesize[1] = frame.width / 2;
-        frame.planes[2] = frame.planes[1] + frame.linesize[1] * (frame.height / 2);
-        frame.linesize[2] = frame.width / 2;
-        m_videoOutput->displayFrame(frame);
-        if (m_callbacks.onPosition)
-          m_callbacks.onPosition(m_videoClock);
+      if (ok) {
+        auto *frame = new VideoFrame();
+        frame->width = tmp.width;
+        frame->height = tmp.height;
+        frame->linesize[0] = tmp.linesize[0];
+        frame->linesize[1] = tmp.linesize[1];
+        frame->linesize[2] = tmp.linesize[2];
+        frame->pts = m_videoDecoder.lastPts();
+        int yBytes = frame->linesize[0] * frame->height;
+        int uBytes = frame->linesize[1] * frame->height / 2;
+        int vBytes = frame->linesize[2] * frame->height / 2;
+        frame->data[0] = new uint8_t[yBytes];
+        frame->data[1] = new uint8_t[uBytes];
+        frame->data[2] = new uint8_t[vBytes];
+        for (int y = 0; y < frame->height; ++y)
+          memcpy(frame->data[0] + y * frame->linesize[0], tmp.data[0] + y * tmp.linesize[0],
+                 frame->linesize[0]);
+        for (int y = 0; y < frame->height / 2; ++y) {
+          memcpy(frame->data[1] + y * frame->linesize[1], tmp.data[1] + y * tmp.linesize[1],
+                 frame->linesize[1]);
+          memcpy(frame->data[2] + y * frame->linesize[2], tmp.data[2] + y * tmp.linesize[2],
+                 frame->linesize[2]);
+        }
+        while (!m_frameQueue.push(frame)) {
+          if (m_stopRequested.load()) {
+            delete[] frame->data[0];
+            delete[] frame->data[1];
+            delete[] frame->data[2];
+            delete frame;
+            break;
+          }
+          std::this_thread::sleep_for(std::chrono::milliseconds(5));
+        }
       }
     } else {
       break;
     }
   }
+
+  m_stopRequested.store(true);
+  m_frameQueue.clear();
+  if (renderThread.joinable())
+    renderThread.join();
 }
 
 } // namespace mediaplayer
