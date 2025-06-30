@@ -9,6 +9,7 @@ Ensure the following packages are installed:
 - **CMake** 3.15 or newer
 - A C++17 compatible compiler
 - **FFmpeg** development libraries
+- **libcurl** development headers (`libcurl4-openssl-dev`) so FFmpeg supports HTTP/HTTPS streaming
 - **TagLib** development headers
 - **PulseAudio** (`libpulse` and `libpulse-simple`)
 - **SQLite** development library
@@ -19,6 +20,7 @@ On Ubuntu the packages can be installed with:
 ```bash
 sudo apt-get install -y build-essential cmake git \
     libavcodec-dev libavformat-dev libswresample-dev libswscale-dev \
+    libcurl4-openssl-dev \
     libsqlite3-dev libtag1-dev libpulse-dev libpulse-simple-dev
 ```
 

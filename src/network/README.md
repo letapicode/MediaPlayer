@@ -11,3 +11,12 @@ if (stream.open("https://example.com/video.mp4")) {
   // pass ctx to MediaPlayer or custom processing
 }
 ```
+
+The helper function `protocolAvailable` can be used to verify that a protocol
+such as `"http"` or `"rtmp"` is supported by the FFmpeg build:
+
+```cpp
+if (mediaplayer::protocolAvailable("http")) {
+  // safe to open HTTP URLs
+}
+```
