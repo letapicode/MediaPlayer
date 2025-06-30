@@ -17,7 +17,8 @@ elseif(APPLE)
 elseif(WIN32)
     list(APPEND CORE_SOURCES src/AudioOutputWASAPI.cpp)
 elseif(ANDROID)
-    list(APPEND CORE_SOURCES src/AudioOutputAndroid.cpp)
+    list(APPEND CORE_SOURCES src/AudioOutputAndroid.cpp
+        ../android/AndroidGLVideoOutput.cpp)
 elseif(UNIX)
     list(APPEND CORE_SOURCES src/AudioOutputPulse.cpp)
 endif()
@@ -45,6 +46,7 @@ target_include_directories(mediaplayer_core PUBLIC
     $<INSTALL_INTERFACE:include>
     ${FFMPEG_INCLUDE_DIRS}
     ${TAGLIB_INCLUDE_DIRS}
+    $<$<PLATFORM_ID:Android>:${CMAKE_SOURCE_DIR}/src/android>
 )
 
 target_link_libraries(mediaplayer_core
