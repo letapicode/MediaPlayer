@@ -321,6 +321,7 @@ void MediaPlayer::seek(double seconds) {
     std::lock_guard<std::mutex> lock(m_mutex);
     m_audioPackets.clear();
     m_videoPackets.clear();
+    m_frameQueue.clear();
   }
   m_audioClock = seconds;
   m_videoClock = seconds;
