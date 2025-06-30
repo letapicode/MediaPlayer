@@ -22,6 +22,13 @@ sudo apt-get install -y build-essential cmake git \
     libsqlite3-dev libtag1-dev libpulse-dev libpulse-simple-dev
 ```
 
+For YouTube integration used by `src/network/youtube_resolve.py`,
+install the `youtube-dl` or `youtube-dlp` Python package:
+
+```bash
+pip install youtube_dl  # or youtube-dlp
+```
+
 ## Audio Output Backends
 
 MediaPlayer includes several platform specific audio modules. The correct
