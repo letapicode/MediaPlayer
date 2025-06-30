@@ -60,6 +60,7 @@ MediaPlayer::~MediaPlayer() {
   }
   m_audioPackets.clear();
   m_videoPackets.clear();
+  m_subtitlePackets.clear();
   m_frameQueue.clear();
   avformat_network_deinit();
 }
@@ -98,6 +99,9 @@ bool MediaPlayer::open(const std::string &path) {
       return false;
     }
   }
+  if (m_demuxer.subtitleStream() >= 0) {
+    m_subtitleDecoder.open(fmtCtx, m_demuxer.subtitleStream());
+  }
   // Extract metadata
   m_metadata = {};
   m_metadata.path = path;
@@ -135,6 +139,7 @@ bool MediaPlayer::open(const std::string &path) {
     m_callbacks.onTrackLoaded(m_metadata);
   m_audioClock = 0.0;
   m_videoClock = 0.0;
+  m_subtitlePackets.clear();
   m_audioPackets.clear();
   m_videoPackets.clear();
   m_playRecorded = false;
@@ -285,6 +290,8 @@ void MediaPlayer::play() {
     m_audioThread = std::thread(&MediaPlayer::audioLoop, this);
   if (m_demuxer.videoStream() >= 0)
     m_videoThread = std::thread(&MediaPlayer::videoLoop, this);
+  if (m_demuxer.subtitleStream() >= 0)
+    m_subtitleThread = std::thread(&MediaPlayer::subtitleLoop, this);
   if (!m_playRecorded && m_library) {
     m_library->recordPlayback(m_metadata.path);
     m_playRecorded = true;
@@ -320,12 +327,15 @@ void MediaPlayer::stop() {
     m_audioThread.join();
   if (m_videoThread.joinable())
     m_videoThread.join();
+  if (m_subtitleThread.joinable())
+    m_subtitleThread.join();
   if (m_output)
     m_output->shutdown();
   if (m_videoOutput)
     m_videoOutput->shutdown();
   m_audioPackets.clear();
   m_videoPackets.clear();
+  m_subtitlePackets.clear();
   m_frameQueue.clear();
   m_running = false;
   if (m_callbacks.onStop)
@@ -344,6 +354,7 @@ void MediaPlayer::seek(double seconds) {
     std::lock_guard<std::mutex> lock(m_mutex);
     m_audioPackets.clear();
     m_videoPackets.clear();
+    m_subtitlePackets.clear();
     m_frameQueue.clear();
   }
   m_startTime = av_gettime() / 1000000.0 - seconds;
@@ -396,7 +407,7 @@ void MediaPlayer::demuxLoop() {
   while (true) {
     if (m_stopRequested.load())
       break;
-    if (m_audioPackets.full() && m_videoPackets.full()) {
+    if (m_audioPackets.full() && m_videoPackets.full() && m_subtitlePackets.full()) {
       std::this_thread::sleep_for(std::chrono::milliseconds(10));
       continue;
     }
@@ -417,6 +428,8 @@ void MediaPlayer::demuxLoop() {
       m_audioPackets.push(&pkt);
     } else if (pkt.stream_index == m_demuxer.videoStream() && !m_videoPackets.full()) {
       m_videoPackets.push(&pkt);
+    } else if (pkt.stream_index == m_demuxer.subtitleStream() && !m_subtitlePackets.full()) {
+      m_subtitlePackets.push(&pkt);
     }
     av_packet_unref(&pkt);
   }
@@ -558,6 +571,41 @@ void MediaPlayer::videoLoop() {
   m_frameQueue.clear();
   if (renderThread.joinable())
     renderThread.join();
+}
+
+bool MediaPlayer::setSubtitleTrack(int index) {
+  std::lock_guard<std::mutex> lock(m_mutex);
+  if (m_demuxer.setSubtitleStream(index)) {
+    m_subtitleDecoder.flush();
+    m_subtitlePackets.clear();
+    return true;
+  }
+  return false;
+}
+
+void MediaPlayer::subtitleLoop() {
+  while (true) {
+    {
+      std::unique_lock<std::mutex> lock(m_mutex);
+      m_cv.wait(lock, [this]() {
+        return (!m_paused && !m_stopRequested.load()) || m_stopRequested.load();
+      });
+      if (m_stopRequested.load() && m_subtitlePackets.size() == 0)
+        break;
+    }
+    AVPacket *pkt = nullptr;
+    if (m_subtitlePackets.pop(pkt,
+                              [this]() { return m_stopRequested.load() || m_demuxer.eof(); })) {
+      SubtitleCue cue{};
+      if (m_subtitleDecoder.decode(pkt, cue)) {
+        if (m_callbacks.onSubtitle)
+          m_callbacks.onSubtitle(cue);
+      }
+      av_packet_free(&pkt);
+    } else {
+      break;
+    }
+  }
 }
 
 } // namespace mediaplayer

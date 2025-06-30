@@ -4,6 +4,7 @@
 #include <functional>
 
 #include "MediaMetadata.h"
+#include "SrtParser.h"
 
 namespace mediaplayer {
 
@@ -14,6 +15,7 @@ struct PlaybackCallbacks {
   std::function<void()> onFinished;
   std::function<void(const MediaMetadata &)> onTrackLoaded;
   std::function<void(double)> onPosition;
+  std::function<void(const SubtitleCue &)> onSubtitle;
 };
 
 } // namespace mediaplayer

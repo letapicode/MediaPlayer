@@ -45,7 +45,7 @@
 | 39 | Subtitle Parser (SRT) | done | relevant |
 | 40 | Subtitle Renderer/Provider | done | `SubtitleProvider` supplies cues |
 | 41 | Subtitle Sync Adjustment | done | `SubtitleProvider::setOffset` |
-| 42 | Subtitle Track Selection | open | relevant |
+| 42 | Subtitle Track Selection | done | decoder & API implemented |
 | 43 | Audio Visualization Feed | open | relevant |
 | 44 | Visualization API Hook | open | relevant |
 | 45 | Spectrum Analysis (optional) | open | relevant |
