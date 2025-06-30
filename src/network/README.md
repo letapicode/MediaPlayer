@@ -11,3 +11,13 @@ if (stream.open("https://example.com/video.mp4")) {
   // pass ctx to MediaPlayer or custom processing
 }
 ```
+
+The `HlsStream` helper selects the highest quality variant from an HLS playlist.
+
+```cpp
+mediaplayer::HlsStream hls;
+if (hls.open("https://example.com/live/stream.m3u8")) {
+  AVFormatContext *ctx = hls.context();
+  // use ctx for playback
+}
+```
