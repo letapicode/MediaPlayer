@@ -48,6 +48,10 @@ void OpenGLVideoOutput::shutdown() {
     m_window = nullptr;
     glfwTerminate();
   }
+  if (m_swsCtx) {
+    sws_freeContext(m_swsCtx);
+    m_swsCtx = nullptr;
+  }
 }
 
 void OpenGLVideoOutput::displayFrame(const uint8_t *rgba, int linesize) {
@@ -74,15 +78,15 @@ void OpenGLVideoOutput::displayFrame(const uint8_t *rgba, int linesize) {
 }
 
 void OpenGLVideoOutput::displayFrame(const VideoFrame &frame) {
-  static SwsContext *swsCtx = nullptr;
-  if (!swsCtx) {
-    swsCtx = sws_getContext(frame.width, frame.height, AV_PIX_FMT_YUV420P, frame.width,
-                            frame.height, AV_PIX_FMT_RGBA, SWS_BILINEAR, nullptr, nullptr, nullptr);
+  if (!m_swsCtx) {
+    m_swsCtx =
+        sws_getContext(frame.width, frame.height, AV_PIX_FMT_YUV420P, frame.width, frame.height,
+                       AV_PIX_FMT_RGBA, SWS_BILINEAR, nullptr, nullptr, nullptr);
   }
   std::vector<uint8_t> rgba(frame.width * frame.height * 4);
   uint8_t *dstData[4] = {rgba.data(), nullptr, nullptr, nullptr};
   int dstLinesize[4] = {frame.width * 4, 0, 0, 0};
-  sws_scale(swsCtx, frame.data, frame.linesize, 0, frame.height, dstData, dstLinesize);
+  sws_scale(m_swsCtx, frame.data, frame.linesize, 0, frame.height, dstData, dstLinesize);
   displayFrame(rgba.data(), frame.width * 4);
 }
 
