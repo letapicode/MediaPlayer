@@ -23,11 +23,11 @@
 | 17 | Audio Output – iOS (AVAudio) | done | implemented in `AudioOutputiOS.mm` |
 | 18 | Audio Buffering & Mixing | done | ring buffer mixing implemented |
 | 19 | Abstract Video Output Interface | done | relevant |
-| 20 | Video Rendering – OpenGL (Desktop) | open | relevant |
-| 21 | Video Rendering – DirectX (Windows optional) | open | relevant |
-| 22 | Video Rendering – Metal (macOS) | open | relevant |
-| 23 | Frame Renderer – Android (OpenGL ES) | open | relevant |
-| 24 | Frame Renderer – iOS (Metal/GL ES) | open | relevant |
+| 20 | Video Rendering – OpenGL (Desktop) | done | implemented in `src/core/src/OpenGLVideoOutput.cpp` |
+| 21 | Video Rendering – DirectX (Windows optional) | done | implemented in `src/core/src/Direct3D11VideoOutput.cpp` |
+| 22 | Video Rendering – Metal (macOS) | done | implemented in `src/core/src/MetalVideoOutput.mm` |
+| 23 | Frame Renderer – Android (OpenGL ES) | done | implemented in `src/android/AndroidGLVideoOutput.cpp` |
+| 24 | Frame Renderer – iOS (Metal/GL ES) | done | implemented in `src/core/src/MetalVideoOutput.mm` |
 | 25 | Video Output Integration | done | relevant |
 | 26 | Implement Play/Pause/Seek Logic | done | relevant |
 | 27 | Track and Playlist Management (Core) | done | relevant |
