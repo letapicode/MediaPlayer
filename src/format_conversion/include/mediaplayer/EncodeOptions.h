@@ -15,6 +15,7 @@ struct VideoEncodeOptions {
   int width = 0;         // 0 = keep input width
   int height = 0;        // 0 = keep input height
   int bitrate = 1000000; // bits per second
+  int crf = -1;          // constant rate factor, -1 = disabled
   std::string codec;     // encoder name, empty for default
 };
 
