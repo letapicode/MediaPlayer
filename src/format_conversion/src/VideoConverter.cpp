@@ -8,12 +8,13 @@ extern "C" {
 #include <libswscale/swscale.h>
 }
 
+#include <algorithm>
 #include <iostream>
 
 namespace mediaplayer {
 
 bool VideoConverter::convert(const std::string &inputPath, const std::string &outputPath, int width,
-                             int height, int bitrate) {
+                             int height, int bitrate, std::function<void(float)> progress) {
   AVFormatContext *inCtx = nullptr;
   if (avformat_open_input(&inCtx, inputPath.c_str(), nullptr, nullptr) < 0) {
     std::cerr << "Failed to open input" << std::endl;
@@ -24,6 +25,8 @@ bool VideoConverter::convert(const std::string &inputPath, const std::string &ou
     avformat_close_input(&inCtx);
     return false;
   }
+  double totalDuration =
+      inCtx->duration != AV_NOPTS_VALUE ? static_cast<double>(inCtx->duration) / AV_TIME_BASE : 0.0;
   int vStream = av_find_best_stream(inCtx, AVMEDIA_TYPE_VIDEO, -1, -1, nullptr, 0);
   if (vStream < 0) {
     std::cerr << "No video stream" << std::endl;
@@ -128,6 +131,10 @@ bool VideoConverter::convert(const std::string &inputPath, const std::string &ou
                 scaled->linesize);
       scaled->pts = frame->pts;
       avcodec_send_frame(encCtx, scaled);
+      if (totalDuration > 0 && progress) {
+        double sec = frame->pts != AV_NOPTS_VALUE ? frame->pts * av_q2d(inSt->time_base) : 0.0;
+        progress(std::min(1.0f, static_cast<float>(sec / totalDuration)));
+      }
       AVPacket outPkt{};
       while (avcodec_receive_packet(encCtx, &outPkt) == 0) {
         outPkt.stream_index = outSt->index;
@@ -150,6 +157,9 @@ bool VideoConverter::convert(const std::string &inputPath, const std::string &ou
     av_interleaved_write_frame(outCtx, &outPkt);
     av_packet_unref(&outPkt);
   }
+
+  if (totalDuration > 0 && progress)
+    progress(1.0f);
 
   av_write_trailer(outCtx);
   av_frame_free(&frame);

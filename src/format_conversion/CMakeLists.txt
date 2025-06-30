@@ -1,6 +1,7 @@
 add_library(mediaplayer_conversion
     src/AudioConverter.cpp
     src/VideoConverter.cpp
+    src/FormatConverter.cpp
 )
 
 find_package(PkgConfig)
