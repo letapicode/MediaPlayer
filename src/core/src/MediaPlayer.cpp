@@ -323,6 +323,16 @@ void MediaPlayer::clearPlaylist() {
   m_playlist.clear();
 }
 
+void MediaPlayer::enableShuffle(bool enabled) {
+  std::lock_guard<std::mutex> lock(m_mutex);
+  m_playlist.enableShuffle(enabled);
+}
+
+bool MediaPlayer::shuffleEnabled() const {
+  std::lock_guard<std::mutex> lock(m_mutex);
+  return m_playlist.shuffleEnabled();
+}
+
 bool MediaPlayer::nextTrack() {
   std::string path;
   {
