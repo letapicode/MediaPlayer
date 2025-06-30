@@ -8,6 +8,7 @@ This document expands on the Video Output section in [Tasks.MD](../Tasks.MD). Ea
   - `bool init(int width, int height)` – prepare the renderer with the given size.
   - `void shutdown()` – release all resources.
   - `void displayFrame(const uint8_t *rgba, int linesize)` – present a frame already converted to RGBA.
+  - `void displayFrame(const VideoFrame &frame)` – expects YUV plane data and is typically called by decoders.
 
 ## 20. Video Rendering – OpenGL (Desktop)
 
