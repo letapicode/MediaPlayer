@@ -6,9 +6,10 @@
 using namespace mediaplayer;
 
 static void usage() {
-  std::cout << "Usage: mediaconvert <audio|video> <in> <out> [options]\n"
-               "Audio options: --bitrate <b> [--sample-rate <sr>] [--codec <name>]\n"
-               "Video options: --width <w> --height <h> --bitrate <b> [--codec <name>]\n";
+  std::cout
+      << "Usage: mediaconvert <audio|video> <in> <out> [options]\n"
+         "Audio options: --bitrate <b> [--sample-rate <sr>] [--codec <name>]\n"
+         "Video options: --width <w> --height <h> [--bitrate <b> | --crf <v>] [--codec <name>]\n";
 }
 
 int main(int argc, char **argv) {
@@ -35,6 +36,8 @@ int main(int argc, char **argv) {
       vopts.width = std::stoi(argv[++i]);
     } else if (arg == "--height" && i + 1 < argc) {
       vopts.height = std::stoi(argv[++i]);
+    } else if (arg == "--crf" && i + 1 < argc) {
+      vopts.crf = std::stoi(argv[++i]);
     } else if (arg == "--codec" && i + 1 < argc) {
       aopts.codec = argv[++i];
       vopts.codec = aopts.codec;

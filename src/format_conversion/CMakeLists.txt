@@ -26,11 +26,3 @@ set_target_properties(mediaplayer_conversion PROPERTIES
     CXX_STANDARD_REQUIRED ON
 )
 
-add_executable(mediaconvert src/mediaconvert.cpp)
-
-target_link_libraries(mediaconvert PRIVATE mediaplayer_conversion)
-
-set_target_properties(mediaconvert PROPERTIES
-    CXX_STANDARD 17
-    CXX_STANDARD_REQUIRED ON
-)
