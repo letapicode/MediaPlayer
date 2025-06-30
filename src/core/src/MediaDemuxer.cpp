@@ -67,6 +67,30 @@ bool MediaDemuxer::open(const std::string &path) {
   return true;
 }
 
+bool MediaDemuxer::open(AVFormatContext *ctx) {
+  close();
+  if (!ctx)
+    return false;
+  m_ctx = ctx;
+  if (avformat_find_stream_info(m_ctx, nullptr) < 0) {
+    std::cerr << "Failed to retrieve stream info\n";
+    m_ctx = nullptr;
+    return false;
+  }
+  for (unsigned i = 0; i < m_ctx->nb_streams; ++i) {
+    if (m_ctx->streams[i]->codecpar->codec_type == AVMEDIA_TYPE_AUDIO && m_audioStream < 0) {
+      m_audioStream = i;
+    } else if (m_ctx->streams[i]->codecpar->codec_type == AVMEDIA_TYPE_VIDEO && m_videoStream < 0) {
+      m_videoStream = i;
+    } else if (m_ctx->streams[i]->codecpar->codec_type == AVMEDIA_TYPE_SUBTITLE &&
+               m_subtitleStream < 0) {
+      m_subtitleStream = i;
+    }
+  }
+  m_eof = false;
+  return true;
+}
+
 bool MediaDemuxer::readPacket(AVPacket &pkt) {
   if (!m_ctx || m_eof)
     return false;

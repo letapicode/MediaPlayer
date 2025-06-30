@@ -11,3 +11,17 @@ if (stream.open("https://example.com/video.mp4")) {
   // pass ctx to MediaPlayer or custom processing
 }
 ```
+
+The `InternetRadioStream` class works similarly but also reports ICY metadata
+when available.
+
+```cpp
+mediaplayer::InternetRadioStream radio;
+radio.setMetadataCallback([](const std::string &title) {
+  std::cout << "Now playing: " << title << '\n';
+});
+if (radio.open("http://example.com/stream")) {
+  AVFormatContext *ctx = radio.context();
+  // feed ctx to MediaPlayer
+}
+```

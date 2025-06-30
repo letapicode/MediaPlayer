@@ -19,6 +19,7 @@
 #include "VideoFrameQueue.h"
 #include "VideoOutput.h"
 #include "mediaplayer/FormatConverter.h"
+#include "mediaplayer/InternetRadioStream.h"
 
 #include <atomic>
 #include <condition_variable>
@@ -109,6 +110,7 @@ private:
   std::string m_hwDevice;
   bool m_autoAdvance{true};
   FormatConverter m_converter;
+  std::unique_ptr<InternetRadioStream> m_radioStream;
 };
 
 } // namespace mediaplayer

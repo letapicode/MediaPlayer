@@ -6,6 +6,7 @@
 #elif defined(__linux__)
 #include "mediaplayer/AudioOutputPulse.h"
 #endif
+#include "mediaplayer/InternetRadioStream.h"
 #include "mediaplayer/VideoFrame.h"
 #include <algorithm>
 #include <chrono>
@@ -69,9 +70,28 @@ static bool isUrl(const std::string &path) {
 }
 
 bool MediaPlayer::open(const std::string &path) {
+  m_radioStream.reset();
   m_demuxer.setBufferSize(m_networkBufferSize);
-  if (!m_demuxer.open(path)) {
-    return false;
+  if (isUrl(path)) {
+    m_radioStream = std::make_unique<InternetRadioStream>();
+    m_radioStream->setMetadataCallback([this](const std::string &title) {
+      std::lock_guard<std::mutex> lock(m_mutex);
+      m_metadata.title = title;
+      if (m_callbacks.onTrackLoaded)
+        m_callbacks.onTrackLoaded(m_metadata);
+    });
+    if (!m_radioStream->open(path)) {
+      m_radioStream.reset();
+      return false;
+    }
+    if (!m_demuxer.open(m_radioStream->release())) {
+      m_radioStream.reset();
+      return false;
+    }
+  } else {
+    if (!m_demuxer.open(path)) {
+      return false;
+    }
   }
   AVFormatContext *fmtCtx = m_demuxer.context();
   if (m_demuxer.audioStream() >= 0) {
@@ -413,6 +433,8 @@ void MediaPlayer::demuxLoop() {
       }
       break;
     }
+    if (m_radioStream)
+      m_radioStream->updateMetadata();
     if (pkt.stream_index == m_demuxer.audioStream() && !m_audioPackets.full()) {
       m_audioPackets.push(&pkt);
     } else if (pkt.stream_index == m_demuxer.videoStream() && !m_videoPackets.full()) {

@@ -18,6 +18,7 @@ public:
   ~MediaDemuxer();
 
   bool open(const std::string &path);
+  bool open(AVFormatContext *ctx);
   void close();
   bool readPacket(AVPacket &pkt);
   int audioStream() const { return m_audioStream; }
