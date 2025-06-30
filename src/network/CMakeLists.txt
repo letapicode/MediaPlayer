@@ -4,12 +4,18 @@ add_library(mediaplayer_network
 
 find_package(PkgConfig)
 pkg_check_modules(FFMPEG REQUIRED IMPORTED_TARGET libavformat)
+pkg_check_modules(LIBCURL IMPORTED_TARGET libcurl)
 
 target_include_directories(mediaplayer_network PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     $<INSTALL_INTERFACE:include>
     ${FFMPEG_INCLUDE_DIRS}
 )
+
+if(LIBCURL_FOUND)
+    target_include_directories(mediaplayer_network PUBLIC ${LIBCURL_INCLUDE_DIRS})
+    target_link_libraries(mediaplayer_network PkgConfig::LIBCURL)
+endif()
 
 target_link_libraries(mediaplayer_network PkgConfig::FFMPEG)
 
