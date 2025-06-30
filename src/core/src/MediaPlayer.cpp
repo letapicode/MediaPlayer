@@ -317,6 +317,7 @@ void MediaPlayer::seek(double seconds) {
     return;
   int64_t ts = static_cast<int64_t>(seconds * AV_TIME_BASE);
   av_seek_frame(m_demuxer.context(), -1, ts, AVSEEK_FLAG_BACKWARD);
+  m_demuxer.resetEof();
   m_audioDecoder.flush();
   m_videoDecoder.flush();
   {
