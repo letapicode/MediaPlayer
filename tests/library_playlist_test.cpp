@@ -1,4 +1,5 @@
 #include "mediaplayer/LibraryDB.h"
+#include "mediaplayer/PlaylistManager.h"
 #include <cassert>
 #include <cstdio>
 
@@ -20,5 +21,14 @@ int main() {
   assert(db.deletePlaylist("fav"));
   db.close();
   std::remove(dbPath);
+
+  mediaplayer::PlaylistManager pm;
+  pm.set({"a.mp3", "b.mp3", "a.mp3"});
+  pm.enableShuffle(true);
+  assert(pm.remove("a.mp3"));
+  auto next = pm.next();
+  assert(next == "b.mp3");
+  assert(pm.empty());
+  assert(!pm.remove("c.mp3"));
   return 0;
 }

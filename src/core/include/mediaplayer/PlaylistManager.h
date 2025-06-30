@@ -11,6 +11,7 @@ class PlaylistManager {
 public:
   void set(const std::vector<std::string> &paths);
   void add(const std::string &path);
+  bool remove(const std::string &path);
   void clear();
   std::string next();
   bool empty() const;
