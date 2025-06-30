@@ -67,11 +67,16 @@ network access won't run in restricted environments.
 
 ## Usage
 
-Run the resulting `mediaplayer` executable with a media file:
+Run the resulting `mediaplayer` executable with a media file or network stream:
 
 ```
 ./mediaplayer path/to/video.mp4
+./mediaplayer https://example.com/stream.m3u8
 ```
+
+`mediaplayer_network` includes helpers to verify available streaming protocols
+via `listProtocols()` and supports opening internet radio streams with ICY
+metadata when FFmpeg is built with HTTP support.
 
 The graphical interface allows you to open files and manage your library as features are implemented.
 
