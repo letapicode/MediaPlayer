@@ -19,7 +19,14 @@ On Ubuntu the packages can be installed with:
 ```bash
 sudo apt-get install -y build-essential cmake git \
     libavcodec-dev libavformat-dev libswresample-dev libswscale-dev \
-    libsqlite3-dev libtag1-dev libpulse-dev libpulse-simple-dev
+    libsqlite3-dev libtag1-dev libpulse-dev libpulse-simple-dev \
+    libcurl4-openssl-dev
+```
+
+To enable optional YouTube playback support install `youtube_dl`:
+
+```bash
+pip install --user youtube_dl
 ```
 
 ## Audio Output Backends

@@ -10,6 +10,8 @@ struct MediaMetadata {
   std::string title;    // Title (from tags or file name)
   std::string artist;   // Artist if available
   std::string album;    // Album if available
+  std::string icyName;  // Station name for internet radio
+  std::string icyTitle; // Current song title from ICY metadata
   double duration{0.0}; // In seconds
   int width{0};         // Video width, 0 for audio-only
   int height{0};        // Video height

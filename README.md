@@ -75,6 +75,24 @@ Run the resulting `mediaplayer` executable with a media file:
 
 The graphical interface allows you to open files and manage your library as features are implemented.
 
+### Streaming URLs
+
+`MediaPlayer` can open network streams such as HTTP(S) or HLS playlists directly:
+
+```
+./mediaplayer https://example.com/stream.m3u8
+```
+
+Internet radio streams expose ICY metadata when available. To play a YouTube
+link, first resolve it using the optional helper:
+
+```
+mediaplayer::NetworkStream stream;
+auto url = mediaplayer::fetchYouTubeStream("https://youtu.be/VIDEO_ID");
+if (url)
+  stream.open(*url);
+```
+
 ## Contributing
 
 Please read our [Code of Conduct](CODE_OF_CONDUCT.md) before participating.

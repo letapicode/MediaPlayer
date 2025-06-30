@@ -116,6 +116,12 @@ bool MediaPlayer::open(const std::string &path) {
   tag = av_dict_get(fmtCtx->metadata, "album", nullptr, 0);
   if (tag && tag->value)
     m_metadata.album = tag->value;
+  tag = av_dict_get(fmtCtx->metadata, "icy-name", nullptr, 0);
+  if (tag && tag->value)
+    m_metadata.icyName = tag->value;
+  tag = av_dict_get(fmtCtx->metadata, "icy-title", nullptr, 0);
+  if (tag && tag->value)
+    m_metadata.icyTitle = tag->value;
   if (!isUrl(path)) {
     TagLib::FileRef f(path.c_str());
     if (!f.isNull() && f.tag()) {
