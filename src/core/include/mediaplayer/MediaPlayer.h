@@ -50,6 +50,8 @@ public:
   double position() const; // seconds
   void setNetworkBufferSize(size_t size);
   size_t networkBufferSize() const;
+  void setAutoAdvance(bool enable);
+  bool autoAdvance() const { return m_autoAdvance; }
   const MediaMetadata &metadata() const { return m_metadata; }
   int readAudio(uint8_t *buffer, int bufferSize);
   int readVideo(uint8_t *buffer, int bufferSize);
@@ -85,6 +87,7 @@ private:
   double m_volume{1.0};
   MediaMetadata m_metadata;
   std::string m_hwDevice;
+  bool m_autoAdvance{true};
 };
 
 } // namespace mediaplayer

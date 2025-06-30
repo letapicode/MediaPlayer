@@ -225,6 +225,11 @@ size_t MediaPlayer::networkBufferSize() const {
   return m_networkBufferSize;
 }
 
+void MediaPlayer::setAutoAdvance(bool enable) {
+  std::lock_guard<std::mutex> lock(m_mutex);
+  m_autoAdvance = enable;
+}
+
 void MediaPlayer::play() {
   std::unique_lock<std::mutex> lock(m_mutex);
   if (m_running) {
@@ -350,6 +355,14 @@ void MediaPlayer::demuxLoop() {
     if (!m_demuxer.readPacket(pkt)) {
       if (m_callbacks.onFinished)
         m_callbacks.onFinished();
+      bool advance = false;
+      {
+        std::lock_guard<std::mutex> lock(m_mutex);
+        advance = m_autoAdvance && !m_playlist.empty();
+      }
+      if (advance) {
+        std::thread([this]() { nextTrack(); }).detach();
+      }
       break;
     }
     if (pkt.stream_index == m_demuxer.audioStream() && !m_audioPackets.full()) {
