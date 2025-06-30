@@ -14,6 +14,31 @@ void PlaylistManager::add(const std::string &path) {
     m_unusedIndices.push_back(m_items.size() - 1);
 }
 
+bool PlaylistManager::remove(const std::string &path) {
+  bool removed = false;
+  for (size_t i = 0; i < m_items.size();) {
+    if (m_items[i] == path) {
+      removed = true;
+      m_items.erase(m_items.begin() + i);
+      if (!m_shuffle && i < m_index)
+        --m_index;
+      for (auto it = m_unusedIndices.begin(); it != m_unusedIndices.end();) {
+        if (*it == i) {
+          it = m_unusedIndices.erase(it);
+          continue;
+        } else {
+          if (*it > i)
+            --(*it);
+        }
+        ++it;
+      }
+      continue; // do not increment i after erase
+    }
+    ++i;
+  }
+  return removed;
+}
+
 void PlaylistManager::clear() {
   m_items.clear();
   m_index = 0;
