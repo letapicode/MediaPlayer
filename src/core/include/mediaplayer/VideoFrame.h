@@ -6,10 +6,11 @@
 namespace mediaplayer {
 
 struct VideoFrame {
-  const uint8_t *planes[3]{nullptr, nullptr, nullptr};
+  uint8_t *data[3]{nullptr, nullptr, nullptr};
   int linesize[3]{0, 0, 0};
   int width{0};
   int height{0};
+  double pts{0.0};
 };
 
 } // namespace mediaplayer
