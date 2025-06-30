@@ -116,7 +116,7 @@ bool AudioConverter::convert(const std::string &inputPath, const std::string &ou
   resampled->format = encCtx->sample_fmt;
   resampled->sample_rate = encCtx->sample_rate;
   int outSamples = encCtx->frame_size > 0 ? encCtx->frame_size : 1024;
-  av_frame_set_nb_samples(resampled, outSamples);
+  resampled->nb_samples = outSamples;
   av_frame_get_buffer(resampled, 0);
 
   while (av_read_frame(inCtx, &pkt) >= 0) {
