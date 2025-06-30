@@ -11,3 +11,16 @@ if (stream.open("https://example.com/video.mp4")) {
   // pass ctx to MediaPlayer or custom processing
 }
 ```
+
+`HlsStream` and `DashStream` handle adaptive streaming playlists:
+
+```cpp
+mediaplayer::HlsStream hls;
+if (hls.open("https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8")) {
+  AVFormatContext *ctx = hls.context();
+  // use the context
+}
+
+mediaplayer::DashStream dash;
+dash.open("https://example.com/manifest.mpd", /*variant index*/ 0);
+```
