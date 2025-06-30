@@ -8,6 +8,7 @@ set(CORE_SOURCES
     src/BufferedReader.cpp
     src/OpenGLVideoOutput.cpp
     src/RingBuffer.cpp
+    src/VideoFrameQueue.cpp
 )
 
 if(CMAKE_SYSTEM_NAME STREQUAL "iOS")
@@ -105,4 +106,3 @@ set_target_properties(mediaplayer_core PROPERTIES
 
 target_compile_definitions(mediaplayer_core PUBLIC MEDIAPLAYER_DESKTOP
     $<$<BOOL:${ENABLE_HW_DECODING}>:MEDIAPLAYER_HW_DECODING>)
-

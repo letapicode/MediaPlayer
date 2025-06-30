@@ -30,10 +30,14 @@ MediaPlayer::MediaPlayer() {
 #else
   m_output = std::make_unique<NullAudioOutput>();
 #endif
-#ifdef MEDIAPLAYER_DESKTOP
+#ifdef _WIN32
   m_videoOutput = std::make_unique<OpenGLVideoOutput>();
-#else
+#elif defined(__APPLE__)
+  m_videoOutput = std::make_unique<OpenGLVideoOutput>();
+#elif defined(ANDROID)
   m_videoOutput = std::make_unique<NullVideoOutput>();
+#else
+  m_videoOutput = std::make_unique<OpenGLVideoOutput>();
 #endif
 #ifdef MEDIAPLAYER_HW_DECODING
 #ifdef _WIN32
@@ -53,6 +57,7 @@ MediaPlayer::~MediaPlayer() {
   }
   m_audioPackets.clear();
   m_videoPackets.clear();
+  m_frameQueue.clear();
   avformat_network_deinit();
 }
 
@@ -279,6 +284,7 @@ void MediaPlayer::stop() {
     m_videoOutput->shutdown();
   m_audioPackets.clear();
   m_videoPackets.clear();
+  m_frameQueue.clear();
   m_running = false;
   if (m_callbacks.onStop)
     m_callbacks.onStop();
@@ -400,7 +406,30 @@ void MediaPlayer::audioLoop() {
 void MediaPlayer::videoLoop() {
   const int videoBufferSize =
       av_image_get_buffer_size(AV_PIX_FMT_RGBA, m_videoDecoder.width(), m_videoDecoder.height(), 1);
-  std::vector<uint8_t> videoBuffer(videoBufferSize);
+
+  std::thread renderThread([this]() {
+    while (true) {
+      VideoFrame *frame = nullptr;
+      if (m_frameQueue.pop(frame, [this]() { return m_stopRequested.load(); })) {
+        if (!frame)
+          continue;
+        m_videoClock = frame->pts;
+        double master =
+            m_demuxer.audioStream() >= 0 ? m_audioClock : (av_gettime() / 1000000.0 - m_startTime);
+        double delay = m_videoClock - master;
+        if (delay > 0)
+          std::this_thread::sleep_for(std::chrono::duration<double>(delay));
+        if (m_videoOutput)
+          m_videoOutput->displayFrame(frame->data.data(), frame->linesize);
+        if (m_callbacks.onPosition)
+          m_callbacks.onPosition(m_videoClock);
+        delete frame;
+      } else if (m_stopRequested.load()) {
+        break;
+      }
+    }
+  });
+
   while (true) {
     {
       std::unique_lock<std::mutex> lock(m_mutex);
@@ -412,23 +441,34 @@ void MediaPlayer::videoLoop() {
     }
     AVPacket *pkt = nullptr;
     if (m_videoPackets.pop(pkt, [this]() { return m_stopRequested.load() || m_demuxer.eof(); })) {
-      int bytes = m_videoDecoder.decode(pkt, videoBuffer.data(), videoBufferSize);
+      auto *frame = new VideoFrame();
+      frame->width = m_videoDecoder.width();
+      frame->height = m_videoDecoder.height();
+      frame->linesize = frame->width * 4;
+      frame->data.resize(videoBufferSize);
+      int bytes = m_videoDecoder.decode(pkt, frame->data.data(), videoBufferSize);
       av_packet_free(&pkt);
-      if (bytes > 0 && m_videoOutput) {
-        m_videoClock = m_videoDecoder.lastPts();
-        double master =
-            m_demuxer.audioStream() >= 0 ? m_audioClock : (av_gettime() / 1000000.0 - m_startTime);
-        double delay = m_videoClock - master;
-        if (delay > 0)
-          std::this_thread::sleep_for(std::chrono::duration<double>(delay));
-        m_videoOutput->displayFrame(videoBuffer.data(), m_videoDecoder.width() * 4);
-        if (m_callbacks.onPosition)
-          m_callbacks.onPosition(m_videoClock);
+      if (bytes > 0) {
+        frame->pts = m_videoDecoder.lastPts();
+        while (!m_frameQueue.push(frame)) {
+          if (m_stopRequested.load()) {
+            delete frame;
+            break;
+          }
+          std::this_thread::sleep_for(std::chrono::milliseconds(5));
+        }
+      } else {
+        delete frame;
       }
     } else {
       break;
     }
   }
+
+  m_stopRequested.store(true);
+  m_frameQueue.clear();
+  if (renderThread.joinable())
+    renderThread.join();
 }
 
 } // namespace mediaplayer

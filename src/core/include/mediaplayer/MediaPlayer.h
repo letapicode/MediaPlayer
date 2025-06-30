@@ -15,6 +15,7 @@
 #include "PlaybackCallbacks.h"
 #include "PlaylistManager.h"
 #include "VideoDecoder.h"
+#include "VideoFrameQueue.h"
 #include "VideoOutput.h"
 
 #include <atomic>
@@ -76,6 +77,7 @@ private:
   std::atomic<bool> m_stopRequested{false};
   PacketQueue m_audioPackets;
   PacketQueue m_videoPackets;
+  VideoFrameQueue m_frameQueue;
   PlaybackCallbacks m_callbacks;
   PlaylistManager m_playlist;
   LibraryDB *m_library{nullptr};
