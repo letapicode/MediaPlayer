@@ -1,5 +1,8 @@
 add_library(mediaplayer_network
     src/NetworkStream.cpp
+    src/ProtocolSupport.cpp
+    src/InternetRadio.cpp
+    src/YoutubeDL.cpp
 )
 
 find_package(PkgConfig)

@@ -11,3 +11,21 @@ if (stream.open("https://example.com/video.mp4")) {
   // pass ctx to MediaPlayer or custom processing
 }
 ```
+
+## Protocol Support
+
+`ProtocolSupport` provides helpers to query supported input protocols at runtime.
+
+```cpp
+for (const auto &proto : mediaplayer::inputProtocols())
+  std::cout << proto << std::endl;
+```
+
+## Internet Radio
+
+`InternetRadio` extends `NetworkStream` and enables ICY metadata for HTTP radio
+streams. Call `currentTitle()` to retrieve the `StreamTitle` if available.
+
+## YouTube Helper
+
+`YoutubeDL` wraps the `youtube-dl` tool to resolve streaming URLs.

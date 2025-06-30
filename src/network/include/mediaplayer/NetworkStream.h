@@ -15,6 +15,7 @@ public:
   ~NetworkStream();
 
   bool open(const std::string &url);
+  bool open(const std::string &url, AVDictionary *options);
   AVFormatContext *context() const { return m_ctx; }
   AVFormatContext *release();
 
