@@ -22,6 +22,7 @@ public:
   void shutdown() override;
   void displayFrame(const uint8_t *rgba, int linesize) override;
   void displayFrame(const VideoFrame &frame);
+  void *layer() const { return m_layer; }
 
 private:
   void *m_layer{nullptr};

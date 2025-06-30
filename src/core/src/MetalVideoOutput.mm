@@ -194,4 +194,6 @@ void MetalVideoOutput::displayFrame(const VideoFrame &frame) {
   }
 }
 
+void *MetalVideoOutput::layer() const { return m_layer; }
+
 } // namespace mediaplayer
