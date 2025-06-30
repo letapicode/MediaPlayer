@@ -1,17 +1,11 @@
 #ifndef MEDIAPLAYER_METALVIDEOOUTPUT_H
 #define MEDIAPLAYER_METALVIDEOOUTPUT_H
 
+#include "VideoFrame.h"
 #include "VideoOutput.h"
 #include <cstdint>
 
 namespace mediaplayer {
-
-struct VideoFrame {
-  const uint8_t *data[3];
-  int linesize[3];
-  int width;
-  int height;
-};
 
 class MetalVideoOutput : public VideoOutput {
 public:

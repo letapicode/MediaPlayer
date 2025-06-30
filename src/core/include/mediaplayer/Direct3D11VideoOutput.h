@@ -2,6 +2,7 @@
 #define MEDIAPLAYER_DIRECT3D11VIDEOOUTPUT_H
 
 #include "ComPtr.h"
+#include "VideoFrame.h"
 #include "VideoOutput.h"
 #ifdef _WIN32
 #include <d3d11.h>
@@ -12,17 +13,6 @@
 namespace mediaplayer {
 
 #ifdef _WIN32
-struct VideoFrame {
-  const uint8_t *y{nullptr};
-  const uint8_t *u{nullptr};
-  const uint8_t *v{nullptr};
-  int width{0};
-  int height{0};
-  int linesizeY{0};
-  int linesizeU{0};
-  int linesizeV{0};
-};
-
 class Direct3D11VideoOutput : public VideoOutput {
 public:
   Direct3D11VideoOutput();
