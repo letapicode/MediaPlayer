@@ -40,8 +40,8 @@ progress updates.
 
 ### mediaconvert CLI
 
-A standalone command line tool `mediaconvert` is built in this directory. It
-provides easy access to the conversion functionality.
+The `mediaconvert` command line tool lives under `src/tools`. It provides easy
+access to the conversion functionality and links against this module.
 
 ```
 mediaconvert <audio|video> <input> <output> [options]
