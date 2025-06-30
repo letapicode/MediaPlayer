@@ -1,4 +1,4 @@
-# Building MediaPlayer
+#Building MediaPlayer
 
 This guide explains how to compile the library modules and run the sample test programs under `tests/`.
 
@@ -92,3 +92,13 @@ After building, run a test binary from the build directory, for example:
 ```
 
 Successful execution prints a short confirmation message.
+
+## Building the conversion utility
+
+The `mediaconvert` command line program can be built alongside the libraries:
+
+```bash
+cmake --build . --target mediaconvert
+```
+
+Use it to convert audio or video files on the command line.

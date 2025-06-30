@@ -13,8 +13,8 @@ extern "C" {
 namespace mediaplayer {
 
 bool AudioConverter::convert(const std::string &inputPath, const std::string &outputPath,
-                             const AudioEncodeOptions &options,
-                             std::function<void(float)> progress) {
+                             const AudioEncodeOptions &options, std::function<void(float)> progress,
+                             std::atomic<bool> *cancelFlag) {
   AVFormatContext *inCtx = nullptr;
   if (avformat_open_input(&inCtx, inputPath.c_str(), nullptr, nullptr) < 0) {
     std::cerr << "Failed to open input" << std::endl;
@@ -124,7 +124,13 @@ bool AudioConverter::convert(const std::string &inputPath, const std::string &ou
   resampled->nb_samples = outSamples;
   av_frame_get_buffer(resampled, 0);
 
+  bool cancelled = false;
   while (av_read_frame(inCtx, &pkt) >= 0) {
+    if (cancelFlag && cancelFlag->load()) {
+      av_packet_unref(&pkt);
+      cancelled = true;
+      break;
+    }
     if (pkt.stream_index != audioStream) {
       av_packet_unref(&pkt);
       continue;
@@ -132,6 +138,10 @@ bool AudioConverter::convert(const std::string &inputPath, const std::string &ou
     avcodec_send_packet(decCtx, &pkt);
     av_packet_unref(&pkt);
     while (avcodec_receive_frame(decCtx, frame) == 0) {
+      if (cancelFlag && cancelFlag->load()) {
+        cancelled = true;
+        break;
+      }
       swr_convert(swr, resampled->data, resampled->nb_samples, (const uint8_t **)frame->data,
                   frame->nb_samples);
       resampled->pts = frame->pts;
@@ -147,6 +157,8 @@ bool AudioConverter::convert(const std::string &inputPath, const std::string &ou
         av_packet_unref(&outPkt);
       }
     }
+    if (cancelled)
+      break;
   }
   // flush encoder
   avcodec_send_frame(encCtx, nullptr);
@@ -170,7 +182,7 @@ bool AudioConverter::convert(const std::string &inputPath, const std::string &ou
   avformat_free_context(outCtx);
   avcodec_free_context(&decCtx);
   avformat_close_input(&inCtx);
-  return true;
+  return !cancelled;
 }
 
 } // namespace mediaplayer

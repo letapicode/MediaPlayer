@@ -72,6 +72,8 @@ public:
                         FormatConverter::CompletionCallback done = {});
   void waitForConversion();
   bool conversionRunning() const;
+  void cancelConversion();
+  bool conversionCancelled() const { return m_converter.isCancelled(); }
 
 private:
   void demuxLoop();

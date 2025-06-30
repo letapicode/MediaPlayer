@@ -11,6 +11,8 @@ add_subdirectory(src/subtitles)
 
 add_subdirectory(src/format_conversion)
 
+add_subdirectory(src/desktop)
+
 # Optionally add other modules later
 
 add_subdirectory(src/tools)

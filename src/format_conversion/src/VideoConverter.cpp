@@ -14,8 +14,8 @@ extern "C" {
 namespace mediaplayer {
 
 bool VideoConverter::convert(const std::string &inputPath, const std::string &outputPath,
-                             const VideoEncodeOptions &options,
-                             std::function<void(float)> progress) {
+                             const VideoEncodeOptions &options, std::function<void(float)> progress,
+                             std::atomic<bool> *cancelFlag) {
   AVFormatContext *inCtx = nullptr;
   if (avformat_open_input(&inCtx, inputPath.c_str(), nullptr, nullptr) < 0) {
     std::cerr << "Failed to open input" << std::endl;
@@ -122,7 +122,13 @@ bool VideoConverter::convert(const std::string &inputPath, const std::string &ou
   av_frame_get_buffer(scaled, 0);
   AVPacket pkt{};
 
+  bool cancelled = false;
   while (av_read_frame(inCtx, &pkt) >= 0) {
+    if (cancelFlag && cancelFlag->load()) {
+      av_packet_unref(&pkt);
+      cancelled = true;
+      break;
+    }
     if (pkt.stream_index != vStream) {
       av_packet_unref(&pkt);
       continue;
@@ -130,6 +136,10 @@ bool VideoConverter::convert(const std::string &inputPath, const std::string &ou
     avcodec_send_packet(decCtx, &pkt);
     av_packet_unref(&pkt);
     while (avcodec_receive_frame(decCtx, frame) == 0) {
+      if (cancelFlag && cancelFlag->load()) {
+        cancelled = true;
+        break;
+      }
       sws_scale(sws, frame->data, frame->linesize, 0, decCtx->height, scaled->data,
                 scaled->linesize);
       scaled->pts = frame->pts;
@@ -148,6 +158,8 @@ bool VideoConverter::convert(const std::string &inputPath, const std::string &ou
         av_packet_unref(&outPkt);
       }
     }
+    if (cancelled)
+      break;
   }
 
   avcodec_send_frame(encCtx, nullptr);
@@ -161,7 +173,7 @@ bool VideoConverter::convert(const std::string &inputPath, const std::string &ou
     av_packet_unref(&outPkt);
   }
 
-  if (totalDuration > 0 && progress)
+  if (totalDuration > 0 && progress && !cancelled)
     progress(1.0f);
 
   av_write_trailer(outCtx);
@@ -174,7 +186,7 @@ bool VideoConverter::convert(const std::string &inputPath, const std::string &ou
   avformat_free_context(outCtx);
   avcodec_free_context(&decCtx);
   avformat_close_input(&inCtx);
-  return true;
+  return !cancelled;
 }
 
 } // namespace mediaplayer

@@ -28,12 +28,15 @@ public:
                          const VideoEncodeOptions &options = {}, ProgressCallback progress = {},
                          CompletionCallback done = {});
 
+  void cancel();
+  bool isCancelled() const;
   void wait();
   bool isRunning() const;
 
 private:
   std::thread m_thread;
   std::atomic<bool> m_running{false};
+  std::atomic<bool> m_cancelFlag{false};
 };
 
 } // namespace mediaplayer
