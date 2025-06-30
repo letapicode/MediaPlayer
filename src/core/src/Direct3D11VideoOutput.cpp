@@ -212,7 +212,7 @@ void Direct3D11VideoOutput::displayFrame(const VideoFrame &frame) {
   if (SUCCEEDED(m_context->Map(m_yTexture.get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mapped))) {
     for (int y = 0; y < frame.height; ++y) {
       memcpy(static_cast<uint8_t *>(mapped.pData) + mapped.RowPitch * y,
-             frame.y + frame.linesizeY * y, frame.width);
+             frame.data[0] + frame.linesize[0] * y, frame.width);
     }
     m_context->Unmap(m_yTexture.get(), 0);
   }
@@ -221,14 +221,14 @@ void Direct3D11VideoOutput::displayFrame(const VideoFrame &frame) {
   if (SUCCEEDED(m_context->Map(m_uTexture.get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mapped))) {
     for (int y = 0; y < chromaH; ++y) {
       memcpy(static_cast<uint8_t *>(mapped.pData) + mapped.RowPitch * y,
-             frame.u + frame.linesizeU * y, chromaW);
+             frame.data[1] + frame.linesize[1] * y, chromaW);
     }
     m_context->Unmap(m_uTexture.get(), 0);
   }
   if (SUCCEEDED(m_context->Map(m_vTexture.get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mapped))) {
     for (int y = 0; y < chromaH; ++y) {
       memcpy(static_cast<uint8_t *>(mapped.pData) + mapped.RowPitch * y,
-             frame.v + frame.linesizeV * y, chromaW);
+             frame.data[2] + frame.linesize[2] * y, chromaW);
     }
     m_context->Unmap(m_vTexture.get(), 0);
   }
