@@ -131,6 +131,8 @@ bool MediaPlayer::open(const std::string &path) {
   }
   if (m_metadata.title.empty())
     m_metadata.title = std::filesystem::path(path).filename().string();
+  if (m_callbacks.onTrackLoaded)
+    m_callbacks.onTrackLoaded(m_metadata);
   m_audioClock = 0.0;
   m_videoClock = 0.0;
   m_audioPackets.clear();

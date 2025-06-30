@@ -3,6 +3,8 @@
 
 #include <functional>
 
+#include "MediaMetadata.h"
+
 namespace mediaplayer {
 
 struct PlaybackCallbacks {
@@ -10,6 +12,7 @@ struct PlaybackCallbacks {
   std::function<void()> onPause;
   std::function<void()> onStop;
   std::function<void()> onFinished;
+  std::function<void(const MediaMetadata &)> onTrackLoaded;
   std::function<void(double)> onPosition;
 };
 
