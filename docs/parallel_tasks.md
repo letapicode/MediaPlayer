@@ -1,4 +1,4 @@
-# Parallel Development Tasks
+#Parallel Development Tasks
 
 ## Core Media Engine (C++17) ([Tasks.MD](../Tasks.MD#core-media-engine-c17))
 
@@ -37,7 +37,7 @@
 | 31 | Audio Format Conversion Utility | done | implemented in `src/format_conversion` |
 | 32 | Video Transcoding Utility | done | implemented in `src/format_conversion` |
 | 33 | Conversion Task Management | done | asynchronous `FormatConverter` |
-| 34 | Integration in UI | done | CLI tool `mediaconvert` demonstrates usage |
+| 34 | Integration in UI | done | CLI tool `mediaconvert` and Qt signals via `FormatConverterQt` |
 | 35 | Network Stream Input Support | open | relevant |
 | 36 | YouTube Integration (Optional) | open | relevant |
 | 37 | Streaming Protocols (HLS/DASH) | open | relevant |

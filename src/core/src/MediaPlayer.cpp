@@ -187,6 +187,8 @@ void MediaPlayer::waitForConversion() { m_converter.wait(); }
 
 bool MediaPlayer::conversionRunning() const { return m_converter.isRunning(); }
 
+void MediaPlayer::cancelConversion() { m_converter.cancel(); }
+
 void MediaPlayer::setAudioOutput(std::unique_ptr<AudioOutput> output) {
   std::lock_guard<std::mutex> lock(m_mutex);
   if (m_output) {

@@ -2,6 +2,7 @@
 #define MEDIAPLAYER_AUDIOCONVERTER_H
 
 #include "EncodeOptions.h"
+#include <atomic>
 #include <functional>
 #include <string>
 
@@ -12,7 +13,8 @@ public:
   // Convert input audio file to the format implied by outputPath extension.
   // Returns true on success.
   bool convert(const std::string &inputPath, const std::string &outputPath,
-               const AudioEncodeOptions &options = {}, std::function<void(float)> progress = {});
+               const AudioEncodeOptions &options = {}, std::function<void(float)> progress = {},
+               std::atomic<bool> *cancelFlag = nullptr);
 };
 
 } // namespace mediaplayer

@@ -20,19 +20,44 @@ UI integration.
 #include <iostream>
 
 int main(int argc, char** argv) {
-    if (argc < 3) {
-        std::cout << "usage: convert <in> <out>" << std::endl;
-        return 0;
-    }
-    mediaplayer::FormatConverter conv;
-    mediaplayer::AudioEncodeOptions opts;
-    opts.bitrate = 128000; // customize encoding settings
-    conv.convertAudioAsync(argv[1], argv[2], opts,
-        [](float p){ std::cout << "progress " << p*100 << "%\n"; },
-        [](bool ok){ std::cout << (ok ? "done" : "error") << std::endl; });
-    conv.wait();
+  if (argc < 3) {
+    std::cout << "usage: convert <in> <out>" << std::endl;
+    return 0;
+  }
+  mediaplayer::FormatConverter conv;
+  mediaplayer::AudioEncodeOptions opts;
+  opts.bitrate = 128000; // customize encoding settings
+  conv.convertAudioAsync(
+      argv[1], argv[2], opts, [](float p) { std::cout << "progress " << p * 100 << "%\n"; },
+      [](bool ok) { std::cout << (ok ? "done" : "error") << std::endl; });
+  conv.wait();
 }
 ```
 
 This converts `argv[1]` to the format specified by `argv[2]` while printing
 progress updates.
+
+### mediaconvert CLI
+
+A standalone command line tool `mediaconvert` is built in this directory. It
+provides easy access to the conversion functionality.
+
+```
+mediaconvert <audio|video> <input> <output> [options]
+```
+
+Options allow setting bitrate, codec and for video the output size. Progress is
+printed to the console.
+
+### Cancellation API
+
+`FormatConverter` now supports cancelling a running job via `cancel()`. The
+`isCancelled()` method reports whether a cancellation was requested. The
+conversion loops in `AudioConverter` and `VideoConverter` check this flag so a
+conversion can be aborted gracefully.
+
+### Qt Integration
+
+For Qt applications the `mediaplayer_desktop` library provides a `FormatConverterQt`
+class that emits progress and completion signals. This wrapper internally uses
+the same conversion engine and can be used directly from QML.
