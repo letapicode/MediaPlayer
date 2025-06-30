@@ -37,6 +37,9 @@ This document expands on the Video Output section in [Tasks.MD](../Tasks.MD). Ea
 1. **Use `MTKView` or `GLKView`** to host the graphics context on iOS.
 2. **Render YUV frames** with either Metal shaders or OpenGL ES, depending on the chosen approach.
 
+### Example: MTKView Integration
+See [ios_video_output.md](ios_video_output.md) for a minimal snippet showing how to attach `MetalVideoOutput` to an `MTKView`.
+
 ## 25. Video Output Integration
 
 1. **Connect decoded frames to the renderer** via a thread‑safe queue or double buffer inside `MediaPlayer::videoLoop`.
