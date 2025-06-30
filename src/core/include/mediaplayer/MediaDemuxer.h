@@ -24,6 +24,7 @@ public:
   int subtitleStream() const { return m_subtitleStream; }
   AVFormatContext *context() const { return m_ctx; }
   bool eof() const { return m_eof; }
+  void resetEof();
   void setBufferSize(size_t size) { m_bufferSize = size; }
   size_t bufferSize() const { return m_bufferSize; }
 
