@@ -1,5 +1,6 @@
 add_library(mediaplayer_network
     src/NetworkStream.cpp
+    src/YouTubeDl.cpp
 )
 
 find_package(PkgConfig)

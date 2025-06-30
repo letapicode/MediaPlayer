@@ -74,6 +74,7 @@ Run the resulting `mediaplayer` executable with a media file:
 ```
 
 The graphical interface allows you to open files and manage your library as features are implemented.
+Network streams (HTTP/HTTPS, HLS or DASH) can be opened via `NetworkStream` when FFmpeg is built with protocol support. Optional helpers integrate `youtube_dl` for resolving YouTube links.
 
 ## Contributing
 

@@ -18,6 +18,12 @@ public:
   AVFormatContext *context() const { return m_ctx; }
   AVFormatContext *release();
 
+  // Retrieve a metadata value from the opened stream.
+  std::string metadata(const std::string &key) const;
+  // Convenience helpers for common ICY tags used by internet radio streams.
+  std::string icyTitle() const;
+  std::string icyName() const;
+
 private:
   AVFormatContext *m_ctx{nullptr};
 };
