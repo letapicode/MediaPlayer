@@ -14,12 +14,12 @@ void FormatConverter::convertAudioAsync(const std::string &input, const std::str
   wait();
   m_cancelFlag = false;
   m_running = true;
-  m_thread = std::thread([=]() {
+  m_thread = std::thread([=, this]() {
     AudioConverter conv;
-    bool ok = conv.convert(input, output, options, progress, &m_cancelFlag);
+    bool ok = conv.convert(input, output, options, progress, &this->m_cancelFlag);
     if (done)
-      done(ok && !m_cancelFlag.load());
-    m_running = false;
+      done(ok && !this->m_cancelFlag.load());
+    this->m_running = false;
   });
 }
 
@@ -29,12 +29,12 @@ void FormatConverter::convertVideoAsync(const std::string &input, const std::str
   wait();
   m_cancelFlag = false;
   m_running = true;
-  m_thread = std::thread([=]() {
+  m_thread = std::thread([=, this]() {
     VideoConverter conv;
-    bool ok = conv.convert(input, output, options, progress, &m_cancelFlag);
+    bool ok = conv.convert(input, output, options, progress, &this->m_cancelFlag);
     if (done)
-      done(ok && !m_cancelFlag.load());
-    m_running = false;
+      done(ok && !this->m_cancelFlag.load());
+    this->m_running = false;
   });
 }
 
@@ -46,6 +46,7 @@ void FormatConverter::wait() {
   if (m_thread.joinable())
     m_thread.join();
   m_cancelFlag = false;
+  m_running = false;
 }
 
 bool FormatConverter::isRunning() const { return m_running.load(); }
