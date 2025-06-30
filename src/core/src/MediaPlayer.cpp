@@ -135,6 +135,8 @@ bool MediaPlayer::open(const std::string &path) {
   m_audioPackets.clear();
   m_videoPackets.clear();
   m_playRecorded = false;
+  if (m_callbacks.onTrackChanged)
+    m_callbacks.onTrackChanged(m_metadata);
   std::cout << "Opened " << path << '\n';
   return true;
 }
@@ -323,6 +325,37 @@ void MediaPlayer::clearPlaylist() {
   m_playlist.clear();
 }
 
+void MediaPlayer::setShuffle(bool enabled) {
+  std::lock_guard<std::mutex> lock(m_mutex);
+  m_playlist.setShuffle(enabled);
+}
+
+bool MediaPlayer::shuffle() const {
+  std::lock_guard<std::mutex> lock(m_mutex);
+  return m_playlist.shuffle();
+}
+
+void MediaPlayer::setAutoAdvance(bool enabled) {
+  std::lock_guard<std::mutex> lock(m_mutex);
+  m_autoAdvance = enabled;
+}
+
+bool MediaPlayer::autoAdvance() const {
+  std::lock_guard<std::mutex> lock(m_mutex);
+  return m_autoAdvance;
+}
+
+void MediaPlayer::addAudioEffect(std::shared_ptr<AudioEffect> effect) {
+  std::lock_guard<std::mutex> lock(m_mutex);
+  if (effect)
+    m_effects.push_back(std::move(effect));
+}
+
+void MediaPlayer::clearAudioEffects() {
+  std::lock_guard<std::mutex> lock(m_mutex);
+  m_effects.clear();
+}
+
 bool MediaPlayer::nextTrack() {
   std::string path;
   {
@@ -350,6 +383,9 @@ void MediaPlayer::demuxLoop() {
     if (!m_demuxer.readPacket(pkt)) {
       if (m_callbacks.onFinished)
         m_callbacks.onFinished();
+      if (m_autoAdvance) {
+        std::thread([this]() { nextTrack(); }).detach();
+      }
       break;
     }
     if (pkt.stream_index == m_demuxer.audioStream() && !m_audioPackets.full()) {
@@ -379,8 +415,13 @@ void MediaPlayer::audioLoop() {
       if (bytes > 0 && m_output) {
         m_audioClock = m_audioDecoder.lastPts();
         double vol;
+        int ch = m_audioDecoder.channels();
+        int rate = m_audioDecoder.sampleRate();
         {
           std::lock_guard<std::mutex> lock(m_mutex);
+          for (auto &e : m_effects) {
+            e->process(reinterpret_cast<int16_t *>(audioBuffer), bytes / sizeof(int16_t), ch, rate);
+          }
           vol = m_volume;
         }
         if (vol < 0.999) {

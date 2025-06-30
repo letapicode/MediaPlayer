@@ -4,6 +4,7 @@
 #include <string>
 
 #include "AudioDecoder.h"
+#include "AudioEffect.h"
 #include "AudioOutput.h"
 #include "LibraryDB.h"
 #include "MediaDemuxer.h"
@@ -23,6 +24,7 @@
 #include <memory>
 #include <mutex>
 #include <thread>
+#include <vector>
 
 namespace mediaplayer {
 
@@ -40,6 +42,12 @@ public:
   void addToPlaylist(const std::string &path);
   void clearPlaylist();
   bool nextTrack();
+  void setShuffle(bool enabled);
+  bool shuffle() const;
+  void setAutoAdvance(bool enabled);
+  bool autoAdvance() const;
+  void addAudioEffect(std::shared_ptr<AudioEffect> effect);
+  void clearAudioEffects();
   void setAudioOutput(std::unique_ptr<AudioOutput> output);
   void setVideoOutput(std::unique_ptr<VideoOutput> output);
   void setPreferredHardwareDevice(const std::string &device);
@@ -80,11 +88,13 @@ private:
   VideoFrameQueue m_frameQueue;
   PlaybackCallbacks m_callbacks;
   PlaylistManager m_playlist;
+  bool m_autoAdvance{true};
   LibraryDB *m_library{nullptr};
   bool m_playRecorded{false};
   double m_volume{1.0};
   MediaMetadata m_metadata;
   std::string m_hwDevice;
+  std::vector<std::shared_ptr<AudioEffect>> m_effects;
 };
 
 } // namespace mediaplayer
