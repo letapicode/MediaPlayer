@@ -63,10 +63,11 @@ public:
   int readAudio(uint8_t *buffer, int bufferSize);
   int readVideo(uint8_t *buffer, int bufferSize);
   void convertAudioFile(const std::string &input, const std::string &output,
+                        const AudioEncodeOptions &options = {},
                         FormatConverter::ProgressCallback progress = {},
                         FormatConverter::CompletionCallback done = {});
-  void convertVideoFile(const std::string &input, const std::string &output, int width = 0,
-                        int height = 0, int bitrate = 1000000,
+  void convertVideoFile(const std::string &input, const std::string &output,
+                        const VideoEncodeOptions &options = {},
                         FormatConverter::ProgressCallback progress = {},
                         FormatConverter::CompletionCallback done = {});
   void waitForConversion();

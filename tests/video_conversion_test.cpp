@@ -66,7 +66,11 @@ int main() {
   const std::string out = "test_out.mp4";
   createTestMp4(in);
   mediaplayer::VideoConverter conv;
-  bool ok = conv.convert(in, out, 16, 16, 500000);
+  mediaplayer::VideoEncodeOptions opts;
+  opts.width = 16;
+  opts.height = 16;
+  opts.bitrate = 500000;
+  bool ok = conv.convert(in, out, opts);
   assert(ok && "conversion failed");
   AVFormatContext *ctx = nullptr;
   assert(avformat_open_input(&ctx, out.c_str(), nullptr, nullptr) == 0);

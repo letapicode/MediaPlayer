@@ -170,17 +170,17 @@ int MediaPlayer::readVideo(uint8_t *buffer, int bufferSize) {
 }
 
 void MediaPlayer::convertAudioFile(const std::string &input, const std::string &output,
+                                   const AudioEncodeOptions &options,
                                    FormatConverter::ProgressCallback progress,
                                    FormatConverter::CompletionCallback done) {
-  m_converter.convertAudioAsync(input, output, std::move(progress), std::move(done));
+  m_converter.convertAudioAsync(input, output, options, std::move(progress), std::move(done));
 }
 
-void MediaPlayer::convertVideoFile(const std::string &input, const std::string &output, int width,
-                                   int height, int bitrate,
+void MediaPlayer::convertVideoFile(const std::string &input, const std::string &output,
+                                   const VideoEncodeOptions &options,
                                    FormatConverter::ProgressCallback progress,
                                    FormatConverter::CompletionCallback done) {
-  m_converter.convertVideoAsync(input, output, width, height, bitrate, std::move(progress),
-                                std::move(done));
+  m_converter.convertVideoAsync(input, output, options, std::move(progress), std::move(done));
 }
 
 void MediaPlayer::waitForConversion() { m_converter.wait(); }
