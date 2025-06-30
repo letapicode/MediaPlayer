@@ -5,6 +5,7 @@ extern "C" {
 #include <libavformat/avformat.h>
 }
 
+#include <memory>
 #include <string>
 
 namespace mediaplayer {

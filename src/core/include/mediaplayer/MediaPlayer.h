@@ -18,6 +18,7 @@
 #include "VideoDecoder.h"
 #include "VideoFrameQueue.h"
 #include "VideoOutput.h"
+#include "mediaplayer/FormatConverter.h"
 
 #include <atomic>
 #include <condition_variable>
@@ -61,6 +62,15 @@ public:
   const MediaMetadata &metadata() const { return m_metadata; }
   int readAudio(uint8_t *buffer, int bufferSize);
   int readVideo(uint8_t *buffer, int bufferSize);
+  void convertAudioFile(const std::string &input, const std::string &output,
+                        FormatConverter::ProgressCallback progress = {},
+                        FormatConverter::CompletionCallback done = {});
+  void convertVideoFile(const std::string &input, const std::string &output, int width = 0,
+                        int height = 0, int bitrate = 1000000,
+                        FormatConverter::ProgressCallback progress = {},
+                        FormatConverter::CompletionCallback done = {});
+  void waitForConversion();
+  bool conversionRunning() const;
 
 private:
   void demuxLoop();
@@ -95,6 +105,7 @@ private:
   MediaMetadata m_metadata;
   std::string m_hwDevice;
   bool m_autoAdvance{true};
+  FormatConverter m_converter;
 };
 
 } // namespace mediaplayer

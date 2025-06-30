@@ -169,6 +169,24 @@ int MediaPlayer::readVideo(uint8_t *buffer, int bufferSize) {
   return 0;
 }
 
+void MediaPlayer::convertAudioFile(const std::string &input, const std::string &output,
+                                   FormatConverter::ProgressCallback progress,
+                                   FormatConverter::CompletionCallback done) {
+  m_converter.convertAudioAsync(input, output, std::move(progress), std::move(done));
+}
+
+void MediaPlayer::convertVideoFile(const std::string &input, const std::string &output, int width,
+                                   int height, int bitrate,
+                                   FormatConverter::ProgressCallback progress,
+                                   FormatConverter::CompletionCallback done) {
+  m_converter.convertVideoAsync(input, output, width, height, bitrate, std::move(progress),
+                                std::move(done));
+}
+
+void MediaPlayer::waitForConversion() { m_converter.wait(); }
+
+bool MediaPlayer::conversionRunning() const { return m_converter.isRunning(); }
+
 void MediaPlayer::setAudioOutput(std::unique_ptr<AudioOutput> output) {
   std::lock_guard<std::mutex> lock(m_mutex);
   if (m_output) {
