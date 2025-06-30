@@ -323,6 +323,7 @@ void MediaPlayer::seek(double seconds) {
     m_videoPackets.clear();
     m_frameQueue.clear();
   }
+  m_startTime = av_gettime() / 1000000.0 - seconds;
   m_audioClock = seconds;
   m_videoClock = seconds;
 }
