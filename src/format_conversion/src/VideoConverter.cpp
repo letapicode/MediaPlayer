@@ -13,8 +13,9 @@ extern "C" {
 
 namespace mediaplayer {
 
-bool VideoConverter::convert(const std::string &inputPath, const std::string &outputPath, int width,
-                             int height, int bitrate, std::function<void(float)> progress) {
+bool VideoConverter::convert(const std::string &inputPath, const std::string &outputPath,
+                             const VideoEncodeOptions &options,
+                             std::function<void(float)> progress) {
   AVFormatContext *inCtx = nullptr;
   if (avformat_open_input(&inCtx, inputPath.c_str(), nullptr, nullptr) < 0) {
     std::cerr << "Failed to open input" << std::endl;
@@ -46,10 +47,8 @@ bool VideoConverter::convert(const std::string &inputPath, const std::string &ou
     avformat_close_input(&inCtx);
     return false;
   }
-  if (width == 0)
-    width = decCtx->width;
-  if (height == 0)
-    height = decCtx->height;
+  int width = options.width > 0 ? options.width : decCtx->width;
+  int height = options.height > 0 ? options.height : decCtx->height;
 
   AVFormatContext *outCtx = nullptr;
   if (avformat_alloc_output_context2(&outCtx, nullptr, nullptr, outputPath.c_str()) < 0) {
@@ -57,7 +56,11 @@ bool VideoConverter::convert(const std::string &inputPath, const std::string &ou
     avformat_close_input(&inCtx);
     return false;
   }
-  const AVCodec *enc = avcodec_find_encoder(outCtx->oformat->video_codec);
+  const AVCodec *enc = nullptr;
+  if (!options.codec.empty())
+    enc = avcodec_find_encoder_by_name(options.codec.c_str());
+  if (!enc)
+    enc = avcodec_find_encoder(outCtx->oformat->video_codec);
   if (!enc) {
     std::cerr << "No encoder" << std::endl;
     avformat_free_context(outCtx);
@@ -78,7 +81,7 @@ bool VideoConverter::convert(const std::string &inputPath, const std::string &ou
   encCtx->height = height;
   encCtx->pix_fmt = enc->pix_fmts ? enc->pix_fmts[0] : AV_PIX_FMT_YUV420P;
   encCtx->time_base = {1, 25};
-  encCtx->bit_rate = bitrate;
+  encCtx->bit_rate = options.bitrate > 0 ? options.bitrate : 1000000;
   outSt->time_base = encCtx->time_base;
   if (outCtx->oformat->flags & AVFMT_GLOBALHEADER)
     encCtx->flags |= AV_CODEC_FLAG_GLOBAL_HEADER;

@@ -12,3 +12,27 @@ transcode between formats and optionally resize or set a target bitrate.
 `convertAudioAsync` and `convertVideoAsync` methods execute on a background
 thread and provide progress callbacks (0-1 range) and a completion callback for
 UI integration.
+
+### Example CLI Usage
+
+```
+#include "mediaplayer/FormatConverter.h"
+#include <iostream>
+
+int main(int argc, char** argv) {
+    if (argc < 3) {
+        std::cout << "usage: convert <in> <out>" << std::endl;
+        return 0;
+    }
+    mediaplayer::FormatConverter conv;
+    mediaplayer::AudioEncodeOptions opts;
+    opts.bitrate = 128000; // customize encoding settings
+    conv.convertAudioAsync(argv[1], argv[2], opts,
+        [](float p){ std::cout << "progress " << p*100 << "%\n"; },
+        [](bool ok){ std::cout << (ok ? "done" : "error") << std::endl; });
+    conv.wait();
+}
+```
+
+This converts `argv[1]` to the format specified by `argv[2]` while printing
+progress updates.

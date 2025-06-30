@@ -41,7 +41,9 @@ int main() {
   const std::string mp3 = "test_output.mp3";
   createTestWav(wav);
   mediaplayer::AudioConverter conv;
-  bool ok = conv.convert(wav, mp3);
+  mediaplayer::AudioEncodeOptions opts;
+  opts.bitrate = 128000;
+  bool ok = conv.convert(wav, mp3, opts);
   assert(ok && "conversion failed");
   std::ifstream f(mp3, std::ios::binary);
   assert(f.good() && "output file missing");

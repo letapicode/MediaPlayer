@@ -9,12 +9,13 @@ FormatConverter::FormatConverter() = default;
 FormatConverter::~FormatConverter() { wait(); }
 
 void FormatConverter::convertAudioAsync(const std::string &input, const std::string &output,
+                                        const AudioEncodeOptions &options,
                                         ProgressCallback progress, CompletionCallback done) {
   wait();
   m_running = true;
   m_thread = std::thread([=]() {
     AudioConverter conv;
-    bool ok = conv.convert(input, output, progress);
+    bool ok = conv.convert(input, output, options, progress);
     if (done)
       done(ok);
     m_running = false;
@@ -22,13 +23,13 @@ void FormatConverter::convertAudioAsync(const std::string &input, const std::str
 }
 
 void FormatConverter::convertVideoAsync(const std::string &input, const std::string &output,
-                                        int width, int height, int bitrate,
+                                        const VideoEncodeOptions &options,
                                         ProgressCallback progress, CompletionCallback done) {
   wait();
   m_running = true;
   m_thread = std::thread([=]() {
     VideoConverter conv;
-    bool ok = conv.convert(input, output, width, height, bitrate, progress);
+    bool ok = conv.convert(input, output, options, progress);
     if (done)
       done(ok);
     m_running = false;

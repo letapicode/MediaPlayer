@@ -2,6 +2,7 @@
 #define MEDIAPLAYER_FORMATCONVERTER_H
 
 #include "AudioConverter.h"
+#include "EncodeOptions.h"
 #include "VideoConverter.h"
 
 #include <atomic>
@@ -20,10 +21,11 @@ public:
   ~FormatConverter();
 
   void convertAudioAsync(const std::string &input, const std::string &output,
-                         ProgressCallback progress = {}, CompletionCallback done = {});
+                         const AudioEncodeOptions &options = {}, ProgressCallback progress = {},
+                         CompletionCallback done = {});
 
-  void convertVideoAsync(const std::string &input, const std::string &output, int width = 0,
-                         int height = 0, int bitrate = 1000000, ProgressCallback progress = {},
+  void convertVideoAsync(const std::string &input, const std::string &output,
+                         const VideoEncodeOptions &options = {}, ProgressCallback progress = {},
                          CompletionCallback done = {});
 
   void wait();

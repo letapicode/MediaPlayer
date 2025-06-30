@@ -13,6 +13,7 @@ extern "C" {
 namespace mediaplayer {
 
 bool AudioConverter::convert(const std::string &inputPath, const std::string &outputPath,
+                             const AudioEncodeOptions &options,
                              std::function<void(float)> progress) {
   AVFormatContext *inCtx = nullptr;
   if (avformat_open_input(&inCtx, inputPath.c_str(), nullptr, nullptr) < 0) {
@@ -53,7 +54,11 @@ bool AudioConverter::convert(const std::string &inputPath, const std::string &ou
     avformat_close_input(&inCtx);
     return false;
   }
-  const AVCodec *enc = avcodec_find_encoder(outCtx->oformat->audio_codec);
+  const AVCodec *enc = nullptr;
+  if (!options.codec.empty())
+    enc = avcodec_find_encoder_by_name(options.codec.c_str());
+  if (!enc)
+    enc = avcodec_find_encoder(outCtx->oformat->audio_codec);
   if (!enc) {
     std::cerr << "No encoder" << std::endl;
     avformat_free_context(outCtx);
@@ -72,9 +77,9 @@ bool AudioConverter::convert(const std::string &inputPath, const std::string &ou
   AVCodecContext *encCtx = avcodec_alloc_context3(enc);
   encCtx->channels = decCtx->channels;
   encCtx->channel_layout = av_get_default_channel_layout(encCtx->channels);
-  encCtx->sample_rate = decCtx->sample_rate;
+  encCtx->sample_rate = options.sampleRate > 0 ? options.sampleRate : decCtx->sample_rate;
   encCtx->sample_fmt = enc->sample_fmts ? enc->sample_fmts[0] : decCtx->sample_fmt;
-  encCtx->bit_rate = 192000;
+  encCtx->bit_rate = options.bitrate > 0 ? options.bitrate : 192000;
   outSt->time_base = {1, encCtx->sample_rate};
   if (outCtx->oformat->flags & AVFMT_GLOBALHEADER)
     encCtx->flags |= AV_CODEC_FLAG_GLOBAL_HEADER;

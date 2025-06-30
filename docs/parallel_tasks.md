@@ -34,9 +34,9 @@
 | 28 | Playback State Notifications | done | relevant |
 | 29 | Volume and Audio Effects | done | relevant |
 | 30 | Media Metadata Extraction | done | relevant |
-| 31 | Audio Format Conversion Utility | open | relevant |
-| 32 | Video Transcoding Utility | open | relevant |
-| 33 | Conversion Task Management | open | relevant |
+| 31 | Audio Format Conversion Utility | done | implemented in `src/format_conversion` |
+| 32 | Video Transcoding Utility | done | implemented in `src/format_conversion` |
+| 33 | Conversion Task Management | done | asynchronous `FormatConverter` |
 | 34 | Integration in UI | open | relevant |
 | 35 | Network Stream Input Support | open | relevant |
 | 36 | YouTube Integration (Optional) | open | relevant |
