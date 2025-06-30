@@ -127,41 +127,59 @@ bool VideoDecoder::open(AVFormatContext *fmtCtx, int streamIndex,
 }
 
 int VideoDecoder::decode(AVPacket *pkt, uint8_t *outBuffer, int outBufferSize) {
-  if (avcodec_send_packet(m_codecCtx, pkt) < 0) {
-    return -1;
-  }
   int total = 0;
   const int frameBytes =
       av_image_get_buffer_size(AV_PIX_FMT_RGBA, m_codecCtx->width, m_codecCtx->height, 1);
-  while (avcodec_receive_frame(m_codecCtx, m_frame) == 0) {
-    m_lastPts = m_frame->best_effort_timestamp;
-    if (total + frameBytes > outBufferSize) {
+  VideoFrame vf{};
+  while (decodeYUV(pkt, vf)) {
+    pkt = nullptr; // send packet only once
+    if (total + frameBytes > outBufferSize)
       break;
-    }
     uint8_t *dstData[4] = {outBuffer + total, nullptr, nullptr, nullptr};
     int dstLinesize[4] = {m_codecCtx->width * 4, 0, 0, 0};
 #ifdef MEDIAPLAYER_HW_DECODING
-    // Decode may return frames stored in GPU memory. When that happens we copy
-    // them back to a regular AVFrame for scaling.
-    AVFrame *src = m_frame;
-    if (m_hwPixFmt != AV_PIX_FMT_NONE && m_frame->format == m_hwPixFmt) {
-      if (!m_swFrame)
-        m_swFrame = av_frame_alloc();
-      av_frame_unref(m_swFrame);
-      if (av_hwframe_transfer_data(m_swFrame, m_frame, 0) < 0) {
-        std::cerr << "Failed to transfer hw frame\n";
-        continue;
-      }
-      src = m_swFrame;
-    }
-    sws_scale(m_swsCtx, src->data, src->linesize, 0, m_codecCtx->height, dstData, dstLinesize);
+    sws_scale(m_swsCtx, vf.data, vf.linesize, 0, vf.height, dstData, dstLinesize);
 #else
-    sws_scale(m_swsCtx, m_frame->data, m_frame->linesize, 0, m_codecCtx->height, dstData,
-              dstLinesize);
+    sws_scale(m_swsCtx, vf.data, vf.linesize, 0, vf.height, dstData, dstLinesize);
 #endif
     total += frameBytes;
   }
   return total;
+}
+
+bool VideoDecoder::decodeYUV(AVPacket *pkt, VideoFrame &frame) {
+  if (pkt && avcodec_send_packet(m_codecCtx, pkt) < 0)
+    return false;
+  if (avcodec_receive_frame(m_codecCtx, m_frame) != 0)
+    return false;
+
+  m_lastPts = m_frame->best_effort_timestamp;
+
+#ifdef MEDIAPLAYER_HW_DECODING
+  AVFrame *src = m_frame;
+  if (m_hwPixFmt != AV_PIX_FMT_NONE && m_frame->format == m_hwPixFmt) {
+    if (!m_swFrame)
+      m_swFrame = av_frame_alloc();
+    av_frame_unref(m_swFrame);
+    if (av_hwframe_transfer_data(m_swFrame, m_frame, 0) < 0) {
+      std::cerr << "Failed to transfer hw frame\n";
+      return false;
+    }
+    src = m_swFrame;
+  }
+#else
+  AVFrame *src = m_frame;
+#endif
+
+  frame.width = m_codecCtx->width;
+  frame.height = m_codecCtx->height;
+  frame.data[0] = src->data[0];
+  frame.data[1] = src->data[1];
+  frame.data[2] = src->data[2];
+  frame.linesize[0] = src->linesize[0];
+  frame.linesize[1] = src->linesize[1];
+  frame.linesize[2] = src->linesize[2];
+  return true;
 }
 
 void VideoDecoder::flush() {

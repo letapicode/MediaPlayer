@@ -2,6 +2,7 @@
 #define MEDIAPLAYER_VIDEODECODER_H
 
 #include "MediaDecoder.h"
+#include "VideoFrame.h"
 #include <string>
 #ifdef MEDIAPLAYER_HW_DECODING
 #include <libavutil/hwcontext.h>
@@ -30,6 +31,8 @@ public:
   bool open(AVFormatContext *fmtCtx, int streamIndex, const std::string &preferredHwDevice);
   // Decode packet and write RGBA data into outBuffer. Returns bytes written.
   int decode(AVPacket *pkt, uint8_t *outBuffer, int outBufferSize) override;
+  // Decode packet and output raw YUV planes. Returns true if a frame was produced.
+  bool decodeYUV(AVPacket *pkt, VideoFrame &frame);
   void flush() override;
   int width() const { return m_codecCtx ? m_codecCtx->width : 0; }
   int height() const { return m_codecCtx ? m_codecCtx->height : 0; }

@@ -1,7 +1,13 @@
 #include "mediaplayer/OpenGLVideoOutput.h"
+#include "mediaplayer/VideoFrame.h"
+#include <libswscale/swscale.h>
+extern "C" {
+#include <libavutil/avutil.h>
+}
 
 #include <GL/gl.h>
 #include <iostream>
+#include <vector>
 
 namespace mediaplayer {
 
@@ -65,6 +71,19 @@ void OpenGLVideoOutput::displayFrame(const uint8_t *rgba, int linesize) {
   glEnd();
   glfwSwapBuffers(m_window);
   glfwPollEvents();
+}
+
+void OpenGLVideoOutput::displayFrame(const VideoFrame &frame) {
+  static SwsContext *swsCtx = nullptr;
+  if (!swsCtx) {
+    swsCtx = sws_getContext(frame.width, frame.height, AV_PIX_FMT_YUV420P, frame.width,
+                            frame.height, AV_PIX_FMT_RGBA, SWS_BILINEAR, nullptr, nullptr, nullptr);
+  }
+  std::vector<uint8_t> rgba(frame.width * frame.height * 4);
+  uint8_t *dstData[4] = {rgba.data(), nullptr, nullptr, nullptr};
+  int dstLinesize[4] = {frame.width * 4, 0, 0, 0};
+  sws_scale(swsCtx, frame.data, frame.linesize, 0, frame.height, dstData, dstLinesize);
+  displayFrame(rgba.data(), frame.width * 4);
 }
 
 } // namespace mediaplayer

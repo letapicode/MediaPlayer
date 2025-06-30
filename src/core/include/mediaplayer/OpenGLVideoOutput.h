@@ -14,6 +14,7 @@ public:
   bool init(int width, int height) override;
   void shutdown() override;
   void displayFrame(const uint8_t *rgba, int linesize) override;
+  void displayFrame(const VideoFrame &frame) override;
 
 private:
   GLFWwindow *m_window{nullptr};
