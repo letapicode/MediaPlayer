@@ -49,9 +49,9 @@
 | 43 | Audio Visualization Feed | done | PCM passed to `Visualizer::onAudioPCM` |
 | 44 | Visualization API Hook | done | `Visualizer` interface implemented |
 | 45 | Spectrum Analysis (optional) | done | `simpleFFT` utility + `BasicVisualizer` |
-| 46 | Memory Management Audit | open | relevant |
-| 47 | CPU/GPU Optimization | open | relevant |
-| 48 | Stress Testing Tools | open | relevant |
+| 46 | Memory Management Audit | done | frame pool implemented |
+| 47 | CPU/GPU Optimization | done | -O3 and SIMD flags added |
+| 48 | Stress Testing Tools | done | stress_load_test.cpp |
 
 ## Media Library & Smart Playlists (C++17, SQLite) ([Tasks.MD](../Tasks.MD#media-library-smart-playlists-c17,-sqlite))
 
