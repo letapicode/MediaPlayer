@@ -100,6 +100,8 @@ bool MediaPlayer::open(const std::string &path) {
       std::cerr << "Failed to init video output\n";
       return false;
     }
+    int lines[3] = {m_videoDecoder.width(), m_videoDecoder.width() / 2, m_videoDecoder.width() / 2};
+    m_framePool.preallocate(m_videoDecoder.width(), m_videoDecoder.height(), lines, 2);
   }
   if (m_demuxer.subtitleStream() >= 0) {
     m_subtitleDecoder.open(fmtCtx, m_demuxer.subtitleStream());

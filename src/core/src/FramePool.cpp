@@ -24,6 +24,13 @@ VideoFrame *FramePool::createFrame(int width, int height, const int linesize[3])
   return f;
 }
 
+void FramePool::preallocate(int width, int height, const int linesize[3], size_t count) {
+  std::lock_guard<std::mutex> lock(m_mutex);
+  for (size_t i = m_freeFrames.size(); i < count && i < m_maxFrames; ++i) {
+    m_freeFrames.push_back(createFrame(width, height, linesize));
+  }
+}
+
 VideoFrame *FramePool::acquire(int width, int height, const int linesize[3]) {
   std::lock_guard<std::mutex> lock(m_mutex);
   for (auto it = m_freeFrames.begin(); it != m_freeFrames.end(); ++it) {
