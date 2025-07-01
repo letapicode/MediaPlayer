@@ -14,6 +14,7 @@ public:
 
   VideoFrame *acquire(int width, int height, const int linesize[3]);
   void release(VideoFrame *frame);
+  void preallocate(int width, int height, const int linesize[3], size_t count);
   void clear();
 
 private:
