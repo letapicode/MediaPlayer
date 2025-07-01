@@ -18,17 +18,30 @@ inline std::vector<float> simpleFFT(const int16_t *samples, size_t count) {
   for (size_t i = count; i < n; ++i)
     data[i] = 0.0;
 
+  // Bit-reversal permutation
+  size_t j = 0;
+  for (size_t i = 1; i < n; ++i) {
+    size_t bit = n >> 1;
+    while (j & bit) {
+      j ^= bit;
+      bit >>= 1;
+    }
+    j ^= bit;
+    if (i < j)
+      std::swap(data[i], data[j]);
+  }
+
   const double pi = std::acos(-1.0);
-  for (size_t len = 1; len < n; len <<= 1) {
-    double angle = -pi / static_cast<double>(len);
+  for (size_t len = 2; len <= n; len <<= 1) {
+    double angle = -2.0 * pi / static_cast<double>(len);
     std::complex<double> wlen{std::cos(angle), std::sin(angle)};
-    for (size_t i = 0; i < n; i += 2 * len) {
+    for (size_t i = 0; i < n; i += len) {
       std::complex<double> w{1.0, 0.0};
-      for (size_t j = 0; j < len; ++j) {
-        auto u = data[i + j];
-        auto v = data[i + j + len] * w;
-        data[i + j] = u + v;
-        data[i + j + len] = u - v;
+      for (size_t k = 0; k < len / 2; ++k) {
+        auto u = data[i + k];
+        auto v = data[i + k + len / 2] * w;
+        data[i + k] = u + v;
+        data[i + k + len / 2] = u - v;
         w *= wlen;
       }
     }

@@ -46,9 +46,9 @@
 | 40 | Subtitle Renderer/Provider | done | `SubtitleProvider` supplies cues |
 | 41 | Subtitle Sync Adjustment | done | `SubtitleProvider::setOffset` |
 | 42 | Subtitle Track Selection | done | decoder & API implemented |
-| 43 | Audio Visualization Feed | open | relevant |
-| 44 | Visualization API Hook | open | relevant |
-| 45 | Spectrum Analysis (optional) | open | relevant |
+| 43 | Audio Visualization Feed | done | PCM passed to `Visualizer::onAudioPCM` |
+| 44 | Visualization API Hook | done | `Visualizer` interface implemented |
+| 45 | Spectrum Analysis (optional) | done | `simpleFFT` utility + `BasicVisualizer` |
 | 46 | Memory Management Audit | open | relevant |
 | 47 | CPU/GPU Optimization | open | relevant |
 | 48 | Stress Testing Tools | open | relevant |
