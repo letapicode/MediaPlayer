@@ -63,6 +63,7 @@ MediaPlayer::~MediaPlayer() {
   m_videoPackets.clear();
   m_subtitlePackets.clear();
   m_frameQueue.clear();
+  m_framePool.clear();
   avformat_network_deinit();
 }
 
@@ -343,6 +344,7 @@ void MediaPlayer::stop() {
   m_videoPackets.clear();
   m_subtitlePackets.clear();
   m_frameQueue.clear();
+  m_framePool.clear();
   m_running = false;
   if (m_callbacks.onStop)
     m_callbacks.onStop();
@@ -515,10 +517,7 @@ void MediaPlayer::videoLoop() {
           m_videoOutput->displayFrame(*frame);
         if (m_callbacks.onPosition)
           m_callbacks.onPosition(m_videoClock);
-        delete[] frame->data[0];
-        delete[] frame->data[1];
-        delete[] frame->data[2];
-        delete frame;
+        m_framePool.release(frame);
       } else if (m_stopRequested.load()) {
         break;
       }
@@ -540,19 +539,14 @@ void MediaPlayer::videoLoop() {
       bool ok = m_videoDecoder.decodeYUV(pkt, tmp);
       av_packet_free(&pkt);
       if (ok) {
-        auto *frame = new VideoFrame();
+        int lines[3] = {tmp.linesize[0], tmp.linesize[1], tmp.linesize[2]};
+        auto *frame = m_framePool.acquire(tmp.width, tmp.height, lines);
         frame->width = tmp.width;
         frame->height = tmp.height;
         frame->linesize[0] = tmp.linesize[0];
         frame->linesize[1] = tmp.linesize[1];
         frame->linesize[2] = tmp.linesize[2];
         frame->pts = m_videoDecoder.lastPts();
-        int yBytes = frame->linesize[0] * frame->height;
-        int uBytes = frame->linesize[1] * frame->height / 2;
-        int vBytes = frame->linesize[2] * frame->height / 2;
-        frame->data[0] = new uint8_t[yBytes];
-        frame->data[1] = new uint8_t[uBytes];
-        frame->data[2] = new uint8_t[vBytes];
         for (int y = 0; y < frame->height; ++y)
           memcpy(frame->data[0] + y * frame->linesize[0], tmp.data[0] + y * tmp.linesize[0],
                  frame->linesize[0]);
@@ -564,10 +558,7 @@ void MediaPlayer::videoLoop() {
         }
         while (!m_frameQueue.push(frame)) {
           if (m_stopRequested.load()) {
-            delete[] frame->data[0];
-            delete[] frame->data[1];
-            delete[] frame->data[2];
-            delete frame;
+            m_framePool.release(frame);
             break;
           }
           std::this_thread::sleep_for(std::chrono::milliseconds(5));
@@ -580,6 +571,7 @@ void MediaPlayer::videoLoop() {
 
   m_stopRequested.store(true);
   m_frameQueue.clear();
+  m_framePool.clear();
   if (renderThread.joinable())
     renderThread.join();
 }
