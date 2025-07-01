@@ -33,9 +33,7 @@ void VideoFrameQueue::clear() {
   std::unique_lock<std::mutex> lock(m_mutex);
   while (!m_queue.empty()) {
     auto *f = m_queue.front();
-    delete[] f->data[0];
-    delete[] f->data[1];
-    delete[] f->data[2];
+    delete[] f->buffer;
     delete f;
     m_queue.pop();
   }

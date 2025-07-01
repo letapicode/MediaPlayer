@@ -18,9 +18,11 @@ VideoFrame *FramePool::createFrame(int width, int height, const int linesize[3])
   int yBytes = linesize[0] * height;
   int uBytes = linesize[1] * height / 2;
   int vBytes = linesize[2] * height / 2;
-  f->data[0] = new uint8_t[yBytes];
-  f->data[1] = new uint8_t[uBytes];
-  f->data[2] = new uint8_t[vBytes];
+  int total = yBytes + uBytes + vBytes;
+  f->buffer = new uint8_t[total];
+  f->data[0] = f->buffer;
+  f->data[1] = f->buffer + yBytes;
+  f->data[2] = f->buffer + yBytes + uBytes;
   return f;
 }
 
@@ -49,9 +51,7 @@ void FramePool::release(VideoFrame *frame) {
     return;
   std::lock_guard<std::mutex> lock(m_mutex);
   if (m_freeFrames.size() >= m_maxFrames) {
-    delete[] frame->data[0];
-    delete[] frame->data[1];
-    delete[] frame->data[2];
+    delete[] frame->buffer;
     delete frame;
   } else {
     m_freeFrames.push_back(frame);
@@ -61,9 +61,7 @@ void FramePool::release(VideoFrame *frame) {
 void FramePool::clear() {
   std::lock_guard<std::mutex> lock(m_mutex);
   for (auto *f : m_freeFrames) {
-    delete[] f->data[0];
-    delete[] f->data[1];
-    delete[] f->data[2];
+    delete[] f->buffer;
     delete f;
   }
   m_freeFrames.clear();
