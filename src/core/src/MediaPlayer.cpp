@@ -7,6 +7,7 @@
 #include "mediaplayer/AudioOutputPulse.h"
 #endif
 #include "mediaplayer/VideoFrame.h"
+#include "mediaplayer/Visualizer.h"
 #include <algorithm>
 #include <chrono>
 #include <cstdint>
@@ -220,6 +221,11 @@ void MediaPlayer::setPreferredHardwareDevice(const std::string &device) {
 void MediaPlayer::setLibrary(LibraryDB *db) {
   std::lock_guard<std::mutex> lock(m_mutex);
   m_library = db;
+}
+
+void MediaPlayer::setVisualizer(std::shared_ptr<Visualizer> vis) {
+  std::lock_guard<std::mutex> lock(m_mutex);
+  m_visualizer = std::move(vis);
 }
 
 void MediaPlayer::addAudioEffect(std::shared_ptr<AudioEffect> effect) {
@@ -470,10 +476,15 @@ void MediaPlayer::audioLoop() {
           }
         }
         std::vector<std::shared_ptr<AudioEffect>> effects;
+        std::shared_ptr<Visualizer> vis;
         {
           std::lock_guard<std::mutex> lock(m_mutex);
           effects = m_audioEffects;
+          vis = m_visualizer;
         }
+        if (vis)
+          vis->onAudioPCM(samples, sampleCount, m_audioDecoder.sampleRate(),
+                          m_audioDecoder.channels());
         for (auto &effect : effects)
           effect->process(samples, sampleCount);
         m_output->write(audioBuffer, bytes);

@@ -19,6 +19,7 @@
 #include "VideoDecoder.h"
 #include "VideoFrameQueue.h"
 #include "VideoOutput.h"
+#include "Visualizer.h"
 #include "mediaplayer/FormatConverter.h"
 
 #include <atomic>
@@ -51,6 +52,7 @@ public:
   void setPreferredHardwareDevice(const std::string &device);
   void setCallbacks(PlaybackCallbacks callbacks);
   void setLibrary(LibraryDB *db);
+  void setVisualizer(std::shared_ptr<Visualizer> vis);
   void addAudioEffect(std::shared_ptr<AudioEffect> effect);
   void removeAudioEffect(std::shared_ptr<AudioEffect> effect);
   void setVolume(double volume); // 0.0 - 1.0
@@ -118,6 +120,7 @@ private:
   FormatConverter m_converter;
   SubtitleDecoder m_subtitleDecoder;
   std::thread m_subtitleThread;
+  std::shared_ptr<Visualizer> m_visualizer;
 };
 
 } // namespace mediaplayer
