@@ -6,6 +6,7 @@
 #include "AudioDecoder.h"
 #include "AudioEffect.h"
 #include "AudioOutput.h"
+#include "FramePool.h"
 #include "LibraryDB.h"
 #include "MediaDemuxer.h"
 #include "MediaMetadata.h"
@@ -108,6 +109,7 @@ private:
   PacketQueue m_videoPackets;
   PacketQueue m_subtitlePackets;
   VideoFrameQueue m_frameQueue;
+  FramePool m_framePool;
   PlaybackCallbacks m_callbacks;
   std::vector<std::shared_ptr<AudioEffect>> m_audioEffects;
   PlaylistManager m_playlist;
