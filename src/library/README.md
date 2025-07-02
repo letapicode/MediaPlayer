@@ -46,6 +46,9 @@ if (db.open()) {
 }
 ```
 
+`scanDirectory` uses an SQLite UPSERT so rescanning will update metadata for
+existing files automatically.
+
 Other helpers allow updating or removing entries, setting ratings and retrieving the items of a playlist.
 
 ## Dependencies and Building
