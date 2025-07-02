@@ -523,12 +523,18 @@ bool LibraryDB::parseSmartFilter(const std::string &filter, std::string &sql,
     if (pos < filter.size() && filter[pos] == '\'') {
       quoted = true;
       ++pos;
-      size_t start = pos;
-      while (pos < filter.size() && filter[pos] != '\'')
-        ++pos;
-      value = filter.substr(start, pos - start);
-      if (pos < filter.size() && filter[pos] == '\'')
-        ++pos;
+      while (pos < filter.size()) {
+        if (filter[pos] == '\'') {
+          if (pos + 1 < filter.size() && filter[pos + 1] == '\'') {
+            value += '\'';
+            pos += 2;
+            continue;
+          }
+          ++pos;
+          break;
+        }
+        value += filter[pos++];
+      }
     } else {
       size_t start = pos;
       while (pos < filter.size() && !std::isspace(static_cast<unsigned char>(filter[pos])))
