@@ -2,6 +2,7 @@
 #define MEDIAPLAYER_LIBRARYDB_H
 
 #include "mediaplayer/MediaMetadata.h"
+
 #include <atomic>
 #include <functional>
 #include <mutex>
@@ -11,6 +12,8 @@
 #include <vector>
 
 namespace mediaplayer {
+
+class AIRecommender;
 
 class LibraryDB {
 public:
@@ -57,6 +60,9 @@ public:
   bool removeFromPlaylist(const std::string &name, const std::string &path);
   std::vector<MediaMetadata> playlistItems(const std::string &name);
 
+  void setRecommender(AIRecommender *recommender);
+  std::vector<MediaMetadata> recommendations();
+
 private:
   bool insertMedia(const std::string &path, const std::string &title, const std::string &artist,
                    const std::string &album, int duration = 0, int width = 0, int height = 0,
@@ -69,6 +75,7 @@ private:
   std::string m_path;
   sqlite3 *m_db{nullptr};
   mutable std::mutex m_mutex;
+  AIRecommender *m_recommender{nullptr};
 };
 
 } // namespace mediaplayer

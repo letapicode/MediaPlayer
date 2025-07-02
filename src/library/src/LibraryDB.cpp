@@ -1,4 +1,5 @@
 #include "mediaplayer/LibraryDB.h"
+#include "mediaplayer/AIRecommender.h"
 #include <ctime>
 #include <filesystem>
 #include <iostream>
@@ -447,6 +448,18 @@ int LibraryDB::rating(const std::string &path) const {
     r = sqlite3_column_int(stmt, 0);
   sqlite3_finalize(stmt);
   return r;
+}
+
+void LibraryDB::setRecommender(AIRecommender *recommender) {
+  std::lock_guard<std::mutex> lock(m_mutex);
+  m_recommender = recommender;
+}
+
+std::vector<MediaMetadata> LibraryDB::recommendations() {
+  std::lock_guard<std::mutex> lock(m_mutex);
+  if (m_recommender)
+    return m_recommender->recommend(*this);
+  return {};
 }
 
 } // namespace mediaplayer
