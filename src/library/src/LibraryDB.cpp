@@ -564,7 +564,9 @@ bool LibraryDB::parseSmartFilter(const std::string &filter, std::string &sql,
       if (pos + len > filter.size())
         return false;
       for (size_t i = 0; i < len; ++i) {
-        if (std::toupper(static_cast<unsigned char>(filter[pos + i])) != kw[i])
+        char c1 = std::toupper(static_cast<unsigned char>(filter[pos + i]));
+        char c2 = std::toupper(static_cast<unsigned char>(kw[i]));
+        if (c1 != c2)
           return false;
       }
       return true;
