@@ -68,9 +68,12 @@ bool LibraryDB::initSchema() {
 bool LibraryDB::insertMedia(const std::string &path, const std::string &title,
                             const std::string &artist, const std::string &album, int duration,
                             int width, int height, int rating) {
-  const char *sql = "INSERT OR IGNORE INTO MediaItem (path, title, artist, album, duration, width, "
-                    "height, rating)"
-                    " VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8);";
+  const char *sql =
+      "INSERT INTO MediaItem (path, title, artist, album, duration, width, height, rating) "
+      "VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8) "
+      "ON CONFLICT(path) DO UPDATE SET "
+      "title=excluded.title, artist=excluded.artist, album=excluded.album, "
+      "duration=excluded.duration, width=excluded.width, height=excluded.height;";
   sqlite3_stmt *stmt = nullptr;
   if (sqlite3_prepare_v2(m_db, sql, -1, &stmt, nullptr) != SQLITE_OK) {
     return false;
@@ -97,34 +100,37 @@ bool LibraryDB::scanDirectory(const std::string &directory) {
       continue;
     auto pathStr = entry.path().string();
     TagLib::FileRef f(pathStr.c_str());
+    std::string title;
+    std::string artist;
+    std::string album;
     if (!f.isNull() && f.tag()) {
-      std::string title = f.tag()->title().to8Bit(true);
-      std::string artist = f.tag()->artist().to8Bit(true);
-      std::string album = f.tag()->album().to8Bit(true);
-      if (title.empty())
-        title = entry.path().filename().string();
+      title = f.tag()->title().to8Bit(true);
+      artist = f.tag()->artist().to8Bit(true);
+      album = f.tag()->album().to8Bit(true);
+    }
+    if (title.empty())
+      title = entry.path().filename().string();
 
-      int duration = 0;
-      int width = 0;
-      int height = 0;
-      AVFormatContext *ctx = nullptr;
-      if (avformat_open_input(&ctx, pathStr.c_str(), nullptr, nullptr) == 0) {
-        if (avformat_find_stream_info(ctx, nullptr) >= 0) {
-          if (ctx->duration > 0)
-            duration = static_cast<int>(ctx->duration / AV_TIME_BASE);
-          for (unsigned i = 0; i < ctx->nb_streams; ++i) {
-            AVStream *st = ctx->streams[i];
-            if (st->codecpar->codec_type == AVMEDIA_TYPE_VIDEO) {
-              width = st->codecpar->width;
-              height = st->codecpar->height;
-              break;
-            }
+    int duration = 0;
+    int width = 0;
+    int height = 0;
+    AVFormatContext *ctx = nullptr;
+    if (avformat_open_input(&ctx, pathStr.c_str(), nullptr, nullptr) == 0) {
+      if (avformat_find_stream_info(ctx, nullptr) >= 0) {
+        if (ctx->duration > 0)
+          duration = static_cast<int>(ctx->duration / AV_TIME_BASE);
+        for (unsigned i = 0; i < ctx->nb_streams; ++i) {
+          AVStream *st = ctx->streams[i];
+          if (st->codecpar->codec_type == AVMEDIA_TYPE_VIDEO) {
+            width = st->codecpar->width;
+            height = st->codecpar->height;
+            break;
           }
         }
-        avformat_close_input(&ctx);
       }
-      insertMedia(pathStr, title, artist, album, duration, width, height, 0);
+      avformat_close_input(&ctx);
     }
+    insertMedia(pathStr, title, artist, album, duration, width, height, 0);
   }
   return true;
 }
