@@ -69,6 +69,14 @@ The `scanDirectoryAsync` method starts a background thread that scans files and
 updates the database. It returns a `std::thread` which callers must join before
 destroying the `LibraryDB` instance to avoid accessing it from a background task.
 
+### Smart playlists
+
+Use `createSmartPlaylist(name, filter)` to define a playlist whose contents are
+determined by a filter expression (same syntax as `smartQuery`). The library
+re-evaluates all smart playlists whenever metadata changes. Convenience methods
+`recentlyAdded()` and `mostPlayed()` return dynamic lists of recent or popular
+items without storing them as playlists.
+
 ## Dependencies and Building
 
 `LibraryDB` relies on:

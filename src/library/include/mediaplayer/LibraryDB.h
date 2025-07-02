@@ -65,6 +65,11 @@ public:
   bool removeFromPlaylist(const std::string &name, const std::string &path);
   std::vector<MediaMetadata> playlistItems(const std::string &name);
 
+  // Smart playlists
+  bool createSmartPlaylist(const std::string &name, const std::string &filter);
+  bool updateSmartPlaylist(const std::string &name, const std::string &filter);
+  bool deleteSmartPlaylist(const std::string &name);
+
   // Retrieve full media and playlist lists
   std::vector<MediaMetadata> allMedia() const;
   std::vector<std::string> allPlaylists() const;
