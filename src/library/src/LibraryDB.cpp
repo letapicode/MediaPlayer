@@ -16,6 +16,14 @@ bool LibraryDB::open() {
     std::cerr << "Failed to open DB: " << sqlite3_errmsg(m_db) << '\n';
     return false;
   }
+  char *err = nullptr;
+  if (sqlite3_exec(m_db, "PRAGMA foreign_keys = ON;", nullptr, nullptr, &err) != SQLITE_OK) {
+    std::cerr << "Failed to enable foreign keys: " << err << '\n';
+    sqlite3_free(err);
+    sqlite3_close(m_db);
+    m_db = nullptr;
+    return false;
+  }
   if (!initSchema()) {
     sqlite3_close(m_db);
     m_db = nullptr;
