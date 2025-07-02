@@ -42,6 +42,8 @@ if (db.open()) {
     for (const auto &m : songs)
         db.addToPlaylist("favorites", m.path);
     db.recordPlayback(songs.front().path);      // update play count
+    auto recent = db.recentlyAdded(5);          // top 5 recently played
+    auto popular = db.mostPlayed(5);            // top 5 most played
     db.close();
 }
 ```
@@ -49,7 +51,9 @@ if (db.open()) {
 `scanDirectory` uses an SQLite UPSERT so rescanning will update metadata for
 existing files automatically.
 
-Other helpers allow updating or removing entries, setting ratings and retrieving the items of a playlist.
+Other helpers allow updating or removing entries, setting ratings and retrieving
+the items of a playlist. You can also fetch recently played or most popular
+tracks via `recentlyAdded()` and `mostPlayed()`.
 
 `LibraryDB` is now thread-safe. All database operations lock an internal mutex,
 so methods such as `search` and playlist management can be called concurrently

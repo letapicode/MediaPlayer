@@ -43,6 +43,14 @@ public:
   // string. Case-insensitive according to SQLite's LIKE operator.
   std::vector<MediaMetadata> search(const std::string &query);
 
+  // Retrieve most recently played items ordered by last_played. Limit results
+  // to the given number of entries.
+  std::vector<MediaMetadata> recentlyAdded(int limit);
+
+  // Retrieve most frequently played items ordered by play_count. Limit results
+  // to the given number of entries.
+  std::vector<MediaMetadata> mostPlayed(int limit);
+
   // Increment play count and update last played timestamp for a media item.
   bool recordPlayback(const std::string &path);
 
