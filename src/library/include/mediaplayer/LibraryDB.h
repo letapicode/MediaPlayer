@@ -23,10 +23,11 @@ public:
   bool scanDirectory(const std::string &directory);
 
   using ProgressCallback = std::function<void(size_t current, size_t total)>;
-  // Scan a directory asynchronously. Progress is reported via the callback and
+  // Scan a directory asynchronously. The thread handle is stored internally
+  // and returned by reference. Progress is reported via the callback and
   // scanning can be cancelled by setting cancelFlag to true.
-  std::thread scanDirectoryAsync(const std::string &directory, ProgressCallback progress,
-                                 std::atomic<bool> &cancelFlag);
+  std::thread &scanDirectoryAsync(const std::string &directory, ProgressCallback progress,
+                                  std::atomic<bool> &cancelFlag);
 
   // Insert a media entry directly. Useful for tests or manual additions.
   bool addMedia(const std::string &path, const std::string &title, const std::string &artist,
@@ -69,6 +70,7 @@ private:
   std::string m_path;
   sqlite3 *m_db{nullptr};
   mutable std::mutex m_mutex;
+  std::thread m_scanThread;
 };
 
 } // namespace mediaplayer
