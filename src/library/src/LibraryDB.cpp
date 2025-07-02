@@ -1,5 +1,6 @@
 #include "mediaplayer/LibraryDB.h"
 #include "mediaplayer/AIRecommender.h"
+#include <algorithm>
 #include <cstring>
 #include <ctime>
 #include <filesystem>
@@ -50,6 +51,7 @@ void LibraryDB::close() {
     m_db = nullptr;
     std::error_code ec;
     std::filesystem::remove(m_path + "-wal", ec);
+    std::filesystem::remove(m_path + "-shm", ec);
   }
 }
 
@@ -588,10 +590,25 @@ std::vector<MediaMetadata> LibraryDB::smartQuery(const std::string &filter) {
   if (sqlite3_prepare_v2(m_db, sql.c_str(), -1, &stmt, nullptr) != SQLITE_OK)
     return results;
   for (size_t i = 0; i < values.size(); ++i) {
-    if (textField[i])
+    if (textField[i]) {
       sqlite3_bind_text(stmt, static_cast<int>(i + 1), values[i].c_str(), -1, SQLITE_TRANSIENT);
-    else
-      sqlite3_bind_int(stmt, static_cast<int>(i + 1), std::stoi(values[i]));
+    } else {
+      const std::string &val = values[i];
+      if (val.empty() || !std::all_of(val.begin(), val.end(), [](char c) {
+            return std::isdigit(static_cast<unsigned char>(c)) || c == '-' || c == '+';
+          })) {
+        sqlite3_finalize(stmt);
+        return results;
+      }
+      int num = 0;
+      try {
+        num = std::stoi(val);
+      } catch (...) {
+        sqlite3_finalize(stmt);
+        return results;
+      }
+      sqlite3_bind_int(stmt, static_cast<int>(i + 1), num);
+    }
   }
 
   while (sqlite3_step(stmt) == SQLITE_ROW) {
@@ -638,7 +655,6 @@ bool LibraryDB::recordPlayback(const std::string &path) {
 }
 
 int LibraryDB::playlistId(const std::string &name) const {
-  std::lock_guard<std::mutex> lock(m_mutex);
   const char *sql = "SELECT id FROM Playlist WHERE name=?1;";
   sqlite3_stmt *stmt = nullptr;
   if (sqlite3_prepare_v2(m_db, sql, -1, &stmt, nullptr) != SQLITE_OK)
@@ -738,7 +754,11 @@ bool LibraryDB::createSmartPlaylist(const std::string &name, const std::string &
     return false;
   if (!createPlaylist(name))
     return false;
-  int pid = playlistId(name);
+  int pid = -1;
+  {
+    std::lock_guard<std::mutex> lock(m_mutex);
+    pid = playlistId(name);
+  }
   if (pid < 0)
     return false;
   bool ok = false;
@@ -764,7 +784,11 @@ bool LibraryDB::updateSmartPlaylist(const std::string &name, const std::string &
   std::vector<bool> textField;
   if (!parseSmartFilter(filter, sqlCheck, values, textField))
     return false;
-  int pid = playlistId(name);
+  int pid = -1;
+  {
+    std::lock_guard<std::mutex> lock(m_mutex);
+    pid = playlistId(name);
+  }
   if (pid < 0)
     return false;
   bool ok = false;
@@ -786,7 +810,11 @@ bool LibraryDB::updateSmartPlaylist(const std::string &name, const std::string &
 }
 
 bool LibraryDB::deleteSmartPlaylist(const std::string &name) {
-  int pid = playlistId(name);
+  int pid = -1;
+  {
+    std::lock_guard<std::mutex> lock(m_mutex);
+    pid = playlistId(name);
+  }
   if (pid < 0)
     return false;
   {
@@ -1003,9 +1031,13 @@ void LibraryDB::setRecommender(AIRecommender *recommender) {
 }
 
 std::vector<MediaMetadata> LibraryDB::recommendations() {
-  std::lock_guard<std::mutex> lock(m_mutex);
-  if (m_recommender)
-    return m_recommender->recommend(*this);
+  AIRecommender *recommender = nullptr;
+  {
+    std::lock_guard<std::mutex> lock(m_mutex);
+    recommender = m_recommender;
+  }
+  if (recommender)
+    return recommender->recommend(*this);
   return {};
 }
 
