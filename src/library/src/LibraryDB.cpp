@@ -139,13 +139,8 @@ bool LibraryDB::scanDirectory(const std::string &directory) {
         }
       }
       insertMedia(pathStr, title, artist, album, duration, width, height, 0);
-      if (sqlite3_changes(m_db) == 0) {
-        updateMedia(pathStr, title, artist, album);
-      }
       avformat_close_input(&ctx);
-
     }
-    insertMedia(pathStr, title, artist, album, duration, width, height, 0);
   }
   return true;
 }
