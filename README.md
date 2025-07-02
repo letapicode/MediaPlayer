@@ -47,6 +47,8 @@ Full text search is powered by SQLite's FTS5 module, so ensure your SQLite
 installation includes this extension.
 Use `LibraryDB::searchFts()` for token-based queries or `search()` for simple
 substring matching.
+Smart playlists are defined using the same filter syntax as `LibraryDB::smartQuery`,
+so filters like `rating>=4 AND artist='Queen'` work for both queries and playlists.
 
 ## Hardware Decoding
 
