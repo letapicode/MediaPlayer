@@ -35,6 +35,10 @@ By default the database operates in SQLite's WAL (write-ahead logging) mode to a
   - `path` TEXT REFERENCES `MediaItem(path)`
   - `position` INTEGER
 
+Query functions such as `search` and `playlistItems` return a `MediaMetadata`
+structure. This now includes a `rating` field corresponding to the column in
+`MediaItem`.
+
 ## Typical Usage
 
 ```cpp
@@ -57,8 +61,9 @@ existing files automatically. Entries whose files are missing are removed from
 `MediaItem` unless cleanup is disabled.
 
 Other helpers allow updating or removing entries, setting ratings and retrieving
-the items of a playlist. You can also fetch recently played or most popular
-tracks via `recentlyAdded()` and `mostPlayed()`.
+the items of a playlist. Search and playlist queries return `MediaMetadata`
+objects which now include a `rating` field. You can also fetch recently added
+or most popular tracks via `recentlyAdded()` and `mostPlayed()`.
 
 `LibraryDB` is now thread-safe. All database operations lock an internal mutex,
 so methods such as `search` and playlist management can be called concurrently

@@ -14,6 +14,7 @@ struct MediaMetadata {
   double duration{0.0}; // In seconds
   int width{0};         // Video width, 0 for audio-only
   int height{0};        // Video height
+  int rating{0};        // User rating 0-5
 };
 
 } // namespace mediaplayer

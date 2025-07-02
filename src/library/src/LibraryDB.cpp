@@ -382,10 +382,11 @@ std::vector<MediaMetadata> LibraryDB::search(const std::string &query) {
   if (!m_db)
     return results;
   std::string pattern = "%" + query + "%";
-  const char *sql = "SELECT path,title,artist,album,genre,duration,width,height FROM MediaItem "
-                    "WHERE title LIKE ?1 COLLATE NOCASE OR artist LIKE ?1 COLLATE NOCASE OR album "
-                    "LIKE ?1 COLLATE NOCASE OR genre LIKE ?1 COLLATE NOCASE "
-                    "ORDER BY title;";
+  const char *sql =
+      "SELECT path,title,artist,album,genre,duration,width,height,rating FROM MediaItem "
+      "WHERE title LIKE ?1 COLLATE NOCASE OR artist LIKE ?1 COLLATE NOCASE OR album "
+      "LIKE ?1 COLLATE NOCASE OR genre LIKE ?1 COLLATE NOCASE "
+      "ORDER BY title;";
   sqlite3_stmt *stmt = nullptr;
   if (sqlite3_prepare_v2(m_db, sql, -1, &stmt, nullptr) != SQLITE_OK)
     return results;
@@ -411,6 +412,7 @@ std::vector<MediaMetadata> LibraryDB::search(const std::string &query) {
     m.duration = sqlite3_column_int(stmt, 5);
     m.width = sqlite3_column_int(stmt, 6);
     m.height = sqlite3_column_int(stmt, 7);
+    m.rating = sqlite3_column_int(stmt, 8);
     results.push_back(std::move(m));
   }
   sqlite3_finalize(stmt);
@@ -422,9 +424,10 @@ std::vector<MediaMetadata> LibraryDB::searchFts(const std::string &query) {
   std::vector<MediaMetadata> results;
   if (!m_db)
     return results;
-  const char *sql = "SELECT m.path,m.title,m.artist,m.album,m.genre,m.duration,m.width,m.height "
-                    "FROM MediaItemFTS f JOIN MediaItem m ON m.id=f.rowid WHERE f MATCH ?1 "
-                    "ORDER BY bm25(f);";
+  const char *sql =
+      "SELECT m.path,m.title,m.artist,m.album,m.genre,m.duration,m.width,m.height,m.rating "
+      "FROM MediaItemFTS f JOIN MediaItem m ON m.id=f.rowid WHERE f MATCH ?1 "
+      "ORDER BY bm25(f);";
   sqlite3_stmt *stmt = nullptr;
   if (sqlite3_prepare_v2(m_db, sql, -1, &stmt, nullptr) != SQLITE_OK)
     return results;
@@ -449,6 +452,7 @@ std::vector<MediaMetadata> LibraryDB::searchFts(const std::string &query) {
     m.duration = sqlite3_column_int(stmt, 5);
     m.width = sqlite3_column_int(stmt, 6);
     m.height = sqlite3_column_int(stmt, 7);
+    m.rating = sqlite3_column_int(stmt, 8);
     results.push_back(std::move(m));
   }
   sqlite3_finalize(stmt);
@@ -486,7 +490,7 @@ std::vector<MediaMetadata> LibraryDB::smartQuery(const std::string &filter) {
   };
 
   std::string sql =
-      "SELECT path,title,artist,album,genre,duration,width,height FROM MediaItem WHERE ";
+      "SELECT path,title,artist,album,genre,duration,width,height,rating FROM MediaItem WHERE ";
   std::vector<std::string> values;
   std::vector<bool> textField;
   int index = 1;
@@ -586,6 +590,7 @@ std::vector<MediaMetadata> LibraryDB::smartQuery(const std::string &filter) {
     m.duration = sqlite3_column_int(stmt, 5);
     m.width = sqlite3_column_int(stmt, 6);
     m.height = sqlite3_column_int(stmt, 7);
+    m.rating = sqlite3_column_int(stmt, 8);
     results.push_back(std::move(m));
   }
   sqlite3_finalize(stmt);
@@ -774,9 +779,10 @@ std::vector<MediaMetadata> LibraryDB::playlistItems(const std::string &name) {
   int id = playlistId(name);
   if (id < 0)
     return items;
-  const char *sql = "SELECT m.path,m.title,m.artist,m.album,m.genre,m.duration,m.width,m.height "
-                    "FROM PlaylistItem p JOIN MediaItem m ON p.path=m.path "
-                    "WHERE p.playlist_id=?1 ORDER BY p.position;";
+  const char *sql =
+      "SELECT m.path,m.title,m.artist,m.album,m.genre,m.duration,m.width,m.height,m.rating "
+      "FROM PlaylistItem p JOIN MediaItem m ON p.path=m.path "
+      "WHERE p.playlist_id=?1 ORDER BY p.position;";
   sqlite3_stmt *stmt = nullptr;
   if (sqlite3_prepare_v2(m_db, sql, -1, &stmt, nullptr) != SQLITE_OK)
     return items;
@@ -801,6 +807,7 @@ std::vector<MediaMetadata> LibraryDB::playlistItems(const std::string &name) {
     m.duration = sqlite3_column_int(stmt, 5);
     m.width = sqlite3_column_int(stmt, 6);
     m.height = sqlite3_column_int(stmt, 7);
+    m.rating = sqlite3_column_int(stmt, 8);
     items.push_back(std::move(m));
   }
   sqlite3_finalize(stmt);
@@ -828,8 +835,8 @@ std::vector<MediaMetadata> LibraryDB::allMedia() const {
   std::vector<MediaMetadata> items;
   if (!m_db)
     return items;
-  const char *sql =
-      "SELECT path,title,artist,album,genre,duration,width,height FROM MediaItem ORDER BY title;";
+  const char *sql = "SELECT path,title,artist,album,genre,duration,width,height,rating FROM "
+                    "MediaItem ORDER BY title;";
   sqlite3_stmt *stmt = nullptr;
   if (sqlite3_prepare_v2(m_db, sql, -1, &stmt, nullptr) != SQLITE_OK)
     return items;
@@ -853,6 +860,7 @@ std::vector<MediaMetadata> LibraryDB::allMedia() const {
     m.duration = sqlite3_column_int(stmt, 5);
     m.width = sqlite3_column_int(stmt, 6);
     m.height = sqlite3_column_int(stmt, 7);
+    m.rating = sqlite3_column_int(stmt, 8);
     items.push_back(std::move(m));
   }
   sqlite3_finalize(stmt);
@@ -883,7 +891,7 @@ std::vector<MediaMetadata> LibraryDB::recentlyAdded(int limit) {
   if (!m_db)
     return items;
   const char *sql =
-      "SELECT path,title,artist,album,genre,duration,width,height FROM MediaItem ORDER BY "
+      "SELECT path,title,artist,album,genre,duration,width,height,rating FROM MediaItem ORDER BY "
       "added_date DESC LIMIT ?1;";
   sqlite3_stmt *stmt = nullptr;
   if (sqlite3_prepare_v2(m_db, sql, -1, &stmt, nullptr) != SQLITE_OK)
@@ -909,6 +917,7 @@ std::vector<MediaMetadata> LibraryDB::recentlyAdded(int limit) {
     m.duration = sqlite3_column_int(stmt, 5);
     m.width = sqlite3_column_int(stmt, 6);
     m.height = sqlite3_column_int(stmt, 7);
+    m.rating = sqlite3_column_int(stmt, 8);
     items.push_back(std::move(m));
   }
   sqlite3_finalize(stmt);
@@ -921,7 +930,7 @@ std::vector<MediaMetadata> LibraryDB::mostPlayed(int limit) {
   if (!m_db)
     return items;
   const char *sql =
-      "SELECT path,title,artist,album,genre,duration,width,height FROM MediaItem ORDER BY "
+      "SELECT path,title,artist,album,genre,duration,width,height,rating FROM MediaItem ORDER BY "
       "play_count DESC LIMIT ?1;";
   sqlite3_stmt *stmt = nullptr;
   if (sqlite3_prepare_v2(m_db, sql, -1, &stmt, nullptr) != SQLITE_OK)
@@ -947,6 +956,7 @@ std::vector<MediaMetadata> LibraryDB::mostPlayed(int limit) {
     m.duration = sqlite3_column_int(stmt, 5);
     m.width = sqlite3_column_int(stmt, 6);
     m.height = sqlite3_column_int(stmt, 7);
+    m.rating = sqlite3_column_int(stmt, 8);
     items.push_back(std::move(m));
   }
   sqlite3_finalize(stmt);
