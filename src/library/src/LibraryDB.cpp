@@ -6,6 +6,7 @@
 #include <mutex>
 #include <taglib/fileref.h>
 #include <taglib/tag.h>
+#include <unordered_set>
 
 namespace mediaplayer {
 
@@ -125,6 +126,8 @@ bool LibraryDB::scanDirectoryImpl(const std::string &directory, ProgressCallback
   if (!m_db)
     return false;
 
+  std::unordered_set<std::string> found;
+
   size_t total = 0;
   for (auto const &entry : fs::recursive_directory_iterator(directory)) {
     if (entry.is_regular_file())
@@ -175,12 +178,45 @@ bool LibraryDB::scanDirectoryImpl(const std::string &directory, ProgressCallback
       }
       avformat_close_input(&ctx);
     }
-    if (tagOk || ffOk)
+    if (tagOk || ffOk) {
       insertMedia(pathStr, title, artist, album, duration, width, height, 0);
+      found.insert(pathStr);
+    }
     ++processed;
     if (progress)
       progress(processed, total);
   }
+
+  bool cancelled = cancelFlag && cancelFlag->load();
+  if (!cancelled) {
+    std::vector<std::string> toDelete;
+    {
+      std::lock_guard<std::mutex> lock(m_mutex);
+      std::string prefix = directory;
+      if (prefix == ".")
+        prefix.clear();
+      if (!prefix.empty() && prefix.back() != '/' && prefix.back() != '\\')
+        prefix += '/';
+      std::string likeArg = prefix + "%";
+      const char *sql = "SELECT path FROM MediaItem WHERE path LIKE ?1;";
+      sqlite3_stmt *stmt = nullptr;
+      if (sqlite3_prepare_v2(m_db, sql, -1, &stmt, nullptr) == SQLITE_OK) {
+        sqlite3_bind_text(stmt, 1, likeArg.c_str(), -1, SQLITE_TRANSIENT);
+        while (sqlite3_step(stmt) == SQLITE_ROW) {
+          const unsigned char *txt = sqlite3_column_text(stmt, 0);
+          if (txt) {
+            std::string p = reinterpret_cast<const char *>(txt);
+            if (!found.count(p))
+              toDelete.push_back(p);
+          }
+        }
+        sqlite3_finalize(stmt);
+      }
+    }
+    for (const auto &p : toDelete)
+      removeMedia(p);
+  }
+
   return true;
 }
 
