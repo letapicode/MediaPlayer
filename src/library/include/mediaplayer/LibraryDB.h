@@ -2,8 +2,11 @@
 #define MEDIAPLAYER_LIBRARYDB_H
 
 #include "mediaplayer/MediaMetadata.h"
+#include <atomic>
+#include <functional>
 #include <sqlite3.h>
 #include <string>
+#include <thread>
 #include <vector>
 
 namespace mediaplayer {
@@ -17,6 +20,12 @@ public:
   void close();
   bool initSchema();
   bool scanDirectory(const std::string &directory);
+
+  using ProgressCallback = std::function<void(size_t current, size_t total)>;
+  // Scan a directory asynchronously. Progress is reported via the callback and
+  // scanning can be cancelled by setting cancelFlag to true.
+  std::thread scanDirectoryAsync(const std::string &directory, ProgressCallback progress,
+                                 std::atomic<bool> &cancelFlag);
 
   // Insert a media entry directly. Useful for tests or manual additions.
   bool addMedia(const std::string &path, const std::string &title, const std::string &artist,
@@ -52,6 +61,8 @@ private:
                    const std::string &album, int duration = 0, int width = 0, int height = 0,
                    int rating = 0);
   int playlistId(const std::string &name) const;
+  bool scanDirectoryImpl(const std::string &directory, ProgressCallback progress,
+                         std::atomic<bool> *cancelFlag);
 
 private:
   std::string m_path;
