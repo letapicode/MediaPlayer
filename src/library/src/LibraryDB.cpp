@@ -140,10 +140,14 @@ bool LibraryDB::scanDirectoryImpl(const std::string &directory, ProgressCallback
     std::string title;
     std::string artist;
     std::string album;
-    if (!f.isNull() && f.tag()) {
-      title = f.tag()->title().to8Bit(true);
-      artist = f.tag()->artist().to8Bit(true);
-      album = f.tag()->album().to8Bit(true);
+    bool tagOk = false;
+    if (!f.isNull()) {
+      tagOk = f.tag() || f.audioProperties();
+      if (f.tag()) {
+        title = f.tag()->title().to8Bit(true);
+        artist = f.tag()->artist().to8Bit(true);
+        album = f.tag()->album().to8Bit(true);
+      }
     }
     if (title.empty())
       title = entry.path().filename().string();
@@ -152,8 +156,10 @@ bool LibraryDB::scanDirectoryImpl(const std::string &directory, ProgressCallback
     int width = 0;
     int height = 0;
     AVFormatContext *ctx = nullptr;
+    bool ffOk = false;
     if (avformat_open_input(&ctx, pathStr.c_str(), nullptr, nullptr) == 0) {
       if (avformat_find_stream_info(ctx, nullptr) >= 0) {
+        ffOk = true;
         if (ctx->duration > 0)
           duration = static_cast<int>(ctx->duration / AV_TIME_BASE);
         for (unsigned i = 0; i < ctx->nb_streams; ++i) {
@@ -167,7 +173,8 @@ bool LibraryDB::scanDirectoryImpl(const std::string &directory, ProgressCallback
       }
       avformat_close_input(&ctx);
     }
-    insertMedia(pathStr, title, artist, album, duration, width, height, 0);
+    if (tagOk || ffOk)
+      insertMedia(pathStr, title, artist, album, duration, width, height, 0);
     ++processed;
     if (progress)
       progress(processed, total);
