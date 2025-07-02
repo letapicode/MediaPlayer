@@ -1,5 +1,10 @@
 # Media Library & Playlists
 
+The library database creates `MediaItem`, `Playlist` and `PlaylistItem` tables.
+The `PlaylistItem` table now enforces a `UNIQUE(playlist_id, path)` constraint.
+If updating an existing database, remove duplicate entries from `PlaylistItem`
+before applying the new schema.
+
 `LibraryDB` is a lightweight wrapper around SQLite that stores metadata for media files and manages user playlists. The database is created on first use and filled by scanning directories with TagLib and FFmpeg to read tags, duration and video resolution. It also records playback statistics such as play count and last played time.
 
 ## Database Schema
@@ -73,3 +78,4 @@ Several example tests under `tests/` exercise the library:
 - `library_video_metadata_test.cpp` – scanning duration and resolution
 
 Enable tests with `-DBUILD_TESTS=ON` when running CMake to build these executables.
+

@@ -62,7 +62,8 @@ bool LibraryDB::initSchema() {
                     "path TEXT,"
                     "position INTEGER,"
                     "FOREIGN KEY(playlist_id) REFERENCES Playlist(id),"
-                    "FOREIGN KEY(path) REFERENCES MediaItem(path)"
+                    "FOREIGN KEY(path) REFERENCES MediaItem(path),"
+                    "UNIQUE(playlist_id, path)"
                     ");";
   char *err = nullptr;
   if (sqlite3_exec(m_db, sql, nullptr, nullptr, &err) != SQLITE_OK) {
@@ -289,7 +290,7 @@ bool LibraryDB::addToPlaylist(const std::string &name, const std::string &path) 
   int id = playlistId(name);
   if (id < 0)
     return false;
-  const char *sql = "INSERT INTO PlaylistItem (playlist_id, path, position) "
+  const char *sql = "INSERT OR IGNORE INTO PlaylistItem (playlist_id, path, position) "
                     "VALUES (?1, ?2, COALESCE((SELECT MAX(position)+1 FROM PlaylistItem WHERE "
                     "playlist_id=?1), 0));";
   sqlite3_stmt *stmt = nullptr;
@@ -297,7 +298,11 @@ bool LibraryDB::addToPlaylist(const std::string &name, const std::string &path) 
     return false;
   sqlite3_bind_int(stmt, 1, id);
   sqlite3_bind_text(stmt, 2, path.c_str(), -1, SQLITE_TRANSIENT);
-  bool ok = sqlite3_step(stmt) == SQLITE_DONE;
+  int rc = sqlite3_step(stmt);
+  bool ok = false;
+  if (rc == SQLITE_DONE) {
+    ok = sqlite3_changes(m_db) > 0;
+  }
   sqlite3_finalize(stmt);
   return ok;
 }
