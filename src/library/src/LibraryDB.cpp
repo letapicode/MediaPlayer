@@ -1,5 +1,6 @@
 #include "mediaplayer/LibraryDB.h"
 #include "mediaplayer/AIRecommender.h"
+#include <cstring>
 #include <ctime>
 #include <filesystem>
 #include <iostream>
@@ -769,17 +770,18 @@ std::vector<MediaMetadata> LibraryDB::playlistItems(const std::string &name) {
 }
 
 Playlist LibraryDB::loadPlaylist(const std::string &name) {
-  Playlist pl;
-  pl.name = name;
-  pl.items = playlistItems(name);
+  Playlist pl(name);
+  auto items = playlistItems(name);
+  for (const auto &m : items)
+    pl.addItem(m.path);
   return pl;
 }
 
 bool LibraryDB::savePlaylist(const Playlist &playlist) {
-  if (!deletePlaylist(playlist.name))
-    createPlaylist(playlist.name);
-  for (const auto &m : playlist.items)
-    addToPlaylist(playlist.name, m.path);
+  if (!deletePlaylist(playlist.name()))
+    createPlaylist(playlist.name());
+  for (const auto &p : playlist.items())
+    addToPlaylist(playlist.name(), p);
   return true;
 }
 

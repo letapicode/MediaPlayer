@@ -1,15 +1,32 @@
 #ifndef MEDIAPLAYER_PLAYLIST_H
 #define MEDIAPLAYER_PLAYLIST_H
 
-#include "mediaplayer/MediaMetadata.h"
 #include <string>
 #include <vector>
 
 namespace mediaplayer {
 
-struct Playlist {
-  std::string name;
-  std::vector<MediaMetadata> items;
+class LibraryDB;
+
+class Playlist {
+public:
+  explicit Playlist(std::string name = "");
+
+  const std::string &name() const;
+  void setName(const std::string &name);
+
+  const std::vector<std::string> &items() const;
+  void addItem(const std::string &path);
+  bool removeItem(const std::string &path);
+  void clear();
+  std::size_t size() const;
+
+  bool save(LibraryDB &db) const;
+  static Playlist load(LibraryDB &db, const std::string &name);
+
+private:
+  std::string m_name;
+  std::vector<std::string> m_items;
 };
 
 } // namespace mediaplayer
