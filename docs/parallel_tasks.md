@@ -70,7 +70,7 @@
 | 59 | Rating System | done | relevant |
 | 60 | Library-Core Integration | done | relevant |
 | 61 | Expose Library API to UI | open | relevant |
-| 62 | Threading for DB | open | relevant |
+| 62 | Threading for DB | done | relevant |
 | 63 | Smart Playlist Evaluation | open | relevant |
 
 ## Visualization Module (C++17 OpenGL) ([Tasks.MD](../Tasks.MD#visualization-module-c17-opengl))
