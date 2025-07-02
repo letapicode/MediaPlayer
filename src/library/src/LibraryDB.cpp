@@ -102,10 +102,25 @@ bool LibraryDB::insertMedia(const std::string &path, const std::string &title,
 }
 
 bool LibraryDB::scanDirectory(const std::string &directory) {
+  return scanDirectoryImpl(directory, nullptr, nullptr);
+}
+
+bool LibraryDB::scanDirectoryImpl(const std::string &directory, ProgressCallback progress,
+                                  std::atomic<bool> *cancelFlag) {
   namespace fs = std::filesystem;
   if (!m_db)
     return false;
+
+  size_t total = 0;
   for (auto const &entry : fs::recursive_directory_iterator(directory)) {
+    if (entry.is_regular_file())
+      ++total;
+  }
+
+  size_t processed = 0;
+  for (auto const &entry : fs::recursive_directory_iterator(directory)) {
+    if (cancelFlag && cancelFlag->load())
+      break;
     if (!entry.is_regular_file())
       continue;
     auto pathStr = entry.path().string();
@@ -143,11 +158,20 @@ bool LibraryDB::scanDirectory(const std::string &directory) {
         updateMedia(pathStr, title, artist, album);
       }
       avformat_close_input(&ctx);
-
     }
     insertMedia(pathStr, title, artist, album, duration, width, height, 0);
+    ++processed;
+    if (progress)
+      progress(processed, total);
   }
   return true;
+}
+
+std::thread LibraryDB::scanDirectoryAsync(const std::string &directory, ProgressCallback progress,
+                                          std::atomic<bool> &cancelFlag) {
+  return std::thread([this, directory, progress, &cancelFlag]() {
+    scanDirectoryImpl(directory, progress, &cancelFlag);
+  });
 }
 
 bool LibraryDB::addMedia(const std::string &path, const std::string &title,
