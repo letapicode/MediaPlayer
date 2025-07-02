@@ -49,6 +49,10 @@ if (db.open()) {
 `scanDirectory` uses an SQLite UPSERT so rescanning will update metadata for
 existing files automatically.
 
+During a scan, any `MediaItem` rows whose paths are missing on disk are removed
+from the database. Pass `false` to the optional `cleanup` parameter if you wish
+to keep these old entries.
+
 Other helpers allow updating or removing entries, setting ratings and retrieving the items of a playlist.
 
 `LibraryDB` is now thread-safe. All database operations lock an internal mutex,

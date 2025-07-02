@@ -20,13 +20,13 @@ public:
   bool open();
   void close();
   bool initSchema();
-  bool scanDirectory(const std::string &directory);
+  bool scanDirectory(const std::string &directory, bool cleanup = true);
 
   using ProgressCallback = std::function<void(size_t current, size_t total)>;
   // Scan a directory asynchronously. Progress is reported via the callback and
   // scanning can be cancelled by setting cancelFlag to true.
   std::thread scanDirectoryAsync(const std::string &directory, ProgressCallback progress,
-                                 std::atomic<bool> &cancelFlag);
+                                 std::atomic<bool> &cancelFlag, bool cleanup = true);
 
   // Insert a media entry directly. Useful for tests or manual additions.
   bool addMedia(const std::string &path, const std::string &title, const std::string &artist,
@@ -63,7 +63,7 @@ private:
                    int rating = 0);
   int playlistId(const std::string &name) const;
   bool scanDirectoryImpl(const std::string &directory, ProgressCallback progress,
-                         std::atomic<bool> *cancelFlag);
+                         std::atomic<bool> *cancelFlag, bool cleanup);
 
 private:
   std::string m_path;

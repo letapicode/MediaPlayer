@@ -6,6 +6,8 @@
 #include <mutex>
 #include <taglib/fileref.h>
 #include <taglib/tag.h>
+#include <unordered_set>
+#include <vector>
 
 namespace mediaplayer {
 
@@ -115,15 +117,17 @@ bool LibraryDB::insertMedia(const std::string &path, const std::string &title,
   return ok;
 }
 
-bool LibraryDB::scanDirectory(const std::string &directory) {
-  return scanDirectoryImpl(directory, nullptr, nullptr);
+bool LibraryDB::scanDirectory(const std::string &directory, bool cleanup) {
+  return scanDirectoryImpl(directory, nullptr, nullptr, cleanup);
 }
 
 bool LibraryDB::scanDirectoryImpl(const std::string &directory, ProgressCallback progress,
-                                  std::atomic<bool> *cancelFlag) {
+                                  std::atomic<bool> *cancelFlag, bool cleanup) {
   namespace fs = std::filesystem;
   if (!m_db)
     return false;
+
+  std::unordered_set<std::string> seen;
 
   size_t total = 0;
   for (auto const &entry : fs::recursive_directory_iterator(directory)) {
@@ -138,6 +142,7 @@ bool LibraryDB::scanDirectoryImpl(const std::string &directory, ProgressCallback
     if (!entry.is_regular_file())
       continue;
     auto pathStr = entry.path().string();
+    seen.insert(pathStr);
     TagLib::FileRef f(pathStr.c_str());
     std::string title;
     std::string artist;
@@ -181,13 +186,34 @@ bool LibraryDB::scanDirectoryImpl(const std::string &directory, ProgressCallback
     if (progress)
       progress(processed, total);
   }
+
+  if (cleanup) {
+    std::vector<std::string> dbPaths;
+    {
+      std::lock_guard<std::mutex> lock(m_mutex);
+      const char *sql = "SELECT path FROM MediaItem;";
+      sqlite3_stmt *stmt = nullptr;
+      if (sqlite3_prepare_v2(m_db, sql, -1, &stmt, nullptr) != SQLITE_OK)
+        return false;
+      while (sqlite3_step(stmt) == SQLITE_ROW) {
+        const unsigned char *txt = sqlite3_column_text(stmt, 0);
+        if (txt)
+          dbPaths.emplace_back(reinterpret_cast<const char *>(txt));
+      }
+      sqlite3_finalize(stmt);
+    }
+    for (const auto &p : dbPaths) {
+      if (seen.find(p) == seen.end())
+        removeMedia(p);
+    }
+  }
   return true;
 }
 
 std::thread LibraryDB::scanDirectoryAsync(const std::string &directory, ProgressCallback progress,
-                                          std::atomic<bool> &cancelFlag) {
-  return std::thread([this, directory, progress, &cancelFlag]() {
-    scanDirectoryImpl(directory, progress, &cancelFlag);
+                                          std::atomic<bool> &cancelFlag, bool cleanup) {
+  return std::thread([this, directory, progress, &cancelFlag, cleanup]() {
+    scanDirectoryImpl(directory, progress, &cancelFlag, cleanup);
   });
 }
 
