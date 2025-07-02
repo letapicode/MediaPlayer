@@ -43,6 +43,11 @@ public:
   // string. Case-insensitive according to SQLite's LIKE operator.
   std::vector<MediaMetadata> search(const std::string &query);
 
+  // Execute a simple filter expression against MediaItem fields. Supported
+  // operators are =, !=, <, >, <= and >= combined with AND/OR. Example:
+  //   "rating>=4 AND artist='Queen'".
+  std::vector<MediaMetadata> smartQuery(const std::string &filter);
+
   // Increment play count and update last played timestamp for a media item.
   bool recordPlayback(const std::string &path);
 
