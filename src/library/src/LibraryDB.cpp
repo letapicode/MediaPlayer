@@ -459,12 +459,9 @@ std::vector<MediaMetadata> LibraryDB::searchFts(const std::string &query) {
   return results;
 }
 
-std::vector<MediaMetadata> LibraryDB::smartQuery(const std::string &filter) {
-  std::lock_guard<std::mutex> lock(m_mutex);
-  std::vector<MediaMetadata> results;
-  if (!m_db)
-    return results;
-
+bool LibraryDB::parseSmartFilter(const std::string &filter, std::string &sql,
+                                 std::vector<std::string> &values,
+                                 std::vector<bool> &textField) const {
   auto isIdentChar = [](char c) { return std::isalnum(static_cast<unsigned char>(c)) || c == '_'; };
   size_t pos = 0;
   auto skipSpaces = [&]() {
@@ -489,17 +486,18 @@ std::vector<MediaMetadata> LibraryDB::smartQuery(const std::string &filter) {
     return {};
   };
 
-  std::string sql =
-      "SELECT path,title,artist,album,genre,duration,width,height,rating FROM MediaItem WHERE ";
-  std::vector<std::string> values;
-  std::vector<bool> textField;
+  sql = "SELECT path,title,artist,album,genre,duration,width,height,rating FROM "
+        "MediaItem WHERE ";
+  values.clear();
+  textField.clear();
   int index = 1;
+  bool hadExpr = false;
 
   skipSpaces();
   while (pos < filter.size()) {
     std::string field = parseIdent();
     if (field.empty())
-      return results;
+      return false;
 
     static const char *allowedFields[] = {"path",   "title",      "artist",     "album",
                                           "genre",  "duration",   "width",      "height",
@@ -512,12 +510,12 @@ std::vector<MediaMetadata> LibraryDB::smartQuery(const std::string &filter) {
       }
     }
     if (!allowed)
-      return results;
+      return false;
 
     skipSpaces();
     std::string op = parseOp();
     if (op.empty())
-      return results;
+      return false;
 
     skipSpaces();
     bool quoted = false;
@@ -543,6 +541,7 @@ std::vector<MediaMetadata> LibraryDB::smartQuery(const std::string &filter) {
     textField.push_back(quoted || field == "title" || field == "artist" || field == "album" ||
                         field == "genre" || field == "path");
     ++index;
+    hadExpr = true;
 
     skipSpaces();
     if (pos >= filter.size())
@@ -554,11 +553,27 @@ std::vector<MediaMetadata> LibraryDB::smartQuery(const std::string &filter) {
       sql += " OR ";
       pos += 2;
     } else {
-      break;
+      return false;
     }
     skipSpaces();
   }
+  if (!hadExpr)
+    return false;
   sql += " ORDER BY title;";
+  return pos >= filter.size();
+}
+
+std::vector<MediaMetadata> LibraryDB::smartQuery(const std::string &filter) {
+  std::lock_guard<std::mutex> lock(m_mutex);
+  std::vector<MediaMetadata> results;
+  if (!m_db)
+    return results;
+
+  std::string sql;
+  std::vector<std::string> values;
+  std::vector<bool> textField;
+  if (!parseSmartFilter(filter, sql, values, textField))
+    return results;
 
   sqlite3_stmt *stmt = nullptr;
   if (sqlite3_prepare_v2(m_db, sql.c_str(), -1, &stmt, nullptr) != SQLITE_OK)
@@ -707,6 +722,11 @@ bool LibraryDB::removeFromPlaylist(const std::string &name, const std::string &p
 }
 
 bool LibraryDB::createSmartPlaylist(const std::string &name, const std::string &filter) {
+  std::string sqlCheck;
+  std::vector<std::string> values;
+  std::vector<bool> textField;
+  if (!parseSmartFilter(filter, sqlCheck, values, textField))
+    return false;
   if (!createPlaylist(name))
     return false;
   int pid = playlistId(name);
@@ -730,6 +750,11 @@ bool LibraryDB::createSmartPlaylist(const std::string &name, const std::string &
 }
 
 bool LibraryDB::updateSmartPlaylist(const std::string &name, const std::string &filter) {
+  std::string sqlCheck;
+  std::vector<std::string> values;
+  std::vector<bool> textField;
+  if (!parseSmartFilter(filter, sqlCheck, values, textField))
+    return false;
   int pid = playlistId(name);
   if (pid < 0)
     return false;
