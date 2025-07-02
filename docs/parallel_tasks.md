@@ -63,15 +63,15 @@
 | 52 | Metadata Extraction | done | TagLib & FFmpeg in `LibraryDB` |
 | 53 | Update/Remove Entries | done | `updateMedia`/`removeMedia` APIs |
 | 54 | Basic Playlist Management | done | relevant |
-| 55 | Smart Playlist Criteria | open | relevant |
-| 56 | Auto Playlists (Recent, Frequent) | open | relevant |
-| 57 | AI Recommendations Hook | open | relevant |
+| 55 | Smart Playlist Criteria | done | `createSmartPlaylist` API |
+| 56 | Auto Playlists (Recent, Frequent) | done | `recentlyAdded`/`mostPlayed` |
+| 57 | AI Recommendations Hook | done | `AIRecommender` interface |
 | 58 | Search Functionality | done | relevant |
 | 59 | Rating System | done | relevant |
 | 60 | Library-Core Integration | done | relevant |
 | 61 | Expose Library API to UI | done | LibraryDB access via MediaPlayer |
 | 62 | Threading for DB | done | relevant |
-| 63 | Smart Playlist Evaluation | open | relevant |
+| 63 | Smart Playlist Evaluation | done | auto-updates on DB changes |
 
 ## Visualization Module (C++17 OpenGL) ([Tasks.MD](../Tasks.MD#visualization-module-c17-opengl))
 

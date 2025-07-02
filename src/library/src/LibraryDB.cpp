@@ -631,6 +631,71 @@ bool LibraryDB::removeFromPlaylist(const std::string &name, const std::string &p
   return ok;
 }
 
+bool LibraryDB::createSmartPlaylist(const std::string &name, const std::string &filter) {
+  if (!createPlaylist(name))
+    return false;
+  int pid = playlistId(name);
+  if (pid < 0)
+    return false;
+  bool ok = false;
+  {
+    std::lock_guard<std::mutex> lock(m_mutex);
+    const char *sql = "INSERT INTO SmartPlaylist (playlist_id, definition) VALUES (?1, ?2)";
+    sqlite3_stmt *stmt = nullptr;
+    if (sqlite3_prepare_v2(m_db, sql, -1, &stmt, nullptr) == SQLITE_OK) {
+      sqlite3_bind_int(stmt, 1, pid);
+      sqlite3_bind_text(stmt, 2, filter.c_str(), -1, SQLITE_TRANSIENT);
+      ok = sqlite3_step(stmt) == SQLITE_DONE;
+      sqlite3_finalize(stmt);
+    }
+  }
+  if (ok)
+    updateSmartPlaylists();
+  return ok;
+}
+
+bool LibraryDB::updateSmartPlaylist(const std::string &name, const std::string &filter) {
+  int pid = playlistId(name);
+  if (pid < 0)
+    return false;
+  bool ok = false;
+  {
+    std::lock_guard<std::mutex> lock(m_mutex);
+    const char *sql = "INSERT INTO SmartPlaylist (playlist_id, definition) VALUES (?1, ?2) "
+                      "ON CONFLICT(playlist_id) DO UPDATE SET definition=excluded.definition;";
+    sqlite3_stmt *stmt = nullptr;
+    if (sqlite3_prepare_v2(m_db, sql, -1, &stmt, nullptr) == SQLITE_OK) {
+      sqlite3_bind_int(stmt, 1, pid);
+      sqlite3_bind_text(stmt, 2, filter.c_str(), -1, SQLITE_TRANSIENT);
+      ok = sqlite3_step(stmt) == SQLITE_DONE;
+      sqlite3_finalize(stmt);
+    }
+  }
+  if (ok)
+    updateSmartPlaylists();
+  return ok;
+}
+
+bool LibraryDB::deleteSmartPlaylist(const std::string &name) {
+  int pid = playlistId(name);
+  if (pid < 0)
+    return false;
+  {
+    std::lock_guard<std::mutex> lock(m_mutex);
+    const char *sql = "DELETE FROM SmartPlaylist WHERE playlist_id=?1;";
+    sqlite3_stmt *stmt = nullptr;
+    if (sqlite3_prepare_v2(m_db, sql, -1, &stmt, nullptr) == SQLITE_OK) {
+      sqlite3_bind_int(stmt, 1, pid);
+      sqlite3_step(stmt);
+      sqlite3_finalize(stmt);
+    }
+  }
+  bool ok = deletePlaylist(name);
+  if (ok)
+    updateSmartPlaylists();
+  return ok;
+}
+
 std::vector<MediaMetadata> LibraryDB::playlistItems(const std::string &name) {
   std::lock_guard<std::mutex> lock(m_mutex);
   std::vector<MediaMetadata> items;
@@ -801,21 +866,26 @@ std::vector<MediaMetadata> LibraryDB::recommendations() {
 }
 
 bool LibraryDB::setRating(const std::string &path, int rating) {
-  std::lock_guard<std::mutex> lock(m_mutex);
-  if (!m_db)
-    return false;
-  if (rating < 0)
-    rating = 0;
-  if (rating > 5)
-    rating = 5;
-  const char *sql = "UPDATE MediaItem SET rating=?2 WHERE path=?1;";
-  sqlite3_stmt *stmt = nullptr;
-  if (sqlite3_prepare_v2(m_db, sql, -1, &stmt, nullptr) != SQLITE_OK)
-    return false;
-  sqlite3_bind_text(stmt, 1, path.c_str(), -1, SQLITE_TRANSIENT);
-  sqlite3_bind_int(stmt, 2, rating);
-  bool ok = sqlite3_step(stmt) == SQLITE_DONE;
-  sqlite3_finalize(stmt);
+  bool ok = false;
+  {
+    std::lock_guard<std::mutex> lock(m_mutex);
+    if (!m_db)
+      return false;
+    if (rating < 0)
+      rating = 0;
+    if (rating > 5)
+      rating = 5;
+    const char *sql = "UPDATE MediaItem SET rating=?2 WHERE path=?1;";
+    sqlite3_stmt *stmt = nullptr;
+    if (sqlite3_prepare_v2(m_db, sql, -1, &stmt, nullptr) != SQLITE_OK)
+      return false;
+    sqlite3_bind_text(stmt, 1, path.c_str(), -1, SQLITE_TRANSIENT);
+    sqlite3_bind_int(stmt, 2, rating);
+    ok = sqlite3_step(stmt) == SQLITE_DONE;
+    sqlite3_finalize(stmt);
+  }
+  if (ok)
+    updateSmartPlaylists();
   return ok;
 }
 
