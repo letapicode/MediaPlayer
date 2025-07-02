@@ -10,6 +10,7 @@ struct MediaMetadata {
   std::string title;    // Title (from tags or file name)
   std::string artist;   // Artist if available
   std::string album;    // Album if available
+  std::string genre;    // Genre if available
   double duration{0.0}; // In seconds
   int width{0};         // Video width, 0 for audio-only
   int height{0};        // Video height

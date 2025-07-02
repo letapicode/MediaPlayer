@@ -1,4 +1,4 @@
-# Media Library & Playlists
+#Media Library &Playlists
 
 The library database creates `MediaItem`, `Playlist` and `PlaylistItem` tables.
 The `PlaylistItem` table now enforces a `UNIQUE(playlist_id, path)` constraint.
@@ -19,6 +19,7 @@ By default the database operates in SQLite's WAL (write-ahead logging) mode to a
   - `title` TEXT
   - `artist` TEXT
   - `album` TEXT
+  - `genre` TEXT
   - `duration` INTEGER
   - `width` INTEGER
   - `height` INTEGER
@@ -39,15 +40,15 @@ By default the database operates in SQLite's WAL (write-ahead logging) mode to a
 ```cpp
 mediaplayer::LibraryDB db("library.db");
 if (db.open()) {
-    db.scanDirectory("/path/to/music"); // populate from files
-    auto songs = db.search("Beatles");  // simple text search
-    db.createPlaylist("favorites");
-    for (const auto &m : songs)
-        db.addToPlaylist("favorites", m.path);
-    db.recordPlayback(songs.front().path); // update play count
-    auto recent = db.recentlyAdded(5);    // top 5 recently played
-    auto popular = db.mostPlayed(5);      // top 5 most played
-    db.close();
+  db.scanDirectory("/path/to/music"); // populate from files
+  auto songs = db.search("Beatles");  // simple text search
+  db.createPlaylist("favorites");
+  for (const auto &m : songs)
+    db.addToPlaylist("favorites", m.path);
+  db.recordPlayback(songs.front().path); // update play count
+  auto recent = db.recentlyAdded(5);     // top 5 recently played
+  auto popular = db.mostPlayed(5);       // top 5 most played
+  db.close();
 }
 ```
 
@@ -107,4 +108,3 @@ Several example tests under `tests/` exercise the library:
 - `library_video_metadata_test.cpp` – scanning duration and resolution
 
 Enable tests with `-DBUILD_TESTS=ON` when running CMake to build these executables.
-

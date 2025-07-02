@@ -2,6 +2,7 @@
 #define MEDIAPLAYER_LIBRARYDB_H
 
 #include "mediaplayer/MediaMetadata.h"
+#include "mediaplayer/Playlist.h"
 #include <atomic>
 #include <functional>
 #include <mutex>
@@ -33,11 +34,11 @@ public:
 
   // Insert a media entry directly. Useful for tests or manual additions.
   bool addMedia(const std::string &path, const std::string &title, const std::string &artist,
-                const std::string &album);
+                const std::string &album, const std::string &genre = "");
 
   // Update metadata for an existing media entry identified by path.
   bool updateMedia(const std::string &path, const std::string &title, const std::string &artist,
-                   const std::string &album);
+                   const std::string &album, const std::string &genre = "");
 
   // Remove a media item from the database by path.
   bool removeMedia(const std::string &path);
@@ -64,6 +65,8 @@ public:
   bool addToPlaylist(const std::string &name, const std::string &path);
   bool removeFromPlaylist(const std::string &name, const std::string &path);
   std::vector<MediaMetadata> playlistItems(const std::string &name);
+  Playlist loadPlaylist(const std::string &name);
+  bool savePlaylist(const Playlist &playlist);
 
   // Smart playlists
   bool createSmartPlaylist(const std::string &name, const std::string &filter);
@@ -87,8 +90,8 @@ public:
 
 private:
   bool insertMedia(const std::string &path, const std::string &title, const std::string &artist,
-                   const std::string &album, int duration = 0, int width = 0, int height = 0,
-                   int rating = 0);
+                   const std::string &album, const std::string &genre, int duration = 0,
+                   int width = 0, int height = 0, int rating = 0);
   int playlistId(const std::string &name) const;
   bool scanDirectoryImpl(const std::string &directory, ProgressCallback progress,
                          std::atomic<bool> *cancelFlag, bool cleanup);
