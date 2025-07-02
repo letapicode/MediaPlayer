@@ -63,7 +63,7 @@ bool LibraryDB::initSchema() {
                     "path TEXT,"
                     "position INTEGER,"
                     "FOREIGN KEY(playlist_id) REFERENCES Playlist(id),"
-                    "FOREIGN KEY(path) REFERENCES MediaItem(path),"
+                    "FOREIGN KEY(path) REFERENCES MediaItem(path) ON DELETE CASCADE,"
                     "UNIQUE(playlist_id, path)"
                     ");";
   char *err = nullptr;
