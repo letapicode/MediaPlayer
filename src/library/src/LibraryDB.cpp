@@ -12,7 +12,11 @@ namespace mediaplayer {
 
 LibraryDB::LibraryDB(const std::string &path) : m_path(path) {}
 
-LibraryDB::~LibraryDB() { close(); }
+LibraryDB::~LibraryDB() {
+  if (m_scanThread.joinable())
+    m_scanThread.join();
+  close();
+}
 
 bool LibraryDB::open() {
   if (sqlite3_open(m_path.c_str(), &m_db) != SQLITE_OK) {
@@ -244,11 +248,14 @@ bool LibraryDB::scanDirectoryImpl(const std::string &directory, ProgressCallback
   return true;
 }
 
-std::thread LibraryDB::scanDirectoryAsync(const std::string &directory, ProgressCallback progress,
-                                          std::atomic<bool> &cancelFlag) {
-  return std::thread([this, directory, progress, &cancelFlag]() {
+std::thread &LibraryDB::scanDirectoryAsync(const std::string &directory, ProgressCallback progress,
+                                           std::atomic<bool> &cancelFlag) {
+  if (m_scanThread.joinable())
+    m_scanThread.join();
+  m_scanThread = std::thread([this, directory, progress, &cancelFlag]() {
     scanDirectoryImpl(directory, progress, &cancelFlag);
   });
+  return m_scanThread;
 }
 
 bool LibraryDB::addMedia(const std::string &path, const std::string &title,

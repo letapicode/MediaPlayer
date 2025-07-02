@@ -55,6 +55,13 @@ Other helpers allow updating or removing entries, setting ratings and retrieving
 so methods such as `search` and playlist management can be called concurrently
 from multiple threads without corruption.
 
+### Asynchronous scanning
+
+The `scanDirectoryAsync` method starts a background thread that scans files and
+updates the database. The thread handle is stored by the `LibraryDB` instance
+and joined automatically in the destructor. Ensure any outstanding scan is
+finished or cancelled before destroying the object.
+
 ## Dependencies and Building
 
 `LibraryDB` relies on:
