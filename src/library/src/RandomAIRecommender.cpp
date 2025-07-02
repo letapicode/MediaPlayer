@@ -1,4 +1,5 @@
 #include "mediaplayer/RandomAIRecommender.h"
+#include <algorithm>
 
 namespace mediaplayer {
 

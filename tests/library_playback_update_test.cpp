@@ -32,6 +32,8 @@ int main() {
     mediaplayer::LibraryDB db(dbPath);
     assert(db.open());
     assert(db.addMedia("song.mp3", "Title", "Artist", "Album"));
+    assert(db.createSmartPlaylist("played", "play_count>0"));
+    assert(db.playlistItems("played").empty());
     db.close();
   }
   sqlite3 *conn = nullptr;
@@ -42,6 +44,8 @@ int main() {
   mediaplayer::LibraryDB db(dbPath);
   assert(db.open());
   assert(db.recordPlayback("song.mp3"));
+  auto items = db.playlistItems("played");
+  assert(items.size() == 1 && items[0].path == "song.mp3");
   db.close();
 
   sqlite3_open(dbPath, &conn);

@@ -20,6 +20,8 @@ LibraryDB::~LibraryDB() { close(); }
 bool LibraryDB::open() {
   if (sqlite3_open(m_path.c_str(), &m_db) != SQLITE_OK) {
     std::cerr << "Failed to open DB: " << sqlite3_errmsg(m_db) << '\n';
+    sqlite3_close(m_db);
+    m_db = nullptr;
     return false;
   }
   char *err = nullptr;
@@ -557,10 +559,20 @@ bool LibraryDB::parseSmartFilter(const std::string &filter, std::string &sql,
     skipSpaces();
     if (pos >= filter.size())
       break;
-    if (filter.compare(pos, 3, "AND") == 0) {
+    auto matchKeyword = [&](const char *kw) {
+      size_t len = std::strlen(kw);
+      if (pos + len > filter.size())
+        return false;
+      for (size_t i = 0; i < len; ++i) {
+        if (std::toupper(static_cast<unsigned char>(filter[pos + i])) != kw[i])
+          return false;
+      }
+      return true;
+    };
+    if (matchKeyword("AND")) {
       sql += " AND ";
       pos += 3;
-    } else if (filter.compare(pos, 2, "OR") == 0) {
+    } else if (matchKeyword("OR")) {
       sql += " OR ";
       pos += 2;
     } else {
@@ -639,18 +651,23 @@ std::vector<MediaMetadata> LibraryDB::smartQuery(const std::string &filter) {
 }
 
 bool LibraryDB::recordPlayback(const std::string &path) {
-  std::lock_guard<std::mutex> lock(m_mutex);
-  if (!m_db)
-    return false;
-  const char *sql =
-      "UPDATE MediaItem SET play_count = play_count + 1, last_played = ?2 WHERE path=?1;";
-  sqlite3_stmt *stmt = nullptr;
-  if (sqlite3_prepare_v2(m_db, sql, -1, &stmt, nullptr) != SQLITE_OK)
-    return false;
-  sqlite3_bind_text(stmt, 1, path.c_str(), -1, SQLITE_TRANSIENT);
-  sqlite3_bind_int64(stmt, 2, static_cast<sqlite3_int64>(time(nullptr)));
-  bool ok = sqlite3_step(stmt) == SQLITE_DONE;
-  sqlite3_finalize(stmt);
+  bool ok = false;
+  {
+    std::lock_guard<std::mutex> lock(m_mutex);
+    if (!m_db)
+      return false;
+    const char *sql =
+        "UPDATE MediaItem SET play_count = play_count + 1, last_played = ?2 WHERE path=?1;";
+    sqlite3_stmt *stmt = nullptr;
+    if (sqlite3_prepare_v2(m_db, sql, -1, &stmt, nullptr) != SQLITE_OK)
+      return false;
+    sqlite3_bind_text(stmt, 1, path.c_str(), -1, SQLITE_TRANSIENT);
+    sqlite3_bind_int64(stmt, 2, static_cast<sqlite3_int64>(time(nullptr)));
+    ok = sqlite3_step(stmt) == SQLITE_DONE;
+    sqlite3_finalize(stmt);
+  }
+  if (ok)
+    updateSmartPlaylists();
   return ok;
 }
 
@@ -833,7 +850,7 @@ bool LibraryDB::deleteSmartPlaylist(const std::string &name) {
   return ok;
 }
 
-std::vector<MediaMetadata> LibraryDB::playlistItems(const std::string &name) {
+std::vector<MediaMetadata> LibraryDB::playlistItems(const std::string &name) const {
   std::lock_guard<std::mutex> lock(m_mutex);
   std::vector<MediaMetadata> items;
   if (!m_db)
@@ -876,7 +893,7 @@ std::vector<MediaMetadata> LibraryDB::playlistItems(const std::string &name) {
   return items;
 }
 
-Playlist LibraryDB::loadPlaylist(const std::string &name) {
+Playlist LibraryDB::loadPlaylist(const std::string &name) const {
   Playlist pl(name);
   auto items = playlistItems(name);
   for (const auto &m : items)
