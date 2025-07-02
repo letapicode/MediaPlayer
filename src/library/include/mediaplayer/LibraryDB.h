@@ -57,6 +57,9 @@ public:
   bool removeFromPlaylist(const std::string &name, const std::string &path);
   std::vector<MediaMetadata> playlistItems(const std::string &name);
 
+  // Re-evaluate smart playlists against current library contents.
+  bool updateSmartPlaylists();
+
 private:
   bool insertMedia(const std::string &path, const std::string &title, const std::string &artist,
                    const std::string &album, int duration = 0, int width = 0, int height = 0,
