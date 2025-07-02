@@ -23,6 +23,7 @@ By default the database operates in SQLite's WAL (write-ahead logging) mode to a
   - `width` INTEGER
   - `height` INTEGER
   - `rating` INTEGER
+  - `added_date` INTEGER UNIX timestamp when the item was first added
   - `play_count` INTEGER
   - `last_played` INTEGER
 - **Playlist** — named playlists.
@@ -38,20 +39,25 @@ By default the database operates in SQLite's WAL (write-ahead logging) mode to a
 ```cpp
 mediaplayer::LibraryDB db("library.db");
 if (db.open()) {
-    db.scanDirectory("/path/to/music");         // populate from files
-    auto songs = db.search("Beatles");          // simple text search
+    db.scanDirectory("/path/to/music"); // populate from files
+    auto songs = db.search("Beatles");  // simple text search
     db.createPlaylist("favorites");
     for (const auto &m : songs)
         db.addToPlaylist("favorites", m.path);
-    db.recordPlayback(songs.front().path);      // update play count
+    db.recordPlayback(songs.front().path); // update play count
+    auto recent = db.recentlyAdded(5);    // top 5 recently played
+    auto popular = db.mostPlayed(5);      // top 5 most played
     db.close();
 }
 ```
 
 `scanDirectory` uses an SQLite UPSERT so rescanning will update metadata for
-existing files automatically.
+existing files automatically. Entries whose files are missing are removed from
+`MediaItem` unless cleanup is disabled.
 
-Other helpers allow updating or removing entries, setting ratings and retrieving the items of a playlist.
+Other helpers allow updating or removing entries, setting ratings and retrieving
+the items of a playlist. You can also fetch recently played or most popular
+tracks via `recentlyAdded()` and `mostPlayed()`.
 
 `LibraryDB` is now thread-safe. All database operations lock an internal mutex,
 so methods such as `search` and playlist management can be called concurrently
@@ -60,9 +66,8 @@ from multiple threads without corruption.
 ### Asynchronous scanning
 
 The `scanDirectoryAsync` method starts a background thread that scans files and
-updates the database. The thread handle is stored by the `LibraryDB` instance
-and joined automatically in the destructor. Ensure any outstanding scan is
-finished or cancelled before destroying the object.
+updates the database. It returns a `std::thread` which callers must join before
+destroying the `LibraryDB` instance to avoid accessing it from a background task.
 
 ## Dependencies and Building
 

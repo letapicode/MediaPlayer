@@ -83,6 +83,11 @@ public:
   void cancelConversion();
   bool conversionCancelled() const { return m_converter.isCancelled(); }
 
+  // Library access helpers
+  std::vector<MediaMetadata> allMedia() const;
+  std::vector<std::string> allPlaylists() const;
+  std::vector<MediaMetadata> playlistItems(const std::string &name) const;
+
 private:
   void demuxLoop();
   void audioLoop();
