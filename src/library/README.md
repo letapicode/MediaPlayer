@@ -78,6 +78,13 @@ re-evaluates all smart playlists whenever metadata changes. Convenience methods
 `recentlyAdded()` and `mostPlayed()` return dynamic lists of recent or popular
 items without storing them as playlists.
 
+### AI recommendations
+
+`LibraryDB` exposes a simple interface to plug in recommendation algorithms via
+`AIRecommender`. The `RandomAIRecommender` implementation included here returns
+a random subset of library items. Applications can set a custom recommender with
+`setRecommender()` and fetch suggestions with `recommendations()`.
+
 ## Dependencies and Building
 
 `LibraryDB` relies on:
