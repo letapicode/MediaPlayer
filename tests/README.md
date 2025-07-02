@@ -8,4 +8,6 @@ demonstrates smart playlist creation and `library_recommender_test.cpp`
 shows the AI recommendation hook. `stress_load_test.cpp` spawns
 multiple `MediaPlayer` instances to stress test core playback.
 `library_ftssearch_test.cpp` checks full text search queries using SQLite's
-FTS5 module.
+FTS5 module. `library_autoplaylist_test.cpp` verifies that the convenience
+queries `recentlyAdded()` and `mostPlayed()` return items ordered by added
+date and play count.
