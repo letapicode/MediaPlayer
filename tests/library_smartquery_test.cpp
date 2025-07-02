@@ -21,6 +21,13 @@ int main() {
   auto res3 = db.smartQuery("artist='O''Connor' Or rating>=5");
   assert(res3.size() == 2);
 
+  // verify lowercase logical operators
+  auto res4 = db.smartQuery("rating>=5 and artist='Artist'");
+  assert(res4.size() == 1 && res4[0].path == "song1.mp3");
+
+  auto res5 = db.smartQuery("artist='Artist' or rating>=5");
+  assert(res5.size() == 2);
+
   db.close();
   std::remove(dbPath);
   return 0;
