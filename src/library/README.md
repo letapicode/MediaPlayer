@@ -23,6 +23,7 @@ By default the database operates in SQLite's WAL (write-ahead logging) mode to a
   - `width` INTEGER
   - `height` INTEGER
   - `rating` INTEGER
+  - `added_date` INTEGER UNIX timestamp when first added
   - `play_count` INTEGER
   - `last_played` INTEGER
 - **Playlist** — named playlists.
@@ -51,7 +52,7 @@ if (db.open()) {
 `scanDirectory` uses an SQLite UPSERT so rescanning will update metadata for
 existing files automatically.
 
-Other helpers allow updating or removing entries, setting ratings and retrieving the items of a playlist.
+Other helpers allow updating or removing entries, setting ratings and retrieving the items of a playlist. Convenience functions return all media items or the list of playlists so the UI can populate views easily. Applications may also register a custom `AIRecommender` implementation to provide recommendation lists.
 
 `LibraryDB` is now thread-safe. All database operations lock an internal mutex,
 so methods such as `search` and playlist management can be called concurrently
@@ -60,9 +61,9 @@ from multiple threads without corruption.
 ### Asynchronous scanning
 
 The `scanDirectoryAsync` method starts a background thread that scans files and
-updates the database. The thread handle is stored by the `LibraryDB` instance
-and joined automatically in the destructor. Ensure any outstanding scan is
-finished or cancelled before destroying the object.
+updates the database. It returns a `std::thread` object. Callers should join the
+thread before destroying the `LibraryDB` instance to avoid concurrent access to
+a destroyed object. The destructor joins any running thread as a safeguard.
 
 ## Dependencies and Building
 

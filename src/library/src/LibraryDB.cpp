@@ -1,4 +1,5 @@
 #include "mediaplayer/LibraryDB.h"
+#include "mediaplayer/AIRecommender.h"
 #include <ctime>
 #include <filesystem>
 #include <iostream>
@@ -66,6 +67,7 @@ bool LibraryDB::initSchema() {
                     "width INTEGER DEFAULT 0,"
                     "height INTEGER DEFAULT 0,"
                     "rating INTEGER DEFAULT 0,"
+                    "added_date INTEGER DEFAULT 0,"
                     "play_count INTEGER DEFAULT 0,"
                     "last_played INTEGER"
                     ");"
@@ -120,6 +122,17 @@ bool LibraryDB::initSchema() {
     sqlite3_free(err);
     return false;
   }
+
+  const char *alterSql = "ALTER TABLE MediaItem ADD COLUMN added_date INTEGER DEFAULT 0;";
+  if (sqlite3_exec(m_db, alterSql, nullptr, nullptr, &err) != SQLITE_OK) {
+    std::string msg = err ? err : "";
+    if (msg.find("duplicate column name") == std::string::npos) {
+      std::cerr << "Failed to alter table: " << msg << '\n';
+      sqlite3_free(err);
+      return false;
+    }
+    sqlite3_free(err);
+  }
   return true;
 }
 
@@ -130,12 +143,12 @@ bool LibraryDB::insertMedia(const std::string &path, const std::string &title,
                             const std::string &artist, const std::string &album, int duration,
                             int width, int height, int rating) {
   std::lock_guard<std::mutex> lock(m_mutex);
-  const char *sql =
-      "INSERT INTO MediaItem (path, title, artist, album, duration, width, height, rating) "
-      "VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8) "
-      "ON CONFLICT(path) DO UPDATE SET "
-      "title=excluded.title, artist=excluded.artist, album=excluded.album, "
-      "duration=excluded.duration, width=excluded.width, height=excluded.height;";
+  const char *sql = "INSERT INTO MediaItem (path, title, artist, album, duration, width, height, "
+                    "rating, added_date) "
+                    "VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9) "
+                    "ON CONFLICT(path) DO UPDATE SET "
+                    "title=excluded.title, artist=excluded.artist, album=excluded.album, "
+                    "duration=excluded.duration, width=excluded.width, height=excluded.height;";
   sqlite3_stmt *stmt = nullptr;
   if (sqlite3_prepare_v2(m_db, sql, -1, &stmt, nullptr) != SQLITE_OK) {
     return false;
@@ -148,17 +161,18 @@ bool LibraryDB::insertMedia(const std::string &path, const std::string &title,
   sqlite3_bind_int(stmt, 6, width);
   sqlite3_bind_int(stmt, 7, height);
   sqlite3_bind_int(stmt, 8, rating);
+  sqlite3_bind_int64(stmt, 9, static_cast<sqlite3_int64>(time(nullptr)));
   bool ok = sqlite3_step(stmt) == SQLITE_DONE;
   sqlite3_finalize(stmt);
   return ok;
 }
 
-bool LibraryDB::scanDirectory(const std::string &directory) {
-  return scanDirectoryImpl(directory, nullptr, nullptr);
+bool LibraryDB::scanDirectory(const std::string &directory, bool cleanup) {
+  return scanDirectoryImpl(directory, nullptr, nullptr, cleanup);
 }
 
 bool LibraryDB::scanDirectoryImpl(const std::string &directory, ProgressCallback progress,
-                                  std::atomic<bool> *cancelFlag) {
+                                  std::atomic<bool> *cancelFlag, bool cleanup) {
   namespace fs = std::filesystem;
   if (!m_db)
     return false;
@@ -166,66 +180,96 @@ bool LibraryDB::scanDirectoryImpl(const std::string &directory, ProgressCallback
   std::unordered_set<std::string> found;
 
   size_t total = 0;
-  for (auto const &entry : fs::recursive_directory_iterator(directory)) {
-    if (entry.is_regular_file())
-      ++total;
+  try {
+    std::error_code ec;
+    fs::recursive_directory_iterator it(directory, fs::directory_options::skip_permission_denied,
+                                        ec);
+    fs::recursive_directory_iterator end;
+    for (; it != end; it.increment(ec)) {
+      if (ec) {
+        std::cerr << "Directory iteration error: " << ec.message() << '\n';
+        ec.clear();
+        continue;
+      }
+      try {
+        if (it->is_regular_file())
+          ++total;
+      } catch (const fs::filesystem_error &e) {
+        std::cerr << "Filesystem error: " << e.what() << '\n';
+      }
+    }
+  } catch (const fs::filesystem_error &e) {
+    std::cerr << "Filesystem error: " << e.what() << '\n';
   }
 
   size_t processed = 0;
-  for (auto const &entry : fs::recursive_directory_iterator(directory)) {
-    if (cancelFlag && cancelFlag->load())
-      break;
-    if (!entry.is_regular_file())
-      continue;
-    auto pathStr = entry.path().string();
-    TagLib::FileRef f(pathStr.c_str());
-    std::string title;
-    std::string artist;
-    std::string album;
-    bool tagOk = false;
-    if (!f.isNull()) {
-      tagOk = f.tag() || f.audioProperties();
-      if (f.tag()) {
-        title = f.tag()->title().to8Bit(true);
-        artist = f.tag()->artist().to8Bit(true);
-        album = f.tag()->album().to8Bit(true);
+  try {
+    std::error_code ec;
+    fs::recursive_directory_iterator it(directory, fs::directory_options::skip_permission_denied,
+                                        ec);
+    fs::recursive_directory_iterator end;
+    for (; it != end; it.increment(ec)) {
+      if (ec) {
+        std::cerr << "Directory iteration error: " << ec.message() << '\n';
+        ec.clear();
+        continue;
       }
-    }
-    if (title.empty())
-      title = entry.path().filename().string();
-
-    int duration = 0;
-    int width = 0;
-    int height = 0;
-    AVFormatContext *ctx = nullptr;
-    bool ffOk = false;
-    if (avformat_open_input(&ctx, pathStr.c_str(), nullptr, nullptr) == 0) {
-      if (avformat_find_stream_info(ctx, nullptr) >= 0) {
-        ffOk = true;
-        if (ctx->duration > 0)
-          duration = static_cast<int>(ctx->duration / AV_TIME_BASE);
-        for (unsigned i = 0; i < ctx->nb_streams; ++i) {
-          AVStream *st = ctx->streams[i];
-          if (st->codecpar->codec_type == AVMEDIA_TYPE_VIDEO) {
-            width = st->codecpar->width;
-            height = st->codecpar->height;
-            break;
-          }
+      if (cancelFlag && cancelFlag->load())
+        break;
+      if (!it->is_regular_file())
+        continue;
+      auto pathStr = it->path().string();
+      TagLib::FileRef f(pathStr.c_str());
+      std::string title;
+      std::string artist;
+      std::string album;
+      bool tagOk = false;
+      if (!f.isNull()) {
+        tagOk = f.tag() || f.audioProperties();
+        if (f.tag()) {
+          title = f.tag()->title().to8Bit(true);
+          artist = f.tag()->artist().to8Bit(true);
+          album = f.tag()->album().to8Bit(true);
         }
       }
-      avformat_close_input(&ctx);
+      if (title.empty())
+        title = it->path().filename().string();
+
+      int duration = 0;
+      int width = 0;
+      int height = 0;
+      AVFormatContext *ctx = nullptr;
+      bool ffOk = false;
+      if (avformat_open_input(&ctx, pathStr.c_str(), nullptr, nullptr) == 0) {
+        if (avformat_find_stream_info(ctx, nullptr) >= 0) {
+          ffOk = true;
+          if (ctx->duration > 0)
+            duration = static_cast<int>(ctx->duration / AV_TIME_BASE);
+          for (unsigned i = 0; i < ctx->nb_streams; ++i) {
+            AVStream *st = ctx->streams[i];
+            if (st->codecpar->codec_type == AVMEDIA_TYPE_VIDEO) {
+              width = st->codecpar->width;
+              height = st->codecpar->height;
+              break;
+            }
+          }
+        }
+        avformat_close_input(&ctx);
+      }
+      if (tagOk || ffOk) {
+        insertMedia(pathStr, title, artist, album, duration, width, height, 0);
+        found.insert(pathStr);
+      }
+      ++processed;
+      if (progress)
+        progress(processed, total);
     }
-    if (tagOk || ffOk) {
-      insertMedia(pathStr, title, artist, album, duration, width, height, 0);
-      found.insert(pathStr);
-    }
-    ++processed;
-    if (progress)
-      progress(processed, total);
+  } catch (const fs::filesystem_error &e) {
+    std::cerr << "Filesystem error: " << e.what() << '\n';
   }
 
   bool cancelled = cancelFlag && cancelFlag->load();
-  if (!cancelled) {
+  if (!cancelled && cleanup) {
     std::vector<std::string> toDelete;
     {
       std::lock_guard<std::mutex> lock(m_mutex);
@@ -258,11 +302,11 @@ bool LibraryDB::scanDirectoryImpl(const std::string &directory, ProgressCallback
 }
 
 std::thread &LibraryDB::scanDirectoryAsync(const std::string &directory, ProgressCallback progress,
-                                           std::atomic<bool> &cancelFlag) {
+                                           std::atomic<bool> &cancelFlag, bool cleanup) {
   if (m_scanThread.joinable())
     m_scanThread.join();
-  m_scanThread = std::thread([this, directory, progress, &cancelFlag]() {
-    scanDirectoryImpl(directory, progress, &cancelFlag);
+  m_scanThread = std::thread([this, directory, progress, &cancelFlag, cleanup]() {
+    scanDirectoryImpl(directory, progress, &cancelFlag, cleanup);
   });
   return m_scanThread;
 }
@@ -324,13 +368,14 @@ std::vector<MediaMetadata> LibraryDB::search(const std::string &query) {
   std::vector<MediaMetadata> results;
   if (!m_db)
     return results;
-  const char *sql = "SELECT m.path,m.title,m.artist,m.album,m.duration,m.width,m.height "
-                    "FROM MediaItem m JOIN MediaItemFTS f ON m.id=f.rowid "
-                    "WHERE f MATCH ?1 ORDER BY m.title;";
+  const char *sql = "SELECT path,title,artist,album,duration,width,height FROM MediaItem "
+                    "WHERE title LIKE ?1 COLLATE NOCASE OR artist LIKE ?1 COLLATE NOCASE "
+                    "OR album LIKE ?1 COLLATE NOCASE ORDER BY title;";
   sqlite3_stmt *stmt = nullptr;
   if (sqlite3_prepare_v2(m_db, sql, -1, &stmt, nullptr) != SQLITE_OK)
     return results;
-  sqlite3_bind_text(stmt, 1, query.c_str(), -1, SQLITE_TRANSIENT);
+  std::string pattern = "%" + query + "%";
+  sqlite3_bind_text(stmt, 1, pattern.c_str(), -1, SQLITE_TRANSIENT);
   while (sqlite3_step(stmt) == SQLITE_ROW) {
     MediaMetadata m{};
     const unsigned char *txt = nullptr;
@@ -353,6 +398,57 @@ std::vector<MediaMetadata> LibraryDB::search(const std::string &query) {
   }
   sqlite3_finalize(stmt);
   return results;
+}
+
+std::vector<MediaMetadata> LibraryDB::allMedia() const {
+  std::lock_guard<std::mutex> lock(m_mutex);
+  std::vector<MediaMetadata> items;
+  if (!m_db)
+    return items;
+  const char *sql =
+      "SELECT path,title,artist,album,duration,width,height FROM MediaItem ORDER BY title;";
+  sqlite3_stmt *stmt = nullptr;
+  if (sqlite3_prepare_v2(m_db, sql, -1, &stmt, nullptr) != SQLITE_OK)
+    return items;
+  while (sqlite3_step(stmt) == SQLITE_ROW) {
+    MediaMetadata m{};
+    const unsigned char *txt = sqlite3_column_text(stmt, 0);
+    if (txt)
+      m.path = reinterpret_cast<const char *>(txt);
+    txt = sqlite3_column_text(stmt, 1);
+    if (txt)
+      m.title = reinterpret_cast<const char *>(txt);
+    txt = sqlite3_column_text(stmt, 2);
+    if (txt)
+      m.artist = reinterpret_cast<const char *>(txt);
+    txt = sqlite3_column_text(stmt, 3);
+    if (txt)
+      m.album = reinterpret_cast<const char *>(txt);
+    m.duration = sqlite3_column_int(stmt, 4);
+    m.width = sqlite3_column_int(stmt, 5);
+    m.height = sqlite3_column_int(stmt, 6);
+    items.push_back(std::move(m));
+  }
+  sqlite3_finalize(stmt);
+  return items;
+}
+
+std::vector<std::string> LibraryDB::allPlaylists() const {
+  std::lock_guard<std::mutex> lock(m_mutex);
+  std::vector<std::string> names;
+  if (!m_db)
+    return names;
+  const char *sql = "SELECT name FROM Playlist ORDER BY name;";
+  sqlite3_stmt *stmt = nullptr;
+  if (sqlite3_prepare_v2(m_db, sql, -1, &stmt, nullptr) != SQLITE_OK)
+    return names;
+  while (sqlite3_step(stmt) == SQLITE_ROW) {
+    const unsigned char *txt = sqlite3_column_text(stmt, 0);
+    if (txt)
+      names.emplace_back(reinterpret_cast<const char *>(txt));
+  }
+  sqlite3_finalize(stmt);
+  return names;
 }
 
 std::vector<MediaMetadata> LibraryDB::smartQuery(const std::string &filter) {
@@ -667,6 +763,18 @@ int LibraryDB::rating(const std::string &path) const {
     r = sqlite3_column_int(stmt, 0);
   sqlite3_finalize(stmt);
   return r;
+}
+
+void LibraryDB::setRecommender(AIRecommender *recommender) {
+  std::lock_guard<std::mutex> lock(m_mutex);
+  m_recommender = recommender;
+}
+
+std::vector<MediaMetadata> LibraryDB::recommendations() {
+  std::lock_guard<std::mutex> lock(m_mutex);
+  if (m_recommender)
+    return m_recommender->recommend(*this);
+  return {};
 }
 
 bool LibraryDB::updateSmartPlaylists() {

@@ -1,6 +1,7 @@
 #ifndef MEDIAPLAYER_LIBRARYDB_H
 #define MEDIAPLAYER_LIBRARYDB_H
 
+#include "mediaplayer/AIRecommender.h"
 #include "mediaplayer/MediaMetadata.h"
 #include <atomic>
 #include <functional>
@@ -20,14 +21,14 @@ public:
   bool open();
   void close();
   bool initSchema();
-  bool scanDirectory(const std::string &directory);
+  bool scanDirectory(const std::string &directory, bool cleanup = true);
 
   using ProgressCallback = std::function<void(size_t current, size_t total)>;
   // Scan a directory asynchronously. The thread handle is stored internally
   // and returned by reference. Progress is reported via the callback and
   // scanning can be cancelled by setting cancelFlag to true.
   std::thread &scanDirectoryAsync(const std::string &directory, ProgressCallback progress,
-                                  std::atomic<bool> &cancelFlag);
+                                  std::atomic<bool> &cancelFlag, bool cleanup = true);
 
   // Insert a media entry directly. Useful for tests or manual additions.
   bool addMedia(const std::string &path, const std::string &title, const std::string &artist,
@@ -43,6 +44,12 @@ public:
   // Search library using full text search over title, artist and album.
   // Powered by SQLite FTS5 and case-insensitive.
   std::vector<MediaMetadata> search(const std::string &query);
+
+  // Retrieve all media entries ordered by title.
+  std::vector<MediaMetadata> allMedia() const;
+
+  // Get list of playlist names ordered alphabetically.
+  std::vector<std::string> allPlaylists() const;
 
   // Execute a simple filter expression against MediaItem fields. Supported
   // operators are =, !=, <, >, <= and >= combined with AND/OR. Example:
@@ -63,6 +70,9 @@ public:
   bool removeFromPlaylist(const std::string &name, const std::string &path);
   std::vector<MediaMetadata> playlistItems(const std::string &name);
 
+  void setRecommender(AIRecommender *recommender);
+  std::vector<MediaMetadata> recommendations();
+
   // Re-evaluate smart playlists against current library contents.
   bool updateSmartPlaylists();
 
@@ -72,13 +82,14 @@ private:
                    int rating = 0);
   int playlistId(const std::string &name) const;
   bool scanDirectoryImpl(const std::string &directory, ProgressCallback progress,
-                         std::atomic<bool> *cancelFlag);
+                         std::atomic<bool> *cancelFlag, bool cleanup);
 
 private:
   std::string m_path;
   sqlite3 *m_db{nullptr};
   mutable std::mutex m_mutex;
   std::thread m_scanThread;
+  AIRecommender *m_recommender{nullptr};
 };
 
 } // namespace mediaplayer

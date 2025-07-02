@@ -198,6 +198,27 @@ bool MediaPlayer::conversionRunning() const { return m_converter.isRunning(); }
 
 void MediaPlayer::cancelConversion() { m_converter.cancel(); }
 
+std::vector<MediaMetadata> MediaPlayer::allMedia() const {
+  std::lock_guard<std::mutex> lock(m_mutex);
+  if (m_library)
+    return m_library->allMedia();
+  return {};
+}
+
+std::vector<std::string> MediaPlayer::allPlaylists() const {
+  std::lock_guard<std::mutex> lock(m_mutex);
+  if (m_library)
+    return m_library->allPlaylists();
+  return {};
+}
+
+std::vector<MediaMetadata> MediaPlayer::playlistItems(const std::string &name) const {
+  std::lock_guard<std::mutex> lock(m_mutex);
+  if (m_library)
+    return m_library->playlistItems(name);
+  return {};
+}
+
 void MediaPlayer::setAudioOutput(std::unique_ptr<AudioOutput> output) {
   std::lock_guard<std::mutex> lock(m_mutex);
   if (m_output) {

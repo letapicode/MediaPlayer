@@ -65,11 +65,11 @@
 | 54 | Basic Playlist Management | done | relevant |
 | 55 | Smart Playlist Criteria | open | relevant |
 | 56 | Auto Playlists (Recent, Frequent) | open | relevant |
-| 57 | AI Recommendations Hook | open | relevant |
+| 57 | AI Recommendations Hook | done | `AIRecommender` interface in LibraryDB |
 | 58 | Search Functionality | done | relevant |
 | 59 | Rating System | done | relevant |
 | 60 | Library-Core Integration | done | relevant |
-| 61 | Expose Library API to UI | open | relevant |
+| 61 | Expose Library API to UI | done | Library access via MediaPlayer |
 | 62 | Threading for DB | done | relevant |
 | 63 | Smart Playlist Evaluation | open | relevant |
 
