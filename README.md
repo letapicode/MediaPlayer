@@ -45,6 +45,8 @@ The SQLite-based library tracks media metadata, including an optional rating
 field, and updates play counts when items are played through the core engine.
 Full text search is powered by SQLite's FTS5 module, so ensure your SQLite
 installation includes this extension.
+Use `LibraryDB::searchFts()` for token-based queries or `search()` for simple
+substring matching.
 
 ## Hardware Decoding
 
