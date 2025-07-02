@@ -96,6 +96,8 @@ private:
   bool insertMedia(const std::string &path, const std::string &title, const std::string &artist,
                    const std::string &album, const std::string &genre, int duration = 0,
                    int width = 0, int height = 0, int rating = 0);
+  // Helper returning the ID of a playlist. The caller must hold m_mutex
+  // before invoking this function.
   int playlistId(const std::string &name) const;
   bool scanDirectoryImpl(const std::string &directory, ProgressCallback progress,
                          std::atomic<bool> *cancelFlag, bool cleanup);
@@ -106,6 +108,8 @@ private:
 private:
   std::string m_path;
   sqlite3 *m_db{nullptr};
+  // Mutex protecting m_db. Most methods lock it internally. Functions marked
+  // as requiring the caller to lock (e.g. playlistId) expect it to be held.
   mutable std::mutex m_mutex;
   AIRecommender *m_recommender{nullptr};
 };
