@@ -3,6 +3,7 @@
 #include <filesystem>
 #include <iostream>
 #include <libavformat/avformat.h>
+#include <mutex>
 #include <taglib/fileref.h>
 #include <taglib/tag.h>
 
@@ -90,6 +91,7 @@ bool LibraryDB::initSchema() {
 bool LibraryDB::insertMedia(const std::string &path, const std::string &title,
                             const std::string &artist, const std::string &album, int duration,
                             int width, int height, int rating) {
+  std::lock_guard<std::mutex> lock(m_mutex);
   const char *sql =
       "INSERT INTO MediaItem (path, title, artist, album, duration, width, height, rating) "
       "VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8) "
@@ -184,6 +186,7 @@ std::thread LibraryDB::scanDirectoryAsync(const std::string &directory, Progress
 
 bool LibraryDB::addMedia(const std::string &path, const std::string &title,
                          const std::string &artist, const std::string &album) {
+  std::lock_guard<std::mutex> lock(m_mutex);
   if (!m_db)
     return false;
   return insertMedia(path, title, artist, album, 0, 0, 0, 0);
@@ -191,6 +194,7 @@ bool LibraryDB::addMedia(const std::string &path, const std::string &title,
 
 bool LibraryDB::updateMedia(const std::string &path, const std::string &title,
                             const std::string &artist, const std::string &album) {
+  std::lock_guard<std::mutex> lock(m_mutex);
   if (!m_db)
     return false;
   const char *sql = "UPDATE MediaItem SET title=?2, artist=?3, album=?4 WHERE path=?1;";
@@ -207,6 +211,7 @@ bool LibraryDB::updateMedia(const std::string &path, const std::string &title,
 }
 
 bool LibraryDB::removeMedia(const std::string &path) {
+  std::lock_guard<std::mutex> lock(m_mutex);
   if (!m_db)
     return false;
   const char *sql = "DELETE FROM MediaItem WHERE path=?1;";
@@ -220,6 +225,7 @@ bool LibraryDB::removeMedia(const std::string &path) {
 }
 
 std::vector<MediaMetadata> LibraryDB::search(const std::string &query) {
+  std::lock_guard<std::mutex> lock(m_mutex);
   std::vector<MediaMetadata> results;
   if (!m_db)
     return results;
@@ -255,6 +261,7 @@ std::vector<MediaMetadata> LibraryDB::search(const std::string &query) {
 }
 
 bool LibraryDB::recordPlayback(const std::string &path) {
+  std::lock_guard<std::mutex> lock(m_mutex);
   if (!m_db)
     return false;
   const char *sql =
@@ -270,6 +277,7 @@ bool LibraryDB::recordPlayback(const std::string &path) {
 }
 
 int LibraryDB::playlistId(const std::string &name) const {
+  std::lock_guard<std::mutex> lock(m_mutex);
   const char *sql = "SELECT id FROM Playlist WHERE name=?1;";
   sqlite3_stmt *stmt = nullptr;
   if (sqlite3_prepare_v2(m_db, sql, -1, &stmt, nullptr) != SQLITE_OK)
@@ -283,6 +291,7 @@ int LibraryDB::playlistId(const std::string &name) const {
 }
 
 bool LibraryDB::createPlaylist(const std::string &name) {
+  std::lock_guard<std::mutex> lock(m_mutex);
   if (!m_db)
     return false;
   const char *sql = "INSERT OR IGNORE INTO Playlist (name) VALUES (?1);";
@@ -296,6 +305,7 @@ bool LibraryDB::createPlaylist(const std::string &name) {
 }
 
 bool LibraryDB::deletePlaylist(const std::string &name) {
+  std::lock_guard<std::mutex> lock(m_mutex);
   if (!m_db)
     return false;
   int id = playlistId(name);
@@ -318,6 +328,7 @@ bool LibraryDB::deletePlaylist(const std::string &name) {
 }
 
 bool LibraryDB::addToPlaylist(const std::string &name, const std::string &path) {
+  std::lock_guard<std::mutex> lock(m_mutex);
   if (!m_db)
     return false;
   int id = playlistId(name);
@@ -341,6 +352,7 @@ bool LibraryDB::addToPlaylist(const std::string &name, const std::string &path) 
 }
 
 bool LibraryDB::removeFromPlaylist(const std::string &name, const std::string &path) {
+  std::lock_guard<std::mutex> lock(m_mutex);
   if (!m_db)
     return false;
   int id = playlistId(name);
@@ -358,6 +370,7 @@ bool LibraryDB::removeFromPlaylist(const std::string &name, const std::string &p
 }
 
 std::vector<MediaMetadata> LibraryDB::playlistItems(const std::string &name) {
+  std::lock_guard<std::mutex> lock(m_mutex);
   std::vector<MediaMetadata> items;
   if (!m_db)
     return items;
@@ -395,6 +408,7 @@ std::vector<MediaMetadata> LibraryDB::playlistItems(const std::string &name) {
 }
 
 bool LibraryDB::setRating(const std::string &path, int rating) {
+  std::lock_guard<std::mutex> lock(m_mutex);
   if (!m_db)
     return false;
   if (rating < 0)
@@ -413,6 +427,7 @@ bool LibraryDB::setRating(const std::string &path, int rating) {
 }
 
 int LibraryDB::rating(const std::string &path) const {
+  std::lock_guard<std::mutex> lock(m_mutex);
   if (!m_db)
     return 0;
   const char *sql = "SELECT rating FROM MediaItem WHERE path=?1;";
