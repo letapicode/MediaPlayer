@@ -100,6 +100,9 @@ private:
   bool scanDirectoryImpl(const std::string &directory, ProgressCallback progress,
                          std::atomic<bool> *cancelFlag, bool cleanup);
 
+  bool parseSmartFilter(const std::string &filter, std::string &sql,
+                        std::vector<std::string> &values, std::vector<bool> &textField) const;
+
 private:
   std::string m_path;
   sqlite3 *m_db{nullptr};
