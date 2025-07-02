@@ -267,6 +267,138 @@ std::vector<MediaMetadata> LibraryDB::search(const std::string &query) {
   return results;
 }
 
+std::vector<MediaMetadata> LibraryDB::smartQuery(const std::string &filter) {
+  std::lock_guard<std::mutex> lock(m_mutex);
+  std::vector<MediaMetadata> results;
+  if (!m_db)
+    return results;
+
+  auto isIdentChar = [](char c) { return std::isalnum(static_cast<unsigned char>(c)) || c == '_'; };
+  size_t pos = 0;
+  auto skipSpaces = [&]() {
+    while (pos < filter.size() && std::isspace(static_cast<unsigned char>(filter[pos])))
+      ++pos;
+  };
+  auto parseIdent = [&]() -> std::string {
+    size_t start = pos;
+    while (pos < filter.size() && isIdentChar(filter[pos]))
+      ++pos;
+    return filter.substr(start, pos - start);
+  };
+  auto parseOp = [&]() -> std::string {
+    static const char *ops[] = {"<=", ">=", "!=", "<", ">", "="};
+    for (auto op : ops) {
+      size_t len = std::strlen(op);
+      if (filter.compare(pos, len, op) == 0) {
+        pos += len;
+        return op;
+      }
+    }
+    return {};
+  };
+
+  std::string sql = "SELECT path,title,artist,album,duration,width,height FROM MediaItem WHERE ";
+  std::vector<std::string> values;
+  std::vector<bool> textField;
+  int index = 1;
+
+  skipSpaces();
+  while (pos < filter.size()) {
+    std::string field = parseIdent();
+    if (field.empty())
+      return results;
+
+    static const char *allowedFields[] = {"path",  "title",  "artist", "album",      "duration",
+                                          "width", "height", "rating", "play_count", "last_played"};
+    bool allowed = false;
+    for (auto f : allowedFields) {
+      if (field == f) {
+        allowed = true;
+        break;
+      }
+    }
+    if (!allowed)
+      return results;
+
+    skipSpaces();
+    std::string op = parseOp();
+    if (op.empty())
+      return results;
+
+    skipSpaces();
+    bool quoted = false;
+    std::string value;
+    if (pos < filter.size() && filter[pos] == '\'') {
+      quoted = true;
+      ++pos;
+      size_t start = pos;
+      while (pos < filter.size() && filter[pos] != '\'')
+        ++pos;
+      value = filter.substr(start, pos - start);
+      if (pos < filter.size() && filter[pos] == '\'')
+        ++pos;
+    } else {
+      size_t start = pos;
+      while (pos < filter.size() && !std::isspace(static_cast<unsigned char>(filter[pos])))
+        ++pos;
+      value = filter.substr(start, pos - start);
+    }
+
+    sql += field + op + "?" + std::to_string(index);
+    values.push_back(value);
+    textField.push_back(quoted || field == "title" || field == "artist" || field == "album" ||
+                        field == "path");
+    ++index;
+
+    skipSpaces();
+    if (pos >= filter.size())
+      break;
+    if (filter.compare(pos, 3, "AND") == 0) {
+      sql += " AND ";
+      pos += 3;
+    } else if (filter.compare(pos, 2, "OR") == 0) {
+      sql += " OR ";
+      pos += 2;
+    } else {
+      break;
+    }
+    skipSpaces();
+  }
+  sql += " ORDER BY title;";
+
+  sqlite3_stmt *stmt = nullptr;
+  if (sqlite3_prepare_v2(m_db, sql.c_str(), -1, &stmt, nullptr) != SQLITE_OK)
+    return results;
+  for (size_t i = 0; i < values.size(); ++i) {
+    if (textField[i])
+      sqlite3_bind_text(stmt, static_cast<int>(i + 1), values[i].c_str(), -1, SQLITE_TRANSIENT);
+    else
+      sqlite3_bind_int(stmt, static_cast<int>(i + 1), std::stoi(values[i]));
+  }
+
+  while (sqlite3_step(stmt) == SQLITE_ROW) {
+    MediaMetadata m{};
+    const unsigned char *txt = sqlite3_column_text(stmt, 0);
+    if (txt)
+      m.path = reinterpret_cast<const char *>(txt);
+    txt = sqlite3_column_text(stmt, 1);
+    if (txt)
+      m.title = reinterpret_cast<const char *>(txt);
+    txt = sqlite3_column_text(stmt, 2);
+    if (txt)
+      m.artist = reinterpret_cast<const char *>(txt);
+    txt = sqlite3_column_text(stmt, 3);
+    if (txt)
+      m.album = reinterpret_cast<const char *>(txt);
+    m.duration = sqlite3_column_int(stmt, 4);
+    m.width = sqlite3_column_int(stmt, 5);
+    m.height = sqlite3_column_int(stmt, 6);
+    results.push_back(std::move(m));
+  }
+  sqlite3_finalize(stmt);
+  return results;
+}
+
 bool LibraryDB::recordPlayback(const std::string &path) {
   std::lock_guard<std::mutex> lock(m_mutex);
   if (!m_db)
