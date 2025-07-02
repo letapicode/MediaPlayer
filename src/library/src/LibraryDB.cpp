@@ -238,7 +238,9 @@ std::vector<MediaMetadata> LibraryDB::search(const std::string &query) {
     return results;
   std::string pattern = "%" + query + "%";
   const char *sql = "SELECT path,title,artist,album,duration,width,height FROM MediaItem "
-                    "WHERE title LIKE ?1 OR artist LIKE ?1 OR album LIKE ?1 ORDER BY title;";
+                    "WHERE title LIKE ?1 COLLATE NOCASE OR artist LIKE ?1 COLLATE NOCASE OR album "
+                    "LIKE ?1 COLLATE NOCASE "
+                    "ORDER BY title;";
   sqlite3_stmt *stmt = nullptr;
   if (sqlite3_prepare_v2(m_db, sql, -1, &stmt, nullptr) != SQLITE_OK)
     return results;
