@@ -39,8 +39,8 @@ public:
   // Remove a media item from the database by path.
   bool removeMedia(const std::string &path);
 
-  // Search library for items where title, artist or album contain the query
-  // string. Case-insensitive according to SQLite's LIKE operator.
+  // Search library using full text search over title, artist and album.
+  // Powered by SQLite FTS5 and case-insensitive.
   std::vector<MediaMetadata> search(const std::string &query);
 
   // Execute a simple filter expression against MediaItem fields. Supported
