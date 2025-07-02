@@ -87,8 +87,10 @@ items without storing them as playlists.
 
 `LibraryDB` exposes a simple interface to plug in recommendation algorithms via
 `AIRecommender`. The `RandomAIRecommender` implementation included here returns
-a random subset of library items. Applications can set a custom recommender with
-`setRecommender()` and fetch suggestions with `recommendations()`.
+a random subset of library items. A slightly smarter stub,
+`MoodAIRecommender`, picks tracks whose genre matches a given mood string.
+Applications can set any recommender with `setRecommender()` and fetch
+suggestions with `recommendations()`.
 
 ## Dependencies and Building
 

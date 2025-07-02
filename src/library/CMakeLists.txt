@@ -1,6 +1,7 @@
 add_library(mediaplayer_library
     src/LibraryDB.cpp
     src/RandomAIRecommender.cpp
+    src/MoodAIRecommender.cpp
     src/Playlist.cpp
 )
 
