@@ -82,6 +82,25 @@ bool LibraryDB::initSchema() {
     sqlite3_free(err);
     return false;
   }
+
+  const char *ftsSql =
+      "CREATE VIRTUAL TABLE IF NOT EXISTS MediaItemFTS USING fts5(path,title,artist,album);"
+      "CREATE TRIGGER IF NOT EXISTS mediaitem_ai AFTER INSERT ON MediaItem BEGIN "
+      "INSERT INTO MediaItemFTS(rowid,path,title,artist,album) "
+      "VALUES(new.id,new.path,new.title,new.artist,new.album); END;"
+      "CREATE TRIGGER IF NOT EXISTS mediaitem_ad AFTER DELETE ON MediaItem BEGIN "
+      "INSERT INTO MediaItemFTS(MediaItemFTS,rowid,path,title,artist,album) "
+      "VALUES('delete',old.id,old.path,old.title,old.artist,old.album); END;"
+      "CREATE TRIGGER IF NOT EXISTS mediaitem_au AFTER UPDATE ON MediaItem BEGIN "
+      "INSERT INTO MediaItemFTS(MediaItemFTS,rowid,path,title,artist,album) "
+      "VALUES('delete',old.id,old.path,old.title,old.artist,old.album);"
+      "INSERT INTO MediaItemFTS(rowid,path,title,artist,album) "
+      "VALUES(new.id,new.path,new.title,new.artist,new.album); END;";
+  if (sqlite3_exec(m_db, ftsSql, nullptr, nullptr, &err) != SQLITE_OK) {
+    std::cerr << "Failed to create FTS table: " << err << '\n';
+    sqlite3_free(err);
+    return false;
+  }
   return true;
 }
 
@@ -236,13 +255,13 @@ std::vector<MediaMetadata> LibraryDB::search(const std::string &query) {
   std::vector<MediaMetadata> results;
   if (!m_db)
     return results;
-  std::string pattern = "%" + query + "%";
-  const char *sql = "SELECT path,title,artist,album,duration,width,height FROM MediaItem "
-                    "WHERE title LIKE ?1 OR artist LIKE ?1 OR album LIKE ?1 ORDER BY title;";
+  const char *sql = "SELECT m.path,m.title,m.artist,m.album,m.duration,m.width,m.height "
+                    "FROM MediaItem m JOIN MediaItemFTS f ON m.id=f.rowid "
+                    "WHERE f MATCH ?1 ORDER BY m.title;";
   sqlite3_stmt *stmt = nullptr;
   if (sqlite3_prepare_v2(m_db, sql, -1, &stmt, nullptr) != SQLITE_OK)
     return results;
-  sqlite3_bind_text(stmt, 1, pattern.c_str(), -1, SQLITE_TRANSIENT);
+  sqlite3_bind_text(stmt, 1, query.c_str(), -1, SQLITE_TRANSIENT);
   while (sqlite3_step(stmt) == SQLITE_ROW) {
     MediaMetadata m{};
     const unsigned char *txt = nullptr;

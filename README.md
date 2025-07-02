@@ -22,6 +22,7 @@ A detailed breakdown of planned modules and tasks can be found in [Tasks.MD](Tas
 - FFmpeg development libraries
 - Qt 6 development files
 - OpenGL headers and GLFW 3
+- SQLite3 built with FTS5 support
 
 See [docs/building.md](docs/building.md) for a complete build walkthrough,
 including how to compile the sample test programs.
@@ -42,6 +43,8 @@ convert audio files between formats while the subtitles module parses
 SRT files.
 The SQLite-based library tracks media metadata, including an optional rating
 field, and updates play counts when items are played through the core engine.
+Full text search is powered by SQLite's FTS5 module, so ensure your SQLite
+installation includes this extension.
 
 ## Hardware Decoding
 
