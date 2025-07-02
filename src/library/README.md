@@ -31,9 +31,13 @@ By default the database operates in SQLite's WAL (write-ahead logging) mode to a
   - `id` INTEGER PRIMARY KEY
   - `name` TEXT UNIQUE
 - **PlaylistItem** — items belonging to a playlist.
-  - `playlist_id` INTEGER REFERENCES `Playlist(id)`
+- `playlist_id` INTEGER REFERENCES `Playlist(id)`
   - `path` TEXT REFERENCES `MediaItem(path)`
   - `position` INTEGER
+
+The library creates indexes on `MediaItem(title)`, `MediaItem(artist)`,
+`MediaItem(album)`, `MediaItem(genre)`, `MediaItem(added_date)` and
+`MediaItem(play_count)` to speed up search and sorting queries.
 
 Query functions such as `search` and `playlistItems` return a `MediaMetadata`
 structure. This now includes a `rating` field corresponding to the column in

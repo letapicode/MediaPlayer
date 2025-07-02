@@ -93,10 +93,13 @@ bool LibraryDB::initSchema() {
     return false;
   }
 
-  const char *indexSql = "CREATE INDEX IF NOT EXISTS idx_media_title ON MediaItem(title);"
-                         "CREATE INDEX IF NOT EXISTS idx_media_artist ON MediaItem(artist);"
-                         "CREATE INDEX IF NOT EXISTS idx_media_album ON MediaItem(album);"
-                         "CREATE INDEX IF NOT EXISTS idx_media_genre ON MediaItem(genre);";
+  const char *indexSql =
+      "CREATE INDEX IF NOT EXISTS idx_media_title ON MediaItem(title);"
+      "CREATE INDEX IF NOT EXISTS idx_media_artist ON MediaItem(artist);"
+      "CREATE INDEX IF NOT EXISTS idx_media_album ON MediaItem(album);"
+      "CREATE INDEX IF NOT EXISTS idx_media_genre ON MediaItem(genre);"
+      "CREATE INDEX IF NOT EXISTS idx_media_added_date ON MediaItem(added_date);"
+      "CREATE INDEX IF NOT EXISTS idx_media_play_count ON MediaItem(play_count);";
   if (sqlite3_exec(m_db, indexSql, nullptr, nullptr, &err) != SQLITE_OK) {
     std::cerr << "Failed to create indexes: " << err << '\n';
     sqlite3_free(err);
