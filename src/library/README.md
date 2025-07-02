@@ -76,9 +76,22 @@ assume the mutex is already held by the caller.
 
 ### Asynchronous scanning
 
-The `scanDirectoryAsync` method starts a background thread that scans files and
-updates the database. It returns a `std::thread` which callers must join before
-destroying the `LibraryDB` instance to avoid accessing it from a background task.
+Use the `LibraryScanner` helper to scan directories in a background thread. The
+scanner joins the worker thread in its destructor so it is safe to let the
+object fall out of scope.
+
+```cpp
+mediaplayer::LibraryDB db("library.db");
+mediaplayer::LibraryScanner scanner(db);
+scanner.start("/path/to/music", [&](size_t c, size_t t) {
+  std::printf("%zu/%zu\n", c, t);
+});
+// ... later
+scanner.wait();
+```
+
+Call `scanner.cancel()` to stop early or `scanner.wait()` to block until the
+scan finishes.
 
 ### Smart playlists
 
