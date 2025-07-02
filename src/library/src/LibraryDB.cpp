@@ -75,6 +75,9 @@ bool LibraryDB::initSchema() {
   return true;
 }
 
+// Insert a media item or update the existing row if the path already exists.
+// The SQLite UPSERT ensures rescanning refreshes metadata without a separate
+// update step.
 bool LibraryDB::insertMedia(const std::string &path, const std::string &title,
                             const std::string &artist, const std::string &album, int duration,
                             int width, int height, int rating) {
@@ -139,11 +142,7 @@ bool LibraryDB::scanDirectory(const std::string &directory) {
         }
       }
       insertMedia(pathStr, title, artist, album, duration, width, height, 0);
-      if (sqlite3_changes(m_db) == 0) {
-        updateMedia(pathStr, title, artist, album);
-      }
       avformat_close_input(&ctx);
-
     }
     insertMedia(pathStr, title, artist, album, duration, width, height, 0);
   }
