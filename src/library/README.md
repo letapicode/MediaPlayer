@@ -1,4 +1,4 @@
-# Media Library & Playlists
+#Media Library &Playlists
 
 The library database creates `MediaItem`, `Playlist` and `PlaylistItem` tables.
 The `PlaylistItem` table now enforces a `UNIQUE(playlist_id, path)` constraint.
@@ -36,18 +36,19 @@ before applying the new schema.
 ```cpp
 mediaplayer::LibraryDB db("library.db");
 if (db.open()) {
-    db.scanDirectory("/path/to/music");         // populate from files
-    auto songs = db.search("Beatles");          // simple text search
-    db.createPlaylist("favorites");
-    for (const auto &m : songs)
-        db.addToPlaylist("favorites", m.path);
-    db.recordPlayback(songs.front().path);      // update play count
-    db.close();
+  db.scanDirectory("/path/to/music"); // populate from files
+  auto songs = db.search("Beatles");  // simple text search
+  db.createPlaylist("favorites");
+  for (const auto &m : songs)
+    db.addToPlaylist("favorites", m.path);
+  db.recordPlayback(songs.front().path); // update play count
+  db.close();
 }
 ```
 
 `scanDirectory` uses an SQLite UPSERT so rescanning will update metadata for
-existing files automatically.
+existing files automatically. Entries whose files are missing are removed from
+`MediaItem` unless cleanup is disabled.
 
 Other helpers allow updating or removing entries, setting ratings and retrieving the items of a playlist.
 
@@ -83,6 +84,6 @@ Several example tests under `tests/` exercise the library:
 - `library_rating_test.cpp` – rating values
 - `library_search_test.cpp` – search queries
 - `library_video_metadata_test.cpp` – scanning duration and resolution
+- `library_cleanup_test.cpp` – removes stale entries after scanning
 
 Enable tests with `-DBUILD_TESTS=ON` when running CMake to build these executables.
-
