@@ -49,6 +49,10 @@ if (db.open()) {
 `scanDirectory` uses an SQLite UPSERT so rescanning will update metadata for
 existing files automatically.
 
+When scanning in the background with `scanDirectoryAsync` the function returns a
+`std::thread`. Join this thread before destroying the `LibraryDB` object to
+avoid the scan accessing a destroyed instance.
+
 Other helpers allow updating or removing entries, setting ratings and retrieving the items of a playlist.
 
 `LibraryDB` is now thread-safe. All database operations lock an internal mutex,

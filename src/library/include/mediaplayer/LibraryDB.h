@@ -24,7 +24,9 @@ public:
 
   using ProgressCallback = std::function<void(size_t current, size_t total)>;
   // Scan a directory asynchronously. Progress is reported via the callback and
-  // scanning can be cancelled by setting cancelFlag to true.
+  // scanning can be cancelled by setting cancelFlag to true. Callers must join
+  // the returned thread before destroying the LibraryDB object to avoid
+  // accessing it from a dangling background task.
   std::thread scanDirectoryAsync(const std::string &directory, ProgressCallback progress,
                                  std::atomic<bool> &cancelFlag);
 
