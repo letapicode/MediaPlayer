@@ -31,6 +31,13 @@ bool LibraryDB::open() {
     m_db = nullptr;
     return false;
   }
+  if (sqlite3_exec(m_db, "PRAGMA journal_mode=WAL;", nullptr, nullptr, &err) != SQLITE_OK) {
+    std::cerr << "Failed to set WAL mode: " << err << '\n';
+    sqlite3_free(err);
+    sqlite3_close(m_db);
+    m_db = nullptr;
+    return false;
+  }
   if (!initSchema()) {
     sqlite3_close(m_db);
     m_db = nullptr;
@@ -43,6 +50,8 @@ void LibraryDB::close() {
   if (m_db) {
     sqlite3_close(m_db);
     m_db = nullptr;
+    std::error_code ec;
+    std::filesystem::remove(m_path + "-wal", ec);
   }
 }
 

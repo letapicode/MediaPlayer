@@ -7,6 +7,8 @@ before applying the new schema.
 
 `LibraryDB` is a lightweight wrapper around SQLite that stores metadata for media files and manages user playlists. The database is created on first use and filled by scanning directories with TagLib and FFmpeg to read tags, duration and video resolution. It also records playback statistics such as play count and last played time.
 
+By default the database operates in SQLite's WAL (write-ahead logging) mode to allow concurrent reads and writes. The `LibraryDB::close` method cleans up any `*-wal` journal file when the connection is closed.
+
 ## Database Schema
 
 `LibraryDB` creates three tables:
