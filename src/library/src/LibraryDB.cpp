@@ -72,6 +72,15 @@ bool LibraryDB::initSchema() {
     sqlite3_free(err);
     return false;
   }
+
+  const char *indexSql = "CREATE INDEX IF NOT EXISTS idx_media_title ON MediaItem(title);"
+                         "CREATE INDEX IF NOT EXISTS idx_media_artist ON MediaItem(artist);"
+                         "CREATE INDEX IF NOT EXISTS idx_media_album ON MediaItem(album);";
+  if (sqlite3_exec(m_db, indexSql, nullptr, nullptr, &err) != SQLITE_OK) {
+    std::cerr << "Failed to create indexes: " << err << '\n';
+    sqlite3_free(err);
+    return false;
+  }
   return true;
 }
 
@@ -143,7 +152,6 @@ bool LibraryDB::scanDirectory(const std::string &directory) {
         updateMedia(pathStr, title, artist, album);
       }
       avformat_close_input(&ctx);
-
     }
     insertMedia(pathStr, title, artist, album, duration, width, height, 0);
   }
