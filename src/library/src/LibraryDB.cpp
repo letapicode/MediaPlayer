@@ -52,6 +52,7 @@ bool LibraryDB::initSchema() {
                     "width INTEGER DEFAULT 0,"
                     "height INTEGER DEFAULT 0,"
                     "rating INTEGER DEFAULT 0,"
+                    "added_date INTEGER DEFAULT 0,"
                     "play_count INTEGER DEFAULT 0,"
                     "last_played INTEGER"
                     ");"
@@ -82,6 +83,17 @@ bool LibraryDB::initSchema() {
     sqlite3_free(err);
     return false;
   }
+
+  const char *alterSql = "ALTER TABLE MediaItem ADD COLUMN added_date INTEGER DEFAULT 0;";
+  if (sqlite3_exec(m_db, alterSql, nullptr, nullptr, &err) != SQLITE_OK) {
+    std::string msg = err ? err : "";
+    if (msg.find("duplicate column name") == std::string::npos) {
+      std::cerr << "Failed to alter table: " << msg << '\n';
+      sqlite3_free(err);
+      return false;
+    }
+    sqlite3_free(err);
+  }
   return true;
 }
 
@@ -92,12 +104,12 @@ bool LibraryDB::insertMedia(const std::string &path, const std::string &title,
                             const std::string &artist, const std::string &album, int duration,
                             int width, int height, int rating) {
   std::lock_guard<std::mutex> lock(m_mutex);
-  const char *sql =
-      "INSERT INTO MediaItem (path, title, artist, album, duration, width, height, rating) "
-      "VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8) "
-      "ON CONFLICT(path) DO UPDATE SET "
-      "title=excluded.title, artist=excluded.artist, album=excluded.album, "
-      "duration=excluded.duration, width=excluded.width, height=excluded.height;";
+  const char *sql = "INSERT INTO MediaItem (path, title, artist, album, duration, width, height, "
+                    "rating, added_date) "
+                    "VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9) "
+                    "ON CONFLICT(path) DO UPDATE SET "
+                    "title=excluded.title, artist=excluded.artist, album=excluded.album, "
+                    "duration=excluded.duration, width=excluded.width, height=excluded.height;";
   sqlite3_stmt *stmt = nullptr;
   if (sqlite3_prepare_v2(m_db, sql, -1, &stmt, nullptr) != SQLITE_OK) {
     return false;
@@ -110,6 +122,7 @@ bool LibraryDB::insertMedia(const std::string &path, const std::string &title,
   sqlite3_bind_int(stmt, 6, width);
   sqlite3_bind_int(stmt, 7, height);
   sqlite3_bind_int(stmt, 8, rating);
+  sqlite3_bind_int64(stmt, 9, static_cast<sqlite3_int64>(time(nullptr)));
   bool ok = sqlite3_step(stmt) == SQLITE_DONE;
   sqlite3_finalize(stmt);
   return ok;

@@ -21,6 +21,7 @@ before applying the new schema.
   - `width` INTEGER
   - `height` INTEGER
   - `rating` INTEGER
+  - `added_date` INTEGER UNIX timestamp when the item was first added
   - `play_count` INTEGER
   - `last_played` INTEGER
 - **Playlist** — named playlists.
