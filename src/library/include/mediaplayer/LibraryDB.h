@@ -4,6 +4,7 @@
 #include "mediaplayer/MediaMetadata.h"
 #include <atomic>
 #include <functional>
+#include <mutex>
 #include <sqlite3.h>
 #include <string>
 #include <thread>
@@ -67,6 +68,7 @@ private:
 private:
   std::string m_path;
   sqlite3 *m_db{nullptr};
+  mutable std::mutex m_mutex;
 };
 
 } // namespace mediaplayer
