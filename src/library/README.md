@@ -78,6 +78,19 @@ re-evaluates all smart playlists whenever metadata changes. Convenience methods
 `recentlyAdded()` and `mostPlayed()` return dynamic lists of recent or popular
 items without storing them as playlists.
 
+### AI recommendations
+
+`LibraryDB` can accept custom recommendation algorithms through the
+`AIRecommender` interface. Use `setRecommender()` to attach an implementation.
+The provided `RandomRecommender` selects a random subset of the library and is
+useful as a lightweight example.
+
+```cpp
+mediaplayer::RandomRecommender rec(5);
+db.setRecommender(&rec);
+auto picks = db.recommendations();
+```
+
 ## Dependencies and Building
 
 `LibraryDB` relies on:

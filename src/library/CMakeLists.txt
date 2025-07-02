@@ -1,5 +1,6 @@
 add_library(mediaplayer_library
     src/LibraryDB.cpp
+    src/RandomRecommender.cpp
 )
 
 find_package(PkgConfig)
