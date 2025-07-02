@@ -1,4 +1,5 @@
 #include "mediaplayer/MoodAIRecommender.h"
+#include <algorithm>
 
 namespace mediaplayer {
 

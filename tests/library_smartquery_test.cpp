@@ -12,11 +12,14 @@ int main() {
   assert(db.setRating("song1.mp3", 5));
   assert(db.setRating("song2.mp3", 3));
 
-  auto res = db.smartQuery("rating>=4 AND artist='Artist'");
+  auto res = db.smartQuery("rating>=4 aNd artist='Artist'");
   assert(res.size() == 1 && res[0].path == "song1.mp3");
 
   auto res2 = db.smartQuery("artist='O''Connor'");
   assert(res2.size() == 1 && res2[0].path == "song3.mp3");
+
+  auto res3 = db.smartQuery("artist='O''Connor' Or rating>=5");
+  assert(res3.size() == 2);
 
   db.close();
   std::remove(dbPath);

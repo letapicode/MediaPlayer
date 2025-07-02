@@ -68,8 +68,8 @@ public:
   bool deletePlaylist(const std::string &name);
   bool addToPlaylist(const std::string &name, const std::string &path);
   bool removeFromPlaylist(const std::string &name, const std::string &path);
-  std::vector<MediaMetadata> playlistItems(const std::string &name);
-  Playlist loadPlaylist(const std::string &name);
+  std::vector<MediaMetadata> playlistItems(const std::string &name) const;
+  Playlist loadPlaylist(const std::string &name) const;
   bool savePlaylist(const Playlist &playlist);
 
   // Smart playlists
