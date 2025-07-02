@@ -47,6 +47,10 @@ public:
   // Powered by SQLite FTS5 and case-insensitive.
   std::vector<MediaMetadata> search(const std::string &query);
 
+  // Search using the FTS5 virtual table for more advanced matching. The query
+  // should be in FTS syntax.
+  std::vector<MediaMetadata> searchFts(const std::string &query);
+
   // Execute a simple filter expression against MediaItem fields. Supported
   // operators are =, !=, <, >, <= and >= combined with AND/OR. Example:
   //   "rating>=4 AND artist='Queen'".

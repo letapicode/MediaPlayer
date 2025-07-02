@@ -417,6 +417,44 @@ std::vector<MediaMetadata> LibraryDB::search(const std::string &query) {
   return results;
 }
 
+std::vector<MediaMetadata> LibraryDB::searchFts(const std::string &query) {
+  std::lock_guard<std::mutex> lock(m_mutex);
+  std::vector<MediaMetadata> results;
+  if (!m_db)
+    return results;
+  const char *sql = "SELECT m.path,m.title,m.artist,m.album,m.genre,m.duration,m.width,m.height "
+                    "FROM MediaItemFTS f JOIN MediaItem m ON m.id=f.rowid WHERE f MATCH ?1 "
+                    "ORDER BY bm25(f);";
+  sqlite3_stmt *stmt = nullptr;
+  if (sqlite3_prepare_v2(m_db, sql, -1, &stmt, nullptr) != SQLITE_OK)
+    return results;
+  sqlite3_bind_text(stmt, 1, query.c_str(), -1, SQLITE_TRANSIENT);
+  while (sqlite3_step(stmt) == SQLITE_ROW) {
+    MediaMetadata m{};
+    const unsigned char *txt = sqlite3_column_text(stmt, 0);
+    if (txt)
+      m.path = reinterpret_cast<const char *>(txt);
+    txt = sqlite3_column_text(stmt, 1);
+    if (txt)
+      m.title = reinterpret_cast<const char *>(txt);
+    txt = sqlite3_column_text(stmt, 2);
+    if (txt)
+      m.artist = reinterpret_cast<const char *>(txt);
+    txt = sqlite3_column_text(stmt, 3);
+    if (txt)
+      m.album = reinterpret_cast<const char *>(txt);
+    txt = sqlite3_column_text(stmt, 4);
+    if (txt)
+      m.genre = reinterpret_cast<const char *>(txt);
+    m.duration = sqlite3_column_int(stmt, 5);
+    m.width = sqlite3_column_int(stmt, 6);
+    m.height = sqlite3_column_int(stmt, 7);
+    results.push_back(std::move(m));
+  }
+  sqlite3_finalize(stmt);
+  return results;
+}
+
 std::vector<MediaMetadata> LibraryDB::smartQuery(const std::string &filter) {
   std::lock_guard<std::mutex> lock(m_mutex);
   std::vector<MediaMetadata> results;
