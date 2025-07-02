@@ -126,60 +126,91 @@ bool LibraryDB::scanDirectoryImpl(const std::string &directory, ProgressCallback
     return false;
 
   size_t total = 0;
-  for (auto const &entry : fs::recursive_directory_iterator(directory)) {
-    if (entry.is_regular_file())
-      ++total;
+  try {
+    std::error_code ec;
+    fs::recursive_directory_iterator it(directory, fs::directory_options::skip_permission_denied,
+                                        ec);
+    fs::recursive_directory_iterator end;
+    for (; it != end; it.increment(ec)) {
+      if (ec) {
+        std::cerr << "Directory iteration error: " << ec.message() << '\n';
+        ec.clear();
+        continue;
+      }
+      try {
+        if (it->is_regular_file())
+          ++total;
+      } catch (const fs::filesystem_error &e) {
+        std::cerr << "Filesystem error: " << e.what() << '\n';
+      }
+    }
+  } catch (const fs::filesystem_error &e) {
+    std::cerr << "Filesystem error: " << e.what() << '\n';
   }
 
   size_t processed = 0;
-  for (auto const &entry : fs::recursive_directory_iterator(directory)) {
-    if (cancelFlag && cancelFlag->load())
-      break;
-    if (!entry.is_regular_file())
-      continue;
-    auto pathStr = entry.path().string();
-    TagLib::FileRef f(pathStr.c_str());
-    std::string title;
-    std::string artist;
-    std::string album;
-    bool tagOk = false;
-    if (!f.isNull()) {
-      tagOk = f.tag() || f.audioProperties();
-      if (f.tag()) {
-        title = f.tag()->title().to8Bit(true);
-        artist = f.tag()->artist().to8Bit(true);
-        album = f.tag()->album().to8Bit(true);
+  try {
+    std::error_code ec;
+    fs::recursive_directory_iterator it(directory, fs::directory_options::skip_permission_denied,
+                                        ec);
+    fs::recursive_directory_iterator end;
+    for (; it != end; it.increment(ec)) {
+      if (ec) {
+        std::cerr << "Directory iteration error: " << ec.message() << '\n';
+        ec.clear();
+        continue;
       }
-    }
-    if (title.empty())
-      title = entry.path().filename().string();
+      if (cancelFlag && cancelFlag->load())
+        break;
+      if (!it->is_regular_file())
+        continue;
 
-    int duration = 0;
-    int width = 0;
-    int height = 0;
-    AVFormatContext *ctx = nullptr;
-    bool ffOk = false;
-    if (avformat_open_input(&ctx, pathStr.c_str(), nullptr, nullptr) == 0) {
-      if (avformat_find_stream_info(ctx, nullptr) >= 0) {
-        ffOk = true;
-        if (ctx->duration > 0)
-          duration = static_cast<int>(ctx->duration / AV_TIME_BASE);
-        for (unsigned i = 0; i < ctx->nb_streams; ++i) {
-          AVStream *st = ctx->streams[i];
-          if (st->codecpar->codec_type == AVMEDIA_TYPE_VIDEO) {
-            width = st->codecpar->width;
-            height = st->codecpar->height;
-            break;
-          }
+      auto pathStr = it->path().string();
+      TagLib::FileRef f(pathStr.c_str());
+      std::string title;
+      std::string artist;
+      std::string album;
+      bool tagOk = false;
+      if (!f.isNull()) {
+        tagOk = f.tag() || f.audioProperties();
+        if (f.tag()) {
+          title = f.tag()->title().to8Bit(true);
+          artist = f.tag()->artist().to8Bit(true);
+          album = f.tag()->album().to8Bit(true);
         }
       }
-      avformat_close_input(&ctx);
+      if (title.empty())
+        title = it->path().filename().string();
+
+      int duration = 0;
+      int width = 0;
+      int height = 0;
+      AVFormatContext *ctx = nullptr;
+      bool ffOk = false;
+      if (avformat_open_input(&ctx, pathStr.c_str(), nullptr, nullptr) == 0) {
+        if (avformat_find_stream_info(ctx, nullptr) >= 0) {
+          ffOk = true;
+          if (ctx->duration > 0)
+            duration = static_cast<int>(ctx->duration / AV_TIME_BASE);
+          for (unsigned i = 0; i < ctx->nb_streams; ++i) {
+            AVStream *st = ctx->streams[i];
+            if (st->codecpar->codec_type == AVMEDIA_TYPE_VIDEO) {
+              width = st->codecpar->width;
+              height = st->codecpar->height;
+              break;
+            }
+          }
+        }
+        avformat_close_input(&ctx);
+      }
+      if (tagOk || ffOk)
+        insertMedia(pathStr, title, artist, album, duration, width, height, 0);
+      ++processed;
+      if (progress)
+        progress(processed, total);
     }
-    if (tagOk || ffOk)
-      insertMedia(pathStr, title, artist, album, duration, width, height, 0);
-    ++processed;
-    if (progress)
-      progress(processed, total);
+  } catch (const fs::filesystem_error &e) {
+    std::cerr << "Filesystem error: " << e.what() << '\n';
   }
   return true;
 }
