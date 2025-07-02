@@ -1,4 +1,5 @@
 #include "mediaplayer/LibraryDB.h"
+#include "mediaplayer/Playlist.h"
 #include "mediaplayer/PlaylistManager.h"
 #include <cassert>
 #include <cstdio>
@@ -19,6 +20,16 @@ int main() {
   items = db.playlistItems("fav");
   assert(items.size() == 1 && items[0].path == "song2.mp3");
   assert(db.deletePlaylist("fav"));
+
+  mediaplayer::Playlist pl("ordered");
+  pl.addItem("song1.mp3");
+  pl.addItem("song2.mp3");
+  assert(pl.save(db));
+  auto loaded = mediaplayer::Playlist::load(db, "ordered");
+  assert(loaded.size() == 2);
+  assert(loaded.items()[0] == "song1.mp3");
+  assert(loaded.items()[1] == "song2.mp3");
+  assert(db.deletePlaylist("ordered"));
   db.close();
   std::remove(dbPath);
 

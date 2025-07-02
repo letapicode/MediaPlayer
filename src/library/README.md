@@ -114,7 +114,8 @@ See [docs/building.md](../../docs/building.md) for full details, including how t
 
 Several example tests under `tests/` exercise the library:
 
-- `library_playlist_test.cpp` – playlist management
+- `library_playlist_test.cpp` – playlist management and persistence
+- `library_autoplaylist_test.cpp` – automatic "recent" and "popular" lists
 - `library_db_update_test.cpp` – adding, updating and removing entries
 - `library_playback_update_test.cpp` – recording play counts
 - `library_rating_test.cpp` – rating values
