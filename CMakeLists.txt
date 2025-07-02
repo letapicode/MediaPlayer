@@ -28,6 +28,9 @@ add_subdirectory(src/format_conversion)
 
 add_subdirectory(src/desktop)
 
+# Sync module for cross-device playback position sharing
+add_subdirectory(src/sync)
+
 # Optionally add other modules later
 add_subdirectory(src/visualization)
 
