@@ -51,6 +51,11 @@ existing files automatically.
 
 Other helpers allow updating or removing entries, setting ratings and retrieving the items of a playlist.
 
+When the core `MediaPlayer` owns a `LibraryDB` instance, it exposes wrapper
+methods like `allMedia()`, `allPlaylists()` and `playlistItems(name)`. UI layers
+can call these methods on the player to query the library without directly
+accessing the database.
+
 `LibraryDB` is now thread-safe. All database operations lock an internal mutex,
 so methods such as `search` and playlist management can be called concurrently
 from multiple threads without corruption.

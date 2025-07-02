@@ -267,6 +267,57 @@ std::vector<MediaMetadata> LibraryDB::search(const std::string &query) {
   return results;
 }
 
+std::vector<MediaMetadata> LibraryDB::allMedia() const {
+  std::lock_guard<std::mutex> lock(m_mutex);
+  std::vector<MediaMetadata> items;
+  if (!m_db)
+    return items;
+  const char *sql =
+      "SELECT path,title,artist,album,duration,width,height FROM MediaItem ORDER BY title;";
+  sqlite3_stmt *stmt = nullptr;
+  if (sqlite3_prepare_v2(m_db, sql, -1, &stmt, nullptr) != SQLITE_OK)
+    return items;
+  while (sqlite3_step(stmt) == SQLITE_ROW) {
+    MediaMetadata m{};
+    const unsigned char *txt = sqlite3_column_text(stmt, 0);
+    if (txt)
+      m.path = reinterpret_cast<const char *>(txt);
+    txt = sqlite3_column_text(stmt, 1);
+    if (txt)
+      m.title = reinterpret_cast<const char *>(txt);
+    txt = sqlite3_column_text(stmt, 2);
+    if (txt)
+      m.artist = reinterpret_cast<const char *>(txt);
+    txt = sqlite3_column_text(stmt, 3);
+    if (txt)
+      m.album = reinterpret_cast<const char *>(txt);
+    m.duration = sqlite3_column_int(stmt, 4);
+    m.width = sqlite3_column_int(stmt, 5);
+    m.height = sqlite3_column_int(stmt, 6);
+    items.push_back(std::move(m));
+  }
+  sqlite3_finalize(stmt);
+  return items;
+}
+
+std::vector<std::string> LibraryDB::allPlaylists() const {
+  std::lock_guard<std::mutex> lock(m_mutex);
+  std::vector<std::string> names;
+  if (!m_db)
+    return names;
+  const char *sql = "SELECT name FROM Playlist ORDER BY name;";
+  sqlite3_stmt *stmt = nullptr;
+  if (sqlite3_prepare_v2(m_db, sql, -1, &stmt, nullptr) != SQLITE_OK)
+    return names;
+  while (sqlite3_step(stmt) == SQLITE_ROW) {
+    const unsigned char *txt = sqlite3_column_text(stmt, 0);
+    if (txt)
+      names.emplace_back(reinterpret_cast<const char *>(txt));
+  }
+  sqlite3_finalize(stmt);
+  return names;
+}
+
 bool LibraryDB::recordPlayback(const std::string &path) {
   std::lock_guard<std::mutex> lock(m_mutex);
   if (!m_db)

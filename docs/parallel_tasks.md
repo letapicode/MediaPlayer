@@ -69,7 +69,7 @@
 | 58 | Search Functionality | done | relevant |
 | 59 | Rating System | done | relevant |
 | 60 | Library-Core Integration | done | relevant |
-| 61 | Expose Library API to UI | open | relevant |
+| 61 | Expose Library API to UI | done | LibraryDB access via MediaPlayer |
 | 62 | Threading for DB | open | relevant |
 | 63 | Smart Playlist Evaluation | open | relevant |
 

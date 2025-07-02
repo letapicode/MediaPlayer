@@ -43,6 +43,12 @@ public:
   // string. Case-insensitive according to SQLite's LIKE operator.
   std::vector<MediaMetadata> search(const std::string &query);
 
+  // Retrieve all media entries in the library ordered by title.
+  std::vector<MediaMetadata> allMedia() const;
+
+  // Get the list of playlist names.
+  std::vector<std::string> allPlaylists() const;
+
   // Increment play count and update last played timestamp for a media item.
   bool recordPlayback(const std::string &path);
 
