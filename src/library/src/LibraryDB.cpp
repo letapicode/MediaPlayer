@@ -63,7 +63,7 @@ bool LibraryDB::initSchema() {
                     "path TEXT,"
                     "position INTEGER,"
                     "FOREIGN KEY(playlist_id) REFERENCES Playlist(id),"
-                    "FOREIGN KEY(path) REFERENCES MediaItem(path),"
+                    "FOREIGN KEY(path) REFERENCES MediaItem(path) ON DELETE CASCADE,"
                     "UNIQUE(playlist_id, path)"
                     ");";
   char *err = nullptr;
@@ -143,7 +143,6 @@ bool LibraryDB::scanDirectory(const std::string &directory) {
         updateMedia(pathStr, title, artist, album);
       }
       avformat_close_input(&ctx);
-
     }
     insertMedia(pathStr, title, artist, album, duration, width, height, 0);
   }
