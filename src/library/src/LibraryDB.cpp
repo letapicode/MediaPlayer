@@ -165,7 +165,6 @@ bool LibraryDB::scanDirectoryImpl(const std::string &directory, ProgressCallback
           }
         }
       }
-      insertMedia(pathStr, title, artist, album, duration, width, height, 0);
       avformat_close_input(&ctx);
     }
     insertMedia(pathStr, title, artist, album, duration, width, height, 0);
