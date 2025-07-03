@@ -13,12 +13,16 @@ conv.convertAudio("input.wav", "output.mp3");
 
 ## LibraryQt
 
-`LibraryQt` wraps the media library for QML. It allows running a background scan and exposes convenient methods to fetch media and playlist information.
+`LibraryQt` wraps the media library for QML. It allows running a background scan
+and exposes convenient methods to fetch media and playlist information. Queries
+can be executed synchronously or asynchronously using an internal worker thread
+so the UI remains responsive.
 
 ```
 LibraryQt lib;
 lib.setLibrary(&db);
 lib.startScan("/music");
+lib.asyncAllMedia();
 ```
 
 In QML it can be used as:

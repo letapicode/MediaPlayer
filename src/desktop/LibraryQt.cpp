@@ -9,9 +9,19 @@ LibraryQt::~LibraryQt() {
   cancelScan();
   if (m_waitThread.joinable())
     m_waitThread.join();
+  if (m_worker)
+    m_worker->stop();
 }
 
-void LibraryQt::setLibrary(LibraryDB *db) { m_db = db; }
+void LibraryQt::setLibrary(LibraryDB *db) {
+  m_db = db;
+  if (m_worker)
+    m_worker->stop();
+  if (m_db)
+    m_worker = std::make_unique<LibraryWorker>(*m_db);
+  else
+    m_worker.reset();
+}
 
 void LibraryQt::startScan(const QString &directory, bool cleanup) {
   if (!m_db)
@@ -107,4 +117,38 @@ QList<QVariantMap> LibraryQt::playlistItems(const QString &name) const {
   for (const auto &m : m_db->playlistItems(name.toStdString()))
     list.append(toMap(m));
   return list;
+}
+
+void LibraryQt::asyncAllMedia() {
+  if (!m_worker)
+    return;
+  m_worker->asyncAllMedia([this](std::vector<MediaMetadata> media) {
+    QList<QVariantMap> list;
+    for (const auto &m : media)
+      list.append(toMap(m));
+    emit mediaListReady(list);
+  });
+}
+
+void LibraryQt::asyncAllPlaylists() {
+  if (!m_worker)
+    return;
+  m_worker->asyncAllPlaylists([this](std::vector<std::string> names) {
+    QStringList list;
+    for (const auto &n : names)
+      list.append(QString::fromStdString(n));
+    emit playlistListReady(list);
+  });
+}
+
+void LibraryQt::asyncPlaylistItems(const QString &name) {
+  if (!m_worker)
+    return;
+  auto n = name.toStdString();
+  m_worker->asyncPlaylistItems(n, [this, name](std::vector<MediaMetadata> items) {
+    QList<QVariantMap> list;
+    for (const auto &m : items)
+      list.append(toMap(m));
+    emit playlistItemsReady(name, list);
+  });
 }
