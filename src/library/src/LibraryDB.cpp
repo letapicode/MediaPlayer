@@ -13,9 +13,31 @@
 
 namespace mediaplayer {
 
-LibraryDB::LibraryDB(const std::string &path) : m_path(path) {}
+LibraryDB::LibraryDB(const std::string &path) : m_path(path) {
+  m_workerThread = std::thread([this]() {
+    std::unique_lock<std::mutex> lock(m_workerMutex);
+    while (true) {
+      m_workerCv.wait(lock, [this]() { return m_workerStop || m_updateScheduled; });
+      if (m_workerStop)
+        break;
+      m_updateScheduled = false;
+      lock.unlock();
+      updateSmartPlaylists();
+      lock.lock();
+    }
+  });
+}
 
-LibraryDB::~LibraryDB() { close(); }
+LibraryDB::~LibraryDB() {
+  {
+    std::lock_guard<std::mutex> lock(m_workerMutex);
+    m_workerStop = true;
+  }
+  m_workerCv.notify_one();
+  if (m_workerThread.joinable())
+    m_workerThread.join();
+  close();
+}
 
 bool LibraryDB::open() {
   if (sqlite3_open(m_path.c_str(), &m_db) != SQLITE_OK) {
@@ -377,7 +399,7 @@ bool LibraryDB::scanFile(const std::string &path) {
   if (tagOk || ffOk)
     ok = insertMedia(path, title, artist, album, genre, duration, width, height, 0);
   if (ok)
-    updateSmartPlaylists();
+    scheduleSmartPlaylistUpdate();
   return ok;
 }
 
@@ -392,7 +414,7 @@ bool LibraryDB::addMedia(const std::string &path, const std::string &title,
     return false;
   bool ok = insertMedia(path, title, artist, album, genre, 0, 0, 0, 0);
   if (ok)
-    updateSmartPlaylists();
+    scheduleSmartPlaylistUpdate();
   return ok;
 }
 
@@ -417,7 +439,7 @@ bool LibraryDB::updateMedia(const std::string &path, const std::string &title,
     sqlite3_finalize(stmt);
   }
   if (ok)
-    updateSmartPlaylists();
+    scheduleSmartPlaylistUpdate();
   return ok;
 }
 
@@ -436,7 +458,7 @@ bool LibraryDB::removeMedia(const std::string &path) {
     sqlite3_finalize(stmt);
   }
   if (ok)
-    updateSmartPlaylists();
+    scheduleSmartPlaylistUpdate();
   return ok;
 }
 
@@ -726,7 +748,7 @@ bool LibraryDB::recordPlayback(const std::string &path) {
     sqlite3_finalize(stmt);
   }
   if (ok)
-    updateSmartPlaylists();
+    scheduleSmartPlaylistUpdate();
   return ok;
 }
 
@@ -850,7 +872,7 @@ bool LibraryDB::createSmartPlaylist(const std::string &name, const std::string &
     }
   }
   if (ok)
-    updateSmartPlaylists();
+    scheduleSmartPlaylistUpdate();
   return ok;
 }
 
@@ -881,7 +903,7 @@ bool LibraryDB::updateSmartPlaylist(const std::string &name, const std::string &
     }
   }
   if (ok)
-    updateSmartPlaylists();
+    scheduleSmartPlaylistUpdate();
   return ok;
 }
 
@@ -905,7 +927,7 @@ bool LibraryDB::deleteSmartPlaylist(const std::string &name) {
   }
   bool ok = deletePlaylist(name);
   if (ok)
-    updateSmartPlaylists();
+    scheduleSmartPlaylistUpdate();
   return ok;
 }
 
@@ -1137,7 +1159,7 @@ bool LibraryDB::setRating(const std::string &path, int rating) {
     sqlite3_finalize(stmt);
   }
   if (ok)
-    updateSmartPlaylists();
+    scheduleSmartPlaylistUpdate();
   return ok;
 }
 
@@ -1213,6 +1235,16 @@ bool LibraryDB::updateSmartPlaylists() {
   }
   sqlite3_finalize(stmt);
   return ok;
+}
+
+void LibraryDB::scheduleSmartPlaylistUpdate() {
+  {
+    std::lock_guard<std::mutex> lock(m_workerMutex);
+    if (m_updateScheduled)
+      return;
+    m_updateScheduled = true;
+  }
+  m_workerCv.notify_one();
 }
 
 } // namespace mediaplayer

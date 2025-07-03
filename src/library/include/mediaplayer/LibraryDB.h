@@ -4,6 +4,7 @@
 #include "mediaplayer/MediaMetadata.h"
 #include "mediaplayer/Playlist.h"
 #include <atomic>
+#include <condition_variable>
 #include <functional>
 #include <mutex>
 #include <sqlite3.h>
@@ -101,6 +102,9 @@ public:
   bool updateSmartPlaylists();
 
 private:
+  void scheduleSmartPlaylistUpdate();
+
+private:
   bool insertMedia(const std::string &path, const std::string &title, const std::string &artist,
                    const std::string &album, const std::string &genre, int duration = 0,
                    int width = 0, int height = 0, int rating = 0);
@@ -120,6 +124,11 @@ private:
   // as requiring the caller to lock (e.g. playlistId) expect it to be held.
   mutable std::mutex m_mutex;
   AIRecommender *m_recommender{nullptr};
+  std::thread m_workerThread;
+  std::mutex m_workerMutex;
+  std::condition_variable m_workerCv;
+  bool m_workerStop{false};
+  bool m_updateScheduled{false};
 };
 
 } // namespace mediaplayer
