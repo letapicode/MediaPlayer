@@ -36,3 +36,25 @@ LibraryQt {
     Component.onCompleted: lib.asyncAllMedia()
 }
 ```
+
+### LibraryView Example
+
+The `LibraryView.qml` file demonstrates how to call `LibraryQt.allMedia()` and display
+results in a `ListView`. Include it in your Qt Quick project after registering the
+`mediaplayer_desktop` library.
+
+```qml
+import QtQuick 2.15
+import QtQuick.Controls 2.15
+
+Item {
+    LibraryQt { id: lib }
+
+    ListView {
+        anchors.fill: parent
+        model: lib.allMedia()
+        delegate: Text { text: modelData["title"] }
+    }
+}
+```
+\nThis example relates to Task #182 in Tasks.MD.
