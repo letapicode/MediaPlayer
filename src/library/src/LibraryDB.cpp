@@ -317,7 +317,7 @@ bool LibraryDB::scanDirectoryImpl(const std::string &directory, ProgressCallback
         removeMedia(p);
     }
   }
-
+  updateSmartPlaylists();
   return true;
 }
 
@@ -326,6 +326,63 @@ std::thread LibraryDB::scanDirectoryAsync(const std::string &directory, Progress
   return std::thread([this, directory, progress, &cancelFlag, cleanup]() {
     scanDirectoryImpl(directory, progress, &cancelFlag, cleanup);
   });
+}
+
+bool LibraryDB::scanFile(const std::string &path) {
+  namespace fs = std::filesystem;
+  if (!m_db || !fs::exists(path))
+    return false;
+
+  TagLib::FileRef f(path.c_str());
+  std::string title;
+  std::string artist;
+  std::string album;
+  std::string genre;
+  bool tagOk = false;
+  if (!f.isNull()) {
+    tagOk = f.tag() || f.audioProperties();
+    if (f.tag()) {
+      title = f.tag()->title().to8Bit(true);
+      artist = f.tag()->artist().to8Bit(true);
+      album = f.tag()->album().to8Bit(true);
+      genre = f.tag()->genre().to8Bit(true);
+    }
+  }
+  if (title.empty())
+    title = fs::path(path).filename().string();
+
+  int duration = 0;
+  int width = 0;
+  int height = 0;
+  AVFormatContext *ctx = nullptr;
+  bool ffOk = false;
+  if (avformat_open_input(&ctx, path.c_str(), nullptr, nullptr) == 0) {
+    if (avformat_find_stream_info(ctx, nullptr) >= 0) {
+      ffOk = true;
+      if (ctx->duration > 0)
+        duration = static_cast<int>(ctx->duration / AV_TIME_BASE);
+      for (unsigned i = 0; i < ctx->nb_streams; ++i) {
+        AVStream *st = ctx->streams[i];
+        if (st->codecpar->codec_type == AVMEDIA_TYPE_VIDEO) {
+          width = st->codecpar->width;
+          height = st->codecpar->height;
+          break;
+        }
+      }
+    }
+    avformat_close_input(&ctx);
+  }
+
+  bool ok = false;
+  if (tagOk || ffOk)
+    ok = insertMedia(path, title, artist, album, genre, duration, width, height, 0);
+  if (ok)
+    updateSmartPlaylists();
+  return ok;
+}
+
+std::thread LibraryDB::scanFileAsync(const std::string &path) {
+  return std::thread([this, path]() { scanFile(path); });
 }
 
 bool LibraryDB::addMedia(const std::string &path, const std::string &title,

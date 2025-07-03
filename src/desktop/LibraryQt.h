@@ -4,6 +4,7 @@
 #include "mediaplayer/LibraryDB.h"
 #include "mediaplayer/LibraryScanner.h"
 #include <QObject>
+#include <atomic>
 #include <memory>
 #include <thread>
 
@@ -18,6 +19,7 @@ public:
   void setLibrary(LibraryDB *db);
 
   Q_INVOKABLE void startScan(const QString &directory, bool cleanup = true);
+  Q_INVOKABLE void scanFile(const QString &file);
   Q_INVOKABLE void cancelScan();
   Q_INVOKABLE bool scanRunning() const;
   Q_INVOKABLE int current() const;
@@ -35,6 +37,7 @@ private:
   LibraryDB *m_db{nullptr};
   std::unique_ptr<LibraryScanner> m_scanner;
   std::thread m_waitThread;
+  std::atomic<bool> m_fileScan{false};
 };
 
 } // namespace mediaplayer
