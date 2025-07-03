@@ -3,6 +3,7 @@
 
 #include "mediaplayer/LibraryDB.h"
 #include "mediaplayer/LibraryScanner.h"
+#include "mediaplayer/LibraryWorker.h"
 #include <QObject>
 #include <atomic>
 #include <memory>
@@ -29,13 +30,21 @@ public:
   Q_INVOKABLE QStringList allPlaylists() const;
   Q_INVOKABLE QList<QVariantMap> playlistItems(const QString &name) const;
 
+  Q_INVOKABLE void asyncAllMedia();
+  Q_INVOKABLE void asyncAllPlaylists();
+  Q_INVOKABLE void asyncPlaylistItems(const QString &name);
+
 signals:
   void scanProgress(int current, int total);
   void scanFinished();
+  void mediaListReady(const QList<QVariantMap> &media);
+  void playlistListReady(const QStringList &playlists);
+  void playlistItemsReady(const QString &name, const QList<QVariantMap> &items);
 
 private:
   LibraryDB *m_db{nullptr};
   std::unique_ptr<LibraryScanner> m_scanner;
+  std::unique_ptr<LibraryWorker> m_worker;
   std::thread m_waitThread;
   std::atomic<bool> m_fileScan{false};
 };
