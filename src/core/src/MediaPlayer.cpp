@@ -157,6 +157,13 @@ bool MediaPlayer::open(const std::string &path) {
   m_audioPackets.clear();
   m_videoPackets.clear();
   m_playRecorded = false;
+  {
+    std::lock_guard<std::mutex> lock(m_mutex);
+    if (m_library && !isUrl(path) && !m_library->mediaExists(path)) {
+      std::thread t = m_library->scanFileAsync(path);
+      t.detach();
+    }
+  }
   std::cout << "Opened " << path << '\n';
   return true;
 }

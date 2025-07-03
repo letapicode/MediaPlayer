@@ -1157,6 +1157,20 @@ int LibraryDB::rating(const std::string &path) const {
   return r;
 }
 
+bool LibraryDB::mediaExists(const std::string &path) const {
+  std::lock_guard<std::mutex> lock(m_mutex);
+  if (!m_db)
+    return false;
+  const char *sql = "SELECT 1 FROM MediaItem WHERE path=?1 LIMIT 1;";
+  sqlite3_stmt *stmt = nullptr;
+  if (sqlite3_prepare_v2(m_db, sql, -1, &stmt, nullptr) != SQLITE_OK)
+    return false;
+  sqlite3_bind_text(stmt, 1, path.c_str(), -1, SQLITE_TRANSIENT);
+  bool exists = sqlite3_step(stmt) == SQLITE_ROW;
+  sqlite3_finalize(stmt);
+  return exists;
+}
+
 bool LibraryDB::updateSmartPlaylists() {
   std::lock_guard<std::mutex> lock(m_mutex);
   if (!m_db)

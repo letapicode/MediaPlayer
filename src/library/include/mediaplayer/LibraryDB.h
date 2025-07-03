@@ -40,6 +40,9 @@ public:
   // terminates when the operation completes.
   std::thread scanFileAsync(const std::string &path);
 
+  // Check if a media item with the given path already exists in the database.
+  bool mediaExists(const std::string &path) const;
+
   // Insert a media entry directly. Useful for tests or manual additions.
   bool addMedia(const std::string &path, const std::string &title, const std::string &artist,
                 const std::string &album, const std::string &genre = "");
