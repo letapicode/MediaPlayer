@@ -1,6 +1,12 @@
-add_library(mediaplayer_library src/LibraryDB.cpp src/RandomAIRecommender.cpp
-            src/MoodAIRecommender.cpp src/Playlist.cpp src/LibraryScanner.cpp
-            src/LibraryWorker.cpp)
+add_library(mediaplayer_library
+  src/LibraryDB.cpp
+  src/RandomAIRecommender.cpp
+  src/MoodAIRecommender.cpp
+  src/Playlist.cpp
+  src/LibraryScanner.cpp
+  src/LibraryWorker.cpp
+  src/LibraryFacade.cpp
+)
 
     find_package(PkgConfig) pkg_check_modules(SQLITE3 REQUIRED IMPORTED_TARGET sqlite3)
         pkg_check_modules(TAGLIB REQUIRED IMPORTED_TARGET taglib)

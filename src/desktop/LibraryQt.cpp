@@ -5,78 +5,35 @@ using namespace mediaplayer;
 
 LibraryQt::LibraryQt(QObject *parent) : QObject(parent) {}
 
-LibraryQt::~LibraryQt() {
-  cancelScan();
-  if (m_waitThread.joinable())
-    m_waitThread.join();
-  if (m_worker)
-    m_worker->stop();
-}
+LibraryQt::~LibraryQt() = default;
 
 void LibraryQt::setLibrary(LibraryDB *db) {
   m_db = db;
-  if (m_worker)
-    m_worker->stop();
-  if (m_db)
-    m_worker = std::make_unique<LibraryWorker>(*m_db);
-  else
-    m_worker.reset();
+  m_facade.setLibrary(db);
 }
 
 void LibraryQt::startScan(const QString &directory, bool cleanup) {
   if (!m_db)
     return;
-  cancelScan();
-  m_scanner = std::make_unique<LibraryScanner>(*m_db);
-  m_scanner->start(
+  m_facade.startScan(
       directory.toStdString(),
       [this](size_t c, size_t t) { emit scanProgress(static_cast<int>(c), static_cast<int>(t)); },
-      cleanup);
-  m_waitThread = std::thread([this]() {
-    if (m_scanner)
-      m_scanner->wait();
-    emit scanFinished();
-  });
+      [this]() { emit scanFinished(); }, cleanup);
 }
 
 void LibraryQt::scanFile(const QString &file) {
   if (!m_db)
     return;
-  cancelScan();
-  m_fileScan.store(true);
-  m_waitThread = std::thread([this, path = file.toStdString()]() {
-    m_db->scanFile(path);
-    m_fileScan.store(false);
-    emit scanFinished();
-  });
+  m_facade.scanFile(file.toStdString(), [this]() { emit scanFinished(); });
 }
 
-void LibraryQt::cancelScan() {
-  if (m_scanner)
-    m_scanner->cancel();
-  if (m_waitThread.joinable())
-    m_waitThread.join();
-  m_scanner.reset();
-  m_fileScan.store(false);
-}
+void LibraryQt::cancelScan() { m_facade.cancelScan(); }
 
-bool LibraryQt::scanRunning() const {
-  if (m_scanner && m_scanner->isRunning())
-    return true;
-  return m_fileScan.load();
-}
+bool LibraryQt::scanRunning() const { return m_facade.scanRunning(); }
 
-int LibraryQt::current() const {
-  if (m_scanner)
-    return static_cast<int>(m_scanner->current());
-  return 0;
-}
+int LibraryQt::current() const { return static_cast<int>(m_facade.current()); }
 
-int LibraryQt::total() const {
-  if (m_scanner)
-    return static_cast<int>(m_scanner->total());
-  return 0;
-}
+int LibraryQt::total() const { return static_cast<int>(m_facade.total()); }
 
 static QVariantMap toMap(const MediaMetadata &m) {
   QVariantMap v;
@@ -120,9 +77,7 @@ QList<QVariantMap> LibraryQt::playlistItems(const QString &name) const {
 }
 
 void LibraryQt::asyncAllMedia() {
-  if (!m_worker)
-    return;
-  m_worker->asyncAllMedia([this](std::vector<MediaMetadata> media) {
+  m_facade.asyncAllMedia([this](std::vector<MediaMetadata> media) {
     QList<QVariantMap> list;
     for (const auto &m : media)
       list.append(toMap(m));
@@ -131,9 +86,7 @@ void LibraryQt::asyncAllMedia() {
 }
 
 void LibraryQt::asyncAllPlaylists() {
-  if (!m_worker)
-    return;
-  m_worker->asyncAllPlaylists([this](std::vector<std::string> names) {
+  m_facade.asyncAllPlaylists([this](std::vector<std::string> names) {
     QStringList list;
     for (const auto &n : names)
       list.append(QString::fromStdString(n));
@@ -142,10 +95,8 @@ void LibraryQt::asyncAllPlaylists() {
 }
 
 void LibraryQt::asyncPlaylistItems(const QString &name) {
-  if (!m_worker)
-    return;
   auto n = name.toStdString();
-  m_worker->asyncPlaylistItems(n, [this, name](std::vector<MediaMetadata> items) {
+  m_facade.asyncPlaylistItems(n, [this, name](std::vector<MediaMetadata> items) {
     QList<QVariantMap> list;
     for (const auto &m : items)
       list.append(toMap(m));

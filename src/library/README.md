@@ -115,6 +115,21 @@ a random subset of library items. A slightly smarter stub,
 Applications can set any recommender with `setRecommender()` and fetch
 suggestions with `recommendations()`.
 
+### LibraryFacade
+
+`LibraryFacade` wraps `LibraryWorker` to provide asynchronous access to library
+queries without depending on Qt. It exposes callbacks for operations like
+`asyncAllMedia` and `asyncPlaylistItems` and manages the worker thread
+internally.
+
+```cpp
+mediaplayer::LibraryFacade facade;
+facade.setLibrary(&db);
+facade.asyncAllMedia([](std::vector<mediaplayer::MediaMetadata> items) {
+  std::printf("%zu media files\n", items.size());
+});
+```
+
 ## Dependencies and Building
 
 `LibraryDB` relies on:

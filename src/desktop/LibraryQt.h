@@ -2,12 +2,8 @@
 #define MEDIAPLAYER_LIBRARYQT_H
 
 #include "mediaplayer/LibraryDB.h"
-#include "mediaplayer/LibraryScanner.h"
-#include "mediaplayer/LibraryWorker.h"
+#include "mediaplayer/LibraryFacade.h"
 #include <QObject>
-#include <atomic>
-#include <memory>
-#include <thread>
 
 namespace mediaplayer {
 
@@ -43,10 +39,7 @@ signals:
 
 private:
   LibraryDB *m_db{nullptr};
-  std::unique_ptr<LibraryScanner> m_scanner;
-  std::unique_ptr<LibraryWorker> m_worker;
-  std::thread m_waitThread;
-  std::atomic<bool> m_fileScan{false};
+  LibraryFacade m_facade;
 };
 
 } // namespace mediaplayer
