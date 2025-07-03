@@ -25,12 +25,20 @@ public:
   bool initSchema();
   bool scanDirectory(const std::string &directory, bool cleanup = true);
 
+  // Scan a single file and insert or update its metadata. Returns true on
+  // success. This is useful when adding an individual track from the UI.
+  bool scanFile(const std::string &path);
+
   using ProgressCallback = std::function<void(size_t current, size_t total)>;
   // Scan a directory asynchronously. Progress is reported via the callback and
   // scanning can be cancelled by setting cancelFlag to true. Callers must join
   // the returned thread before destroying the LibraryDB object.
   std::thread scanDirectoryAsync(const std::string &directory, ProgressCallback progress,
                                  std::atomic<bool> &cancelFlag, bool cleanup = true);
+
+  // Asynchronous wrapper for scanFile. The returned thread runs scanFile and
+  // terminates when the operation completes.
+  std::thread scanFileAsync(const std::string &path);
 
   // Insert a media entry directly. Useful for tests or manual additions.
   bool addMedia(const std::string &path, const std::string &title, const std::string &artist,

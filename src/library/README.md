@@ -48,8 +48,9 @@ structure. This now includes a `rating` field corresponding to the column in
 ```cpp
 mediaplayer::LibraryDB db("library.db");
 if (db.open()) {
-  db.scanDirectory("/path/to/music"); // populate from files
-  auto songs = db.search("Beatles");  // simple text search
+  db.scanDirectory("/path/to/music");   // populate from files
+  db.scanFile("/path/to/new/song.mp3"); // add a single track
+  auto songs = db.search("Beatles");    // simple text search
   db.createPlaylist("favorites");
   for (const auto &m : songs)
     db.addToPlaylist("favorites", m.path);
@@ -83,11 +84,15 @@ object fall out of scope.
 ```cpp
 mediaplayer::LibraryDB db("library.db");
 mediaplayer::LibraryScanner scanner(db);
-scanner.start("/path/to/music", [&](size_t c, size_t t) {
-  std::printf("%zu/%zu\n", c, t);
-});
+scanner.start("/path/to/music", [&](size_t c, size_t t) { std::printf("%zu/%zu\n", c, t); });
 // ... later
 scanner.wait();
+```
+For a single file you can call `scanFileAsync(path)` which internally invokes
+`scanFile` on a worker thread:
+
+```cpp
+db.scanFileAsync("/some/song.mp3").join();
 ```
 
 Call `scanner.cancel()` to stop early or `scanner.wait()` to block until the

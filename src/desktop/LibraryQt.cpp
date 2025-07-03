@@ -29,15 +29,32 @@ void LibraryQt::startScan(const QString &directory, bool cleanup) {
   });
 }
 
+void LibraryQt::scanFile(const QString &file) {
+  if (!m_db)
+    return;
+  cancelScan();
+  m_fileScan.store(true);
+  m_waitThread = std::thread([this, path = file.toStdString()]() {
+    m_db->scanFile(path);
+    m_fileScan.store(false);
+    emit scanFinished();
+  });
+}
+
 void LibraryQt::cancelScan() {
   if (m_scanner)
     m_scanner->cancel();
   if (m_waitThread.joinable())
     m_waitThread.join();
   m_scanner.reset();
+  m_fileScan.store(false);
 }
 
-bool LibraryQt::scanRunning() const { return m_scanner && m_scanner->isRunning(); }
+bool LibraryQt::scanRunning() const {
+  if (m_scanner && m_scanner->isRunning())
+    return true;
+  return m_fileScan.load();
+}
 
 int LibraryQt::current() const {
   if (m_scanner)
