@@ -80,10 +80,14 @@ bool MediaPlayer::open(const std::string &path) {
   if (m_demuxer.audioStream() >= 0) {
     if (!m_audioDecoder.open(fmtCtx, m_demuxer.audioStream())) {
       std::cerr << "Failed to open audio decoder\n";
+      m_demuxer.close();
+      m_audioDecoder = AudioDecoder();
       return false;
     }
     if (m_output && !m_output->init(m_audioDecoder.sampleRate(), m_audioDecoder.channels())) {
       std::cerr << "Failed to init audio output\n";
+      m_demuxer.close();
+      m_audioDecoder = AudioDecoder();
       return false;
     }
   }
@@ -94,10 +98,16 @@ bool MediaPlayer::open(const std::string &path) {
     if (!m_videoDecoder.open(fmtCtx, m_demuxer.videoStream())) {
 #endif
       std::cerr << "Failed to open video decoder\n";
+      m_demuxer.close();
+      m_audioDecoder = AudioDecoder();
+      m_videoDecoder = VideoDecoder();
       return false;
     }
     if (m_videoOutput && !m_videoOutput->init(m_videoDecoder.width(), m_videoDecoder.height())) {
       std::cerr << "Failed to init video output\n";
+      m_demuxer.close();
+      m_audioDecoder = AudioDecoder();
+      m_videoDecoder = VideoDecoder();
       return false;
     }
     int lines[3] = {m_videoDecoder.width(), m_videoDecoder.width() / 2, m_videoDecoder.width() / 2};

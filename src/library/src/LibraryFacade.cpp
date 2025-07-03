@@ -8,8 +8,6 @@ LibraryFacade::LibraryFacade() = default;
 
 LibraryFacade::~LibraryFacade() {
   cancelScan();
-  if (m_waitThread.joinable())
-    m_waitThread.join();
   if (m_worker)
     m_worker->stop();
 }
