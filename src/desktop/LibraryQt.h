@@ -36,6 +36,9 @@ signals:
   void mediaListReady(const QList<QVariantMap> &media);
   void playlistListReady(const QStringList &playlists);
   void playlistItemsReady(const QString &name, const QList<QVariantMap> &items);
+  void asyncAllMediaReady(const QList<QVariantMap> &media);
+  void asyncAllPlaylistsReady(const QStringList &playlists);
+  void asyncPlaylistItemsReady(const QString &name, const QList<QVariantMap> &items);
 
 private:
   LibraryDB *m_db{nullptr};

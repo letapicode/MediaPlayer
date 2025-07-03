@@ -32,5 +32,7 @@ LibraryQt {
     id: lib
     onScanProgress: console.log(current, total)
     onScanFinished: console.log("scan done")
+    onAsyncAllMediaReady: console.log("loaded", media.length, "tracks")
+    Component.onCompleted: lib.asyncAllMedia()
 }
 ```
