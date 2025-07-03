@@ -28,6 +28,9 @@ public:
   void asyncAllPlaylists(PlaylistListCallback cb);
   void asyncPlaylistItems(const std::string &name, MediaListCallback cb);
 
+  // Queue an arbitrary task on the worker thread
+  void post(std::function<void()> task);
+
   void stop();
 
 private:

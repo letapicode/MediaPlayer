@@ -82,6 +82,7 @@ void LibraryQt::asyncAllMedia() {
     for (const auto &m : media)
       list.append(toMap(m));
     emit mediaListReady(list);
+    emit asyncAllMediaReady(list);
   });
 }
 
@@ -91,6 +92,7 @@ void LibraryQt::asyncAllPlaylists() {
     for (const auto &n : names)
       list.append(QString::fromStdString(n));
     emit playlistListReady(list);
+    emit asyncAllPlaylistsReady(list);
   });
 }
 
@@ -101,5 +103,6 @@ void LibraryQt::asyncPlaylistItems(const QString &name) {
     for (const auto &m : items)
       list.append(toMap(m));
     emit playlistItemsReady(name, list);
+    emit asyncPlaylistItemsReady(name, list);
   });
 }

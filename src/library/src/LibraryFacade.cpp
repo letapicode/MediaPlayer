@@ -29,12 +29,21 @@ void LibraryFacade::startScan(const std::string &directory, ProgressCallback pro
   cancelScan();
   m_scanner = std::make_unique<LibraryScanner>(*m_db);
   m_scanner->start(directory, progress, cleanup);
-  m_waitThread = std::thread([this, done = std::move(done)]() {
-    if (m_scanner)
-      m_scanner->wait();
-    if (done)
-      done();
-  });
+  if (m_worker) {
+    m_worker->post([this, done = std::move(done)]() {
+      if (m_scanner)
+        m_scanner->wait();
+      if (done)
+        done();
+    });
+  } else {
+    m_waitThread = std::thread([this, done = std::move(done)]() {
+      if (m_scanner)
+        m_scanner->wait();
+      if (done)
+        done();
+    });
+  }
 }
 
 void LibraryFacade::scanFile(const std::string &file, std::function<void()> done) {
@@ -42,12 +51,22 @@ void LibraryFacade::scanFile(const std::string &file, std::function<void()> done
     return;
   cancelScan();
   m_fileScan.store(true);
-  m_waitThread = std::thread([this, path = file, done = std::move(done)]() {
-    m_db->scanFile(path);
-    m_fileScan.store(false);
-    if (done)
-      done();
-  });
+  if (m_worker) {
+    auto path = file;
+    m_worker->post([this, path, done = std::move(done)]() {
+      m_db->scanFile(path);
+      m_fileScan.store(false);
+      if (done)
+        done();
+    });
+  } else {
+    m_waitThread = std::thread([this, path = file, done = std::move(done)]() {
+      m_db->scanFile(path);
+      m_fileScan.store(false);
+      if (done)
+        done();
+    });
+  }
 }
 
 void LibraryFacade::cancelScan() {

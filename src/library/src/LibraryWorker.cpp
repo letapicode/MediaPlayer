@@ -47,6 +47,12 @@ void LibraryWorker::asyncPlaylistItems(const std::string &name, MediaListCallbac
   m_cv.notify_one();
 }
 
+void LibraryWorker::post(std::function<void()> task) {
+  std::lock_guard<std::mutex> lock(m_mutex);
+  m_tasks.push({std::move(task)});
+  m_cv.notify_one();
+}
+
 void LibraryWorker::threadLoop() {
   while (true) {
     Task task;
