@@ -68,6 +68,17 @@ Supported device names are `dxva2`, `d3d11va`, `videotoolbox`, `vaapi` and
 - **Linux**: VAAPI
 - **Android**: MediaCodec (via JNI)
 
+## Audio Visualization
+
+The visualization module uses the [projectM](https://github.com/projectM-visualizer/projectm)
+library to render classic MilkDrop presets in real time. `ProjectMVisualizer` wraps
+libprojectM and produces an OpenGL texture that can be displayed in the UI. Attach
+an instance with `MediaPlayer::setVisualizer()` and toggle output with
+`enableVisualization(true)`. The Qt `VisualizerQt` helper exposes the texture to
+QML and `VisualizerItem` renders it on screen. Adjust the mesh size, frame rate
+or preset directory via the `ProjectMVisualizer::Config` struct to tune performance
+on low power devices.
+
 ## Continuous Integration
 
 All pushes and pull requests are built using GitHub Actions. The workflow
