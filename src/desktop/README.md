@@ -58,3 +58,11 @@ Item {
 }
 ```
 \nThis example relates to Task #182 in Tasks.MD.
+
+## VisualizerQt
+
+`VisualizerQt` wraps `ProjectMVisualizer` for use with Qt Quick. It exposes a
+texture handle through the `texture` property so you can display the real-time
+visualization inside QML. Call `setEnabled(true)` and invoke `render()` each
+frame to update the texture. Use `nextPreset()` or `previousPreset()` to cycle
+through projectM presets.
