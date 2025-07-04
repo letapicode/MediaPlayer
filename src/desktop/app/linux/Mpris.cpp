@@ -67,8 +67,8 @@ public slots:
     else
       m_controller->play();
   }
-  void Next() {}
-  void Previous() {}
+  void Next() { m_controller->nextTrack(); }
+  void Previous() { m_controller->previousTrack(); }
   void Seek(qlonglong offset) {
     double pos = m_controller->position() + (offset / 1000000.0);
     m_controller->seek(pos);
@@ -115,7 +115,13 @@ void setupMprisIntegration(mediaplayer::MediaPlayerController *controller) {
   QObject::connect(controller, &mediaplayer::MediaPlayerController::positionChanged,
                    [controller]() {
                      if (s_playerAdaptor)
-                       emit s_playerAdaptor->positionChanged(static_cast<qlonglong>(controller->position() * 1000000.0));
+                       emit s_playerAdaptor->positionChanged(
+                           static_cast<qlonglong>(controller->position() * 1000000.0));
                    });
+  QObject::connect(
+      controller, &mediaplayer::MediaPlayerController::playbackStateChanged, [controller]() {
+        if (s_playerAdaptor)
+          emit s_playerAdaptor->playbackStatusChanged(s_playerAdaptor->playbackStatus());
+      });
 }
 #endif // Q_OS_LINUX

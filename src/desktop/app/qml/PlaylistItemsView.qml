@@ -8,7 +8,19 @@ ListView {
     model: playlistModel.playlistItems(playlistName)
     delegate: Row {
         spacing: 4
+        property int itemIndex: index
         Text { text: model.title }
         Button { text: qsTr("Remove"); onClicked: playlistModel.removeFromPlaylist(playlistName, model.path) }
+        Drag.active: drag.active
+        Drag.mimeData: { "index": itemIndex }
+    }
+    DropArea {
+        anchors.fill: parent
+        onDropped: {
+            if (drop.mimeData.hasOwnProperty("index"))
+                playlistModel.moveItem(playlistName, drop.mimeData.index, playlistItems.indexAt(drop.position.x, drop.position.y))
+            else if (drop.mimeData.hasOwnProperty("path"))
+                playlistModel.addItem(playlistName, drop.mimeData.path)
+        }
     }
 }

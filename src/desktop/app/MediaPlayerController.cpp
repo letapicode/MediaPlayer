@@ -64,6 +64,21 @@ void MediaPlayerController::setAudioDevice(const QAudioDevice &device) {
   m_player.setAudioOutput(std::move(out));
 }
 
+void MediaPlayerController::addToQueue(const QString &path) {
+  m_player.addToPlaylist(path.toStdString());
+  m_nowPlaying->refresh();
+  emit queueUpdated();
+}
+
+void MediaPlayerController::nextTrack() {
+  if (m_player.nextTrack()) {
+    m_nowPlaying->refresh();
+    emit queueUpdated();
+  }
+}
+
+void MediaPlayerController::previousTrack() { seek(position() - 10); }
+
 void MediaPlayerController::removeFromQueue(int row) {
   if (m_player.removeFromQueue(static_cast<size_t>(row))) {
     m_nowPlaying->refresh();
