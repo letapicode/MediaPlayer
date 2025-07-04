@@ -1,6 +1,9 @@
 #include "LibraryModel.h"
 #include "MediaPlayerController.h"
 #include "PlaylistModel.h"
+#ifdef Q_OS_LINUX
+#include "linux/Mpris.h"
+#endif
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
 #include <QQmlContext>
@@ -27,6 +30,9 @@ int main(int argc, char *argv[]) {
   mediaplayer::MediaPlayerController controller;
   mediaplayer::LibraryModel libraryModel;
   mediaplayer::PlaylistModel playlistModel;
+#ifdef Q_OS_LINUX
+  setupMprisIntegration(&controller);
+#endif
 
   engine.rootContext()->setContextProperty("player", &controller);
   engine.rootContext()->setContextProperty("libraryModel", &libraryModel);

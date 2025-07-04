@@ -12,6 +12,9 @@ add_executable(mediaplayer_desktop_app
 )
 
 find_package(Qt6 REQUIRED COMPONENTS Core Gui Qml Quick QuickControls2)
+if(UNIX AND NOT APPLE)
+    find_package(Qt6 REQUIRED COMPONENTS DBus)
+endif()
 if(WIN32)
     find_package(Qt6WinExtras)
 endif()
@@ -27,6 +30,9 @@ target_link_libraries(mediaplayer_desktop_app PRIVATE
     mediaplayer_core
     mediaplayer_desktop
 )
+if(TARGET Qt6::DBus)
+    target_link_libraries(mediaplayer_desktop_app PRIVATE Qt6::DBus)
+endif()
 if(TARGET Qt6::WinExtras)
     target_link_libraries(mediaplayer_desktop_app PRIVATE Qt6::WinExtras)
 endif()
