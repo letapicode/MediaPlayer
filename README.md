@@ -4,7 +4,9 @@ MediaPlayer is an open-source, cross-platform AI-enabled media player focused on
 High level design is described in [Masterplan.MD](Masterplan.MD) and a breakdown of work items is in [Tasks.MD](Tasks.MD).
 For a quick index of task IDs see [parallel_tasks.md](parallel_tasks.md).
 
-See `docs/` for additional documentation and `src/` for module code.
+See `docs/` for additional documentation and `src/` for module code. The
+new [library integration guide](docs/library_integration.md) describes how the
+SQLite library ties into the core engine and UI.
 
 ## Project Goals
 
