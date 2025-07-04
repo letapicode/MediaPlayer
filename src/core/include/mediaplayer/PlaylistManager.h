@@ -14,6 +14,7 @@ public:
   bool remove(const std::string &path);
   void clear();
   std::string next();
+  std::string previous();
   bool empty() const;
   void reset();
   void enableShuffle(bool enabled);
@@ -28,6 +29,8 @@ private:
   bool m_shuffle{false};
   std::vector<size_t> m_unusedIndices;
   std::mt19937 m_rng{std::random_device{}()};
+  std::vector<size_t> m_history;
+  size_t m_historyPos{0};
   void resetShuffle();
 };
 

@@ -77,7 +77,12 @@ void MediaPlayerController::nextTrack() {
   }
 }
 
-void MediaPlayerController::previousTrack() { seek(position() - 10); }
+void MediaPlayerController::previousTrack() {
+  if (m_player.previousTrack()) {
+    m_nowPlaying->refresh();
+    emit queueUpdated();
+  }
+}
 
 void MediaPlayerController::removeFromQueue(int row) {
   if (m_player.removeFromQueue(static_cast<size_t>(row))) {
