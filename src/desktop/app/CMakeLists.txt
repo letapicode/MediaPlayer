@@ -9,6 +9,7 @@ add_executable(mediaplayer_desktop_app
     SyncController.cpp
     AudioDevicesModel.cpp
     TranslationManager.cpp
+    SettingsManager.cpp
     VideoItem.cpp
     windows/WinIntegration.cpp
     windows/Hotkeys.cpp
@@ -60,7 +61,7 @@ target_include_directories(mediaplayer_desktop_app PRIVATE
 )
 
 file(COPY qml DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
-file(GLOB TS_FILES translations/player_*.ts)
+set(TS_FILES translations/player_en.ts translations/player_es.ts)
 qt6_add_translations(QM_FILES ${TS_FILES})
 add_custom_target(trans_qm ALL DEPENDS ${QM_FILES})
 add_dependencies(mediaplayer_desktop_app trans_qm)

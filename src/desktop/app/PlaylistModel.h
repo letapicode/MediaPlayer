@@ -8,6 +8,9 @@ namespace mediaplayer {
 
 class PlaylistModel : public QAbstractListModel {
   Q_OBJECT
+signals:
+  void playlistItemsChanged(const QString &name);
+
 public:
   enum Roles { NameRole = Qt::UserRole + 1 };
 
