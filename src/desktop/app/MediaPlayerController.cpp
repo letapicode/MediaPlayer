@@ -1,8 +1,13 @@
 #include "MediaPlayerController.h"
+#include "../VideoOutputQt.h"
 
 using namespace mediaplayer;
 
-MediaPlayerController::MediaPlayerController(QObject *parent) : QObject(parent) {}
+MediaPlayerController::MediaPlayerController(QObject *parent) : QObject(parent) {
+  auto output = std::make_unique<VideoOutputQt>();
+  m_videoOutput = output.get();
+  m_player.setVideoOutput(std::move(output));
+}
 
 void MediaPlayerController::openFile(const QString &path) {
   if (!m_player.open(path.toStdString()))

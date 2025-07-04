@@ -5,6 +5,7 @@ add_library(mediaplayer_desktop
     LibraryQt.cpp
     VisualizerQt.cpp
     VisualizerItem.cpp
+    VideoOutputQt.cpp
 )
 
 find_package(Qt6 REQUIRED COMPONENTS Core Qml Quick)

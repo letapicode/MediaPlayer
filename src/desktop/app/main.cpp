@@ -7,6 +7,10 @@
 #include <QTranslator>
 #ifdef Q_OS_MAC
 void setupMacIntegration();
+#ifdef _WIN32
+void setupWindowsIntegration();
+#include <QVariant>
+#include <QtGlobal>
 #endif
 
 int main(int argc, char *argv[]) {
@@ -32,5 +36,10 @@ int main(int argc, char *argv[]) {
   engine.load(url);
   if (engine.rootObjects().isEmpty())
     return -1;
+#ifdef _WIN32
+  app.setProperty("playerController",
+                  QVariant::fromValue<quintptr>(reinterpret_cast<quintptr>(&controller)));
+  setupWindowsIntegration();
+#endif
   return app.exec();
 }
