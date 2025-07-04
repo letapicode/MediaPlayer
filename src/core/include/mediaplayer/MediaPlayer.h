@@ -54,6 +54,9 @@ public:
   void setCallbacks(PlaybackCallbacks callbacks);
   void setLibrary(LibraryDB *db);
   void setVisualizer(std::shared_ptr<Visualizer> vis);
+  void enableVisualization(bool enable);
+  bool visualizationEnabled() const;
+  void cycleVisualizationPreset();
   void addAudioEffect(std::shared_ptr<AudioEffect> effect);
   void removeAudioEffect(std::shared_ptr<AudioEffect> effect);
   void setVolume(double volume); // 0.0 - 1.0
@@ -128,6 +131,7 @@ private:
   SubtitleDecoder m_subtitleDecoder;
   std::thread m_subtitleThread;
   std::shared_ptr<Visualizer> m_visualizer;
+  bool m_visualizationEnabled{true};
 };
 
 } // namespace mediaplayer

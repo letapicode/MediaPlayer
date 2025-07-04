@@ -6,6 +6,7 @@
 #elif defined(__linux__)
 #include "mediaplayer/AudioOutputPulse.h"
 #endif
+#include "mediaplayer/ProjectMVisualizer.h"
 #include "mediaplayer/VideoFrame.h"
 #include "mediaplayer/Visualizer.h"
 #include <algorithm>
@@ -17,6 +18,7 @@
 #include <libavformat/avformat.h>
 #include <libavutil/imgutils.h>
 #include <libavutil/time.h>
+#include <memory>
 #include <taglib/fileref.h>
 #include <taglib/tag.h>
 #include <vector>
@@ -269,6 +271,27 @@ void MediaPlayer::setVisualizer(std::shared_ptr<Visualizer> vis) {
   m_visualizer = std::move(vis);
 }
 
+void MediaPlayer::enableVisualization(bool enable) {
+  std::lock_guard<std::mutex> lock(m_mutex);
+  m_visualizationEnabled = enable;
+}
+
+bool MediaPlayer::visualizationEnabled() const {
+  std::lock_guard<std::mutex> lock(m_mutex);
+  return m_visualizationEnabled;
+}
+
+void MediaPlayer::cycleVisualizationPreset() {
+  std::shared_ptr<Visualizer> vis;
+  {
+    std::lock_guard<std::mutex> lock(m_mutex);
+    vis = m_visualizer;
+  }
+  auto pm = std::dynamic_pointer_cast<ProjectMVisualizer>(vis);
+  if (pm)
+    pm->nextPreset();
+}
+
 void MediaPlayer::addAudioEffect(std::shared_ptr<AudioEffect> effect) {
   std::lock_guard<std::mutex> lock(m_mutex);
   if (effect)
@@ -519,12 +542,14 @@ void MediaPlayer::audioLoop() {
         }
         std::vector<std::shared_ptr<AudioEffect>> effects;
         std::shared_ptr<Visualizer> vis;
+        bool visEnabled;
         {
           std::lock_guard<std::mutex> lock(m_mutex);
           effects = m_audioEffects;
           vis = m_visualizer;
+          visEnabled = m_visualizationEnabled;
         }
-        if (vis)
+        if (vis && visEnabled)
           vis->onAudioPCM(samples, sampleCount, m_audioDecoder.sampleRate(),
                           m_audioDecoder.channels());
         for (auto &effect : effects)
