@@ -3,6 +3,7 @@
 
 #include "mediaplayer/Visualizer.h"
 #include <memory>
+#include <mutex>
 #include <projectM.hpp>
 #include <string>
 
@@ -44,10 +45,12 @@ public:
 
 private:
   void init();
+  void initLocked();
 
   Config m_config;
   std::unique_ptr<projectM> m_pm;
   unsigned m_texture{0};
+  mutable std::mutex m_mutex;
 };
 
 } // namespace mediaplayer

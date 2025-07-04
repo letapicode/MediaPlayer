@@ -14,3 +14,7 @@ Additional configuration options include `presetPath`, `titleFont` and
 `menuFont` to point projectM to custom preset directories or font files. You can
 change these at runtime using `setPresetPath()` or `setFonts()` which will
 reinitialize the projectM context with the new settings.
+
+`ProjectMVisualizer` is thread-safe. All access to the internal projectM
+instance is synchronized, allowing audio callbacks and rendering code to call
+its methods from different threads.
