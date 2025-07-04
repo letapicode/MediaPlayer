@@ -6,8 +6,10 @@ Dialog {
     title: qsTr("Smart Playlist Editor")
     standardButtons: Dialog.Ok | Dialog.Cancel
     property var rules: []
+    property string playlistName: ""
     Column {
         spacing: 8
+        TextField { id: nameField; placeholderText: qsTr("Name"); text: dlg.playlistName }
         Repeater {
             model: dlg.rules
             delegate: Row {
@@ -41,6 +43,6 @@ Dialog {
             if (i > 0) query += " AND ";
             query += r.field + " " + r.op + " " + r.value;
         }
-        console.log("smart playlist", query)
+        playlistModel.createSmartPlaylist(nameField.text, query)
     }
 }

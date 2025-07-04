@@ -44,6 +44,16 @@ void PlaylistModel::createPlaylist(const QString &name) {
   endInsertRows();
 }
 
+void PlaylistModel::createSmartPlaylist(const QString &name, const QString &filter) {
+  if (!m_db)
+    return;
+  if (!m_db->createSmartPlaylist(name.toStdString(), filter.toStdString()))
+    return;
+  m_playlists.append(name);
+  beginInsertRows(QModelIndex(), m_playlists.size() - 1, m_playlists.size() - 1);
+  endInsertRows();
+}
+
 void PlaylistModel::removePlaylist(const QString &name) {
   if (!m_db)
     return;
