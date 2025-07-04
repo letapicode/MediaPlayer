@@ -3,6 +3,7 @@ set(CMAKE_AUTOMOC ON)
 add_library(mediaplayer_desktop
     FormatConverterQt.cpp
     LibraryQt.cpp
+    AudioOutputQt.cpp
     VisualizerQt.cpp
     VisualizerItem.cpp
     VideoOutputQt.cpp

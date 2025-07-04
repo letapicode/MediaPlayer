@@ -1,6 +1,8 @@
+#include "../LibraryQt.h"
 #include "LibraryModel.h"
 #include "MediaPlayerController.h"
 #include "PlaylistModel.h"
+#include "mediaplayer/LibraryDB.h"
 #ifdef Q_OS_LINUX
 #include "linux/Mpris.h"
 #endif
@@ -15,9 +17,11 @@
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
 #include <QQmlContext>
+#include <QStandardPaths>
 #include <QtQml/qqml.h>
 #ifdef Q_OS_MAC
 void setupMacIntegration();
+void connectNowPlayingInfo(mediaplayer::MediaPlayerController *controller);
 #endif
 #ifdef _WIN32
 void setupWindowsIntegration();
@@ -40,6 +44,15 @@ int main(int argc, char *argv[]) {
   mediaplayer::MediaPlayerController controller;
   mediaplayer::LibraryModel libraryModel;
   mediaplayer::PlaylistModel playlistModel;
+  mediaplayer::LibraryQt libraryQt;
+  mediaplayer::LibraryDB libraryDb(
+      QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation).toStdString() +
+      "/library.db");
+  libraryDb.open();
+  libraryModel.setLibrary(&libraryDb);
+  playlistModel.setLibrary(&libraryDb);
+  libraryQt.setLibrary(&libraryDb);
+  controller.setLibrary(&libraryDb);
   mediaplayer::AudioDevicesModel audioDevicesModel;
   mediaplayer::SyncController syncController;
   mediaplayer::TranslationManager translation;
@@ -51,6 +64,7 @@ int main(int argc, char *argv[]) {
   engine.rootContext()->setContextProperty("player", &controller);
   engine.rootContext()->setContextProperty("libraryModel", &libraryModel);
   engine.rootContext()->setContextProperty("playlistModel", &playlistModel);
+  engine.rootContext()->setContextProperty("libraryQt", &libraryQt);
   engine.rootContext()->setContextProperty("audioDevicesModel", &audioDevicesModel);
   engine.rootContext()->setContextProperty("sync", &syncController);
   engine.rootContext()->setContextProperty("translation", &translation);
@@ -65,5 +79,10 @@ int main(int argc, char *argv[]) {
                   QVariant::fromValue<quintptr>(reinterpret_cast<quintptr>(&controller)));
   setupWindowsIntegration();
 #endif
-  return app.exec();
+#ifdef Q_OS_MAC
+  connectNowPlayingInfo(&controller);
+#endif
+  int ret = app.exec();
+  libraryDb.close();
+  return ret;
 }

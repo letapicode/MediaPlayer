@@ -11,6 +11,15 @@ ApplicationWindow {
     property string errorMessage: ""
     property string currentFile: ""
 
+    Connections {
+        target: sync
+        function onSyncReceived(path, position) {
+            player.openFile(path)
+            player.seek(position)
+            win.currentFile = path
+        }
+    }
+
     MediaPlayerController {
         id: player
         onErrorOccurred: {
@@ -70,6 +79,12 @@ ApplicationWindow {
     ColumnLayout {
         anchors.fill: parent
         VideoPlayer { Layout.fillWidth: true; height: 300 }
+        RowLayout {
+            spacing: 8
+            Label { text: player.title }
+            Label { text: player.artist }
+            Label { text: player.album }
+        }
         LibraryView { Layout.fillWidth: true; Layout.fillHeight: true }
         PlaylistView { Layout.fillWidth: true; height: 100 }
         VisualizationView { Layout.fillWidth: true; height: 150 }
@@ -88,7 +103,16 @@ ApplicationWindow {
                 icon.source: "qrc:/icons/next.svg"
                 onClicked: player.seek(player.position() + 10)
             }
-            Slider { Layout.fillWidth: true; from: 0; to: 100; onMoved: player.seek(value) }
+            Label { text: Math.floor(player.position) }
+            Slider {
+                id: seekSlider
+                Layout.fillWidth: true
+                from: 0
+                to: player.duration
+                value: player.position
+                onMoved: player.seek(value)
+            }
+            Label { text: Math.floor(player.duration) }
             Slider { from: 0; to: 1; value: 1; onValueChanged: player.setVolume(value) }
         }
     }
