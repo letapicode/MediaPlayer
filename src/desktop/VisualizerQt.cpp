@@ -21,6 +21,8 @@ void VisualizerQt::render() {
 
 unsigned VisualizerQt::texture() const { return m_vis ? m_vis->texture() : 0; }
 
+int VisualizerQt::textureSize() const { return m_vis ? m_vis->textureSize() : 0; }
+
 void VisualizerQt::nextPreset() {
   if (m_vis)
     m_vis->nextPreset();

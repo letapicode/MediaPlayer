@@ -66,3 +66,16 @@ texture handle through the `texture` property so you can display the real-time
 visualization inside QML. Call `setEnabled(true)` and invoke `render()` each
 frame to update the texture. Use `nextPreset()` or `previousPreset()` to cycle
 through projectM presets.
+
+## VisualizerItem
+
+`VisualizerItem` is a `QQuickItem` that displays the texture produced by
+`VisualizerQt`. Assign a `VisualizerQt` instance via the `visualizer`
+property and set `running` to true. The item will call `render()` each
+frame and update the texture on screen.
+
+```qml
+VisualizerQt { id: vis }
+VisualizerItem { anchors.fill: parent; visualizer: vis }
+```
+

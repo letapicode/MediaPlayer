@@ -28,6 +28,7 @@ public:
   void nextPreset();
   void previousPreset();
   unsigned texture() const { return m_texture; }
+  int textureSize() const { return m_config.textureSize; }
   void setMeshSize(int x, int y);
   void setFPS(int fps);
 

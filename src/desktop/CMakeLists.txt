@@ -4,9 +4,10 @@ add_library(mediaplayer_desktop
     FormatConverterQt.cpp
     LibraryQt.cpp
     VisualizerQt.cpp
+    VisualizerItem.cpp
 )
 
-find_package(Qt6 REQUIRED COMPONENTS Core Qml)
+find_package(Qt6 REQUIRED COMPONENTS Core Qml Quick)
 
 target_include_directories(mediaplayer_desktop PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}
@@ -16,7 +17,7 @@ target_include_directories(mediaplayer_desktop PUBLIC
 )
 
 target_link_libraries(mediaplayer_desktop PUBLIC
-    Qt6::Core Qt6::Qml
+    Qt6::Core Qt6::Qml Qt6::Quick
     mediaplayer_conversion
     mediaplayer_library
     mediaplayer_visualization

@@ -22,6 +22,7 @@ public:
   Q_INVOKABLE void previousPreset();
 
   unsigned texture() const;
+  int textureSize() const;
 
 signals:
   void textureChanged();
