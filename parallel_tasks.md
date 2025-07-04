@@ -77,16 +77,16 @@
 
 | # | Task | Status | Notes |
 |-:|------|--------|-------|
-| 64 | Include projectM Library | open | relevant |
-| 65 | Initialize projectM Instance | open | relevant |
-| 66 | PCM Data Feeding | open | relevant |
-| 67 | OpenGL Context Sharing | open | relevant |
-| 68 | Render Visualization Frame | open | relevant |
-| 69 | Offscreen Rendering (Optional) | open | relevant |
-| 70 | Switch Visualization Presets | open | relevant |
-| 71 | Performance Optimization | open | relevant |
-| 72 | Expose Visualizer to UI | open | relevant |
-| 73 | Control Interface | open | relevant |
+| 64 | Include projectM Library | done | relevant |
+| 65 | Initialize projectM Instance | done | relevant |
+| 66 | PCM Data Feeding | done | relevant |
+| 67 | OpenGL Context Sharing | done | relevant |
+| 68 | Render Visualization Frame | done | relevant |
+| 69 | Offscreen Rendering (Optional) | done | relevant |
+| 70 | Switch Visualization Presets | done | relevant |
+| 71 | Performance Optimization | done | relevant |
+| 72 | Expose Visualizer to UI | done | relevant |
+| 73 | Control Interface | done | relevant |
 
 ## Desktop GUI (Qt/QML, C++) ([Tasks.MD](Tasks.MD#desktop-gui-qtqml,-c))
 

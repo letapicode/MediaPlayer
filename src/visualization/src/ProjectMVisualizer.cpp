@@ -36,8 +36,6 @@ void ProjectMVisualizer::onAudioPCM(const int16_t *samples, size_t count, int /*
     m_pm->pcm()->addPCM16Data(samples, static_cast<short>(count));
 }
 
-void ProjectMVisualizer::setGLContext(void *ctx) { m_glContext = ctx; }
-
 void ProjectMVisualizer::render() {
   if (m_pm)
     m_pm->renderFrame();

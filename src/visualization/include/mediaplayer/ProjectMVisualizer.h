@@ -23,7 +23,6 @@ public:
 
   void onAudioPCM(const int16_t *samples, size_t count, int sampleRate, int channels) override;
 
-  void setGLContext(void *ctx);
   void render();
   void nextPreset();
   void previousPreset();
@@ -37,7 +36,6 @@ private:
 
   Config m_config;
   std::unique_ptr<projectM> m_pm;
-  void *m_glContext{nullptr};
   unsigned m_texture{0};
 };
 

@@ -76,6 +76,17 @@ frame and update the texture on screen.
 
 ```qml
 VisualizerQt { id: vis }
-VisualizerItem { anchors.fill: parent; visualizer: vis }
+VisualizerItem {
+    id: canvas
+    anchors.fill: parent
+    visualizer: vis
+}
+Timer {
+    interval: 16; running: true; repeat: true
+    onTriggered: canvas.update()
+}
 ```
+
+The `VisualizerView.qml` file in this directory contains a complete example with
+buttons to switch presets.
 
