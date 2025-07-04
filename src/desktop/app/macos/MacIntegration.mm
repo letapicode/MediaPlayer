@@ -79,10 +79,15 @@ void updateNowPlayingInfo(const MediaMetadata &meta) {
 }
 
 #include "../MediaPlayerController.h"
+#include "TouchBar.h"
 
 void connectNowPlayingInfo(mediaplayer::MediaPlayerController *controller) {
   QObject::connect(controller, &mediaplayer::MediaPlayerController::currentMetadataChanged,
                    [](const mediaplayer::MediaMetadata &meta) { updateNowPlayingInfo(meta); });
 }
 
-void setupMacIntegration() { setupMediaKeyTap(); }
+void setupMacIntegration(mediaplayer::MediaPlayerController *c) {
+  setupMediaKeyTap();
+  if (c)
+    setupTouchBar(c);
+}

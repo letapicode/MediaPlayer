@@ -5,16 +5,20 @@ add_executable(mediaplayer_desktop_app
     MediaPlayerController.cpp
     LibraryModel.cpp
     PlaylistModel.cpp
+    NowPlayingModel.cpp
     SyncController.cpp
     AudioDevicesModel.cpp
     TranslationManager.cpp
     VideoItem.cpp
     windows/WinIntegration.cpp
+    windows/Hotkeys.cpp
     macos/MacIntegration.mm
+    macos/TouchBar.mm
     linux/Mpris.cpp
 )
 
 find_package(Qt6 REQUIRED COMPONENTS Core Gui Qml Quick QuickControls2 Multimedia)
+find_package(Qt6 REQUIRED COMPONENTS LinguistTools)
 if(UNIX AND NOT APPLE)
     find_package(Qt6 REQUIRED COMPONENTS DBus)
 endif()
@@ -56,4 +60,9 @@ target_include_directories(mediaplayer_desktop_app PRIVATE
 )
 
 file(COPY qml DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
-file(COPY translations DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+set(TS_FILES translations/player_en.ts translations/player_es.ts)
+qt6_add_translations(QM_FILES ${TS_FILES})
+add_custom_target(trans_qm ALL DEPENDS ${QM_FILES})
+add_dependencies(mediaplayer_desktop_app trans_qm)
+file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/translations)
+file(COPY ${QM_FILES} DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/translations)

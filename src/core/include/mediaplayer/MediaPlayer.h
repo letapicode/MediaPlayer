@@ -48,6 +48,9 @@ public:
   bool nextTrack();
   void enableShuffle(bool enabled);
   bool shuffleEnabled() const;
+  std::vector<std::string> queue() const;
+  bool removeFromQueue(size_t index);
+  bool moveQueueItem(size_t from, size_t to);
   void setAudioOutput(std::unique_ptr<AudioOutput> output);
   void setVideoOutput(std::unique_ptr<VideoOutput> output);
   void setPreferredHardwareDevice(const std::string &device);

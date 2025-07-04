@@ -458,6 +458,21 @@ bool MediaPlayer::shuffleEnabled() const {
   return m_playlist.shuffleEnabled();
 }
 
+std::vector<std::string> MediaPlayer::queue() const {
+  std::lock_guard<std::mutex> lock(m_mutex);
+  return m_playlist.items();
+}
+
+bool MediaPlayer::removeFromQueue(size_t index) {
+  std::lock_guard<std::mutex> lock(m_mutex);
+  return m_playlist.removeAt(index);
+}
+
+bool MediaPlayer::moveQueueItem(size_t from, size_t to) {
+  std::lock_guard<std::mutex> lock(m_mutex);
+  return m_playlist.moveItem(from, to);
+}
+
 bool MediaPlayer::nextTrack() {
   std::string path;
   {

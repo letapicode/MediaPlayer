@@ -2,6 +2,7 @@
 #include "../AudioOutputQt.h"
 #include "../VideoOutputQt.h"
 #include "../VisualizerQt.h"
+#include "NowPlayingModel.h"
 #include <QAudioDevice>
 #ifdef Q_OS_MAC
 void updateNowPlayingInfo(const mediaplayer::MediaMetadata &meta);
@@ -18,6 +19,7 @@ MediaPlayerController::MediaPlayerController(QObject *parent) : QObject(parent) 
   m_player.setVisualizer(vis);
   m_visualizer = new VisualizerQt(this);
   m_visualizer->setVisualizer(vis);
+  m_nowPlaying = new NowPlayingModel(&m_player, this);
   PlaybackCallbacks cb;
   cb.onPlay = [this]() { emit playbackStateChanged(); };
   cb.onPause = [this]() { emit playbackStateChanged(); };
@@ -60,6 +62,20 @@ void MediaPlayerController::setVolume(double vol) {
 void MediaPlayerController::setAudioDevice(const QAudioDevice &device) {
   auto out = std::make_unique<AudioOutputQt>(device);
   m_player.setAudioOutput(std::move(out));
+}
+
+void MediaPlayerController::removeFromQueue(int row) {
+  if (m_player.removeFromQueue(static_cast<size_t>(row))) {
+    m_nowPlaying->refresh();
+    emit queueUpdated();
+  }
+}
+
+void MediaPlayerController::moveQueueItem(int from, int to) {
+  if (m_player.moveQueueItem(static_cast<size_t>(from), static_cast<size_t>(to))) {
+    m_nowPlaying->refresh();
+    emit queueUpdated();
+  }
 }
 
 void MediaPlayerController::setLibrary(LibraryDB *db) { m_player.setLibrary(db); }

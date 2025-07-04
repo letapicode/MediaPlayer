@@ -1,4 +1,5 @@
 #include "PlaylistModel.h"
+#include "mediaplayer/Playlist.h"
 
 using namespace mediaplayer;
 
@@ -64,4 +65,46 @@ void PlaylistModel::removePlaylist(const QString &name) {
     m_playlists.removeAt(row);
     endRemoveRows();
   }
+}
+
+QList<QVariantMap> PlaylistModel::playlistItems(const QString &name) const {
+  QList<QVariantMap> list;
+  if (!m_db)
+    return list;
+  for (const auto &m : m_db->playlistItems(name.toStdString())) {
+    QVariantMap map;
+    map["path"] = QString::fromStdString(m.path);
+    map["title"] = QString::fromStdString(m.title);
+    list.append(map);
+  }
+  return list;
+}
+
+void PlaylistModel::addItem(const QString &name, const QString &path) {
+  if (!m_db)
+    return;
+  m_db->addToPlaylist(name.toStdString(), path.toStdString());
+}
+
+void PlaylistModel::moveItem(const QString &name, int from, int to) {
+  if (!m_db)
+    return;
+  auto pl = m_db->loadPlaylist(name.toStdString());
+  if (from < 0 || to < 0 || from >= static_cast<int>(pl.size()) ||
+      to >= static_cast<int>(pl.size()))
+    return;
+  auto item = pl.items()[from];
+  auto items = pl.items();
+  items.erase(items.begin() + from);
+  items.insert(items.begin() + to, item);
+  Playlist updated(name.toStdString());
+  for (const auto &p : items)
+    updated.addItem(p);
+  m_db->savePlaylist(updated);
+}
+
+void PlaylistModel::removeFromPlaylist(const QString &name, const QString &path) {
+  if (!m_db)
+    return;
+  m_db->removeFromPlaylist(name.toStdString(), path.toStdString());
 }

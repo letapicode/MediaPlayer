@@ -73,6 +73,18 @@ ApplicationWindow {
         if (event.key === Qt.Key_Space) {
             player.playing ? player.pause() : player.play();
             event.accepted = true;
+        } else if (event.key === Qt.Key_Left) {
+            player.seek(player.position - 5)
+            event.accepted = true;
+        } else if (event.key === Qt.Key_Right) {
+            player.seek(player.position + 5)
+            event.accepted = true;
+        } else if (event.key === Qt.Key_MediaNext) {
+            player.seek(player.position + 10)
+            event.accepted = true;
+        } else if (event.key === Qt.Key_MediaPrevious) {
+            player.seek(player.position - 10)
+            event.accepted = true;
         }
     }
 

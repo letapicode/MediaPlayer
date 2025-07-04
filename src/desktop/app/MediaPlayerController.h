@@ -3,6 +3,7 @@
 
 #include "../VideoOutputQt.h"
 #include "../VisualizerQt.h"
+#include "NowPlayingModel.h"
 #include "mediaplayer/LibraryDB.h"
 #include "mediaplayer/MediaMetadata.h"
 #include "mediaplayer/MediaPlayer.h"
@@ -23,6 +24,7 @@ class MediaPlayerController : public QObject {
   Q_PROPERTY(QString artist READ artist NOTIFY currentMetadataChanged)
   Q_PROPERTY(QString album READ album NOTIFY currentMetadataChanged)
   Q_PROPERTY(double duration READ duration NOTIFY currentMetadataChanged)
+  Q_PROPERTY(NowPlayingModel *nowPlaying READ nowPlaying CONSTANT)
 public:
   explicit MediaPlayerController(QObject *parent = nullptr);
 
@@ -33,6 +35,8 @@ public:
   Q_INVOKABLE void seek(double position);
   Q_INVOKABLE void setVolume(double vol);
   Q_INVOKABLE void setAudioDevice(const QAudioDevice &device);
+  Q_INVOKABLE void removeFromQueue(int row);
+  Q_INVOKABLE void moveQueueItem(int from, int to);
   void setLibrary(LibraryDB *db);
 
   bool playing() const;
@@ -42,6 +46,7 @@ public:
   QString artist() const;
   QString album() const;
   double duration() const;
+  NowPlayingModel *nowPlaying() const { return m_nowPlaying; }
 
   VideoOutputQt *videoOutput() const { return m_videoOutput; }
   VisualizerQt *visualizer() const { return m_visualizer; }
@@ -52,12 +57,14 @@ signals:
   void volumeChanged();
   void currentMetadataChanged(const MediaMetadata &meta);
   void errorOccurred(const QString &message);
+  void queueUpdated();
 
 private:
   MediaPlayer m_player;
   VideoOutputQt *m_videoOutput{nullptr};
   VisualizerQt *m_visualizer{nullptr};
   MediaMetadata m_meta;
+  NowPlayingModel *m_nowPlaying{nullptr};
 };
 
 } // namespace mediaplayer

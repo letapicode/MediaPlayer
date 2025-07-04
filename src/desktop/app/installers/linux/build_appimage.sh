@@ -14,8 +14,8 @@ mkdir -p "$DIST_DIR"
 
 # Copy built binaries and resources
 cp "${BUILD_DIR}/${APP_NAME}" "$APPIMAGE_DIR/"
-cp -r "${PROJECT_ROOT}/src/desktop/app/qml" "$APPIMAGE_DIR/" 2>/dev/null || true
-cp -r "${PROJECT_ROOT}/src/desktop/app/translations" "$APPIMAGE_DIR/" 2>/dev/null || true
+cp -r "${BUILD_DIR}/qml" "$APPIMAGE_DIR/" 2>/dev/null || true
+cp -r "${BUILD_DIR}/translations" "$APPIMAGE_DIR/" 2>/dev/null || true
 
 PACKAGE_TYPE="${1:-appimage}" # 'appimage' or 'deb'
 

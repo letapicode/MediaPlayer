@@ -20,7 +20,7 @@
 #include <QStandardPaths>
 #include <QtQml/qqml.h>
 #ifdef Q_OS_MAC
-void setupMacIntegration();
+void setupMacIntegration(mediaplayer::MediaPlayerController *controller);
 void connectNowPlayingInfo(mediaplayer::MediaPlayerController *controller);
 #endif
 #ifdef _WIN32
@@ -31,10 +31,6 @@ void setupWindowsIntegration();
 
 int main(int argc, char *argv[]) {
   QGuiApplication app(argc, argv);
-
-#ifdef Q_OS_MAC
-  setupMacIntegration();
-#endif
 
   QQmlApplicationEngine engine;
   mediaplayer::registerVideoOutputQtQmlType();
@@ -56,7 +52,11 @@ int main(int argc, char *argv[]) {
   mediaplayer::AudioDevicesModel audioDevicesModel;
   mediaplayer::SyncController syncController;
   mediaplayer::TranslationManager translation;
+  translation.switchLanguage(QLocale::system().name());
   mediaplayer::FormatConverterQt converter;
+#ifdef Q_OS_MAC
+  setupMacIntegration(&controller);
+#endif
 #ifdef Q_OS_LINUX
   setupMprisIntegration(&controller);
 #endif
@@ -69,6 +69,7 @@ int main(int argc, char *argv[]) {
   engine.rootContext()->setContextProperty("sync", &syncController);
   engine.rootContext()->setContextProperty("translation", &translation);
   engine.rootContext()->setContextProperty("formatConverter", &converter);
+  engine.rootContext()->setContextProperty("nowPlayingModel", controller.nowPlaying());
 
   const QUrl url = QUrl::fromLocalFile("qml/Main.qml");
   engine.load(url);
