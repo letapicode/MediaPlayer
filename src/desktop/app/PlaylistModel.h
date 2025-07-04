@@ -18,6 +18,7 @@ public:
   QHash<int, QByteArray> roleNames() const override;
   Q_INVOKABLE void createPlaylist(const QString &name);
   Q_INVOKABLE void removePlaylist(const QString &name);
+  Q_INVOKABLE void createSmartPlaylist(const QString &name, const QString &filter);
 
 private:
   LibraryDB *m_db{nullptr};

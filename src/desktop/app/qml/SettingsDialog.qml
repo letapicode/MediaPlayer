@@ -42,7 +42,59 @@ Dialog {
                 }
             }
         }
+        CheckBox {
+            id: visToggle
+            text: qsTr("Enable Visualization")
+            checked: true
+            onToggled: player.visualizer.setEnabled(checked)
+        }
+        Row {
+            spacing: 4
+            Button { text: qsTr("Prev Preset"); onClicked: player.visualizer.previousPreset() }
+            Button { text: qsTr("Next Preset"); onClicked: player.visualizer.nextPreset() }
+        }
+        GroupBox {
+            title: qsTr("Format Converter")
+            Column {
+                spacing: 4
+                Row {
+                    spacing: 4
+                    Button { text: qsTr("Input"); onClicked: inDialog.open() }
+                    Label { text: convInput }
+                }
+                Row {
+                    spacing: 4
+                    Button { text: qsTr("Output"); onClicked: outDialog.open() }
+                    Label { text: convOutput }
+                }
+                ComboBox { id: convType; model: [qsTr("Audio"), qsTr("Video")] }
+                Button {
+                    text: qsTr("Start")
+                    enabled: convInput !== "" && convOutput !== ""
+                    onClicked: {
+                        converting = true
+                        if (convType.currentIndex === 0)
+                            formatConverter.convertAudio(convInput, convOutput)
+                        else
+                            formatConverter.convertVideo(convInput, convOutput)
+                    }
+                }
+                ProgressBar { id: convProgress; value: 0; visible: converting }
+            }
+        }
     }
 
     property var discoveredDevices: []
+    property string convInput: ""
+    property string convOutput: ""
+    property bool converting: false
+
+    FileDialog { id: inDialog; onAccepted: convInput = file }
+    FileDialog { id: outDialog; onAccepted: convOutput = file }
+
+    Connections {
+        target: formatConverter
+        onProgressChanged: convProgress.value = progress
+        onConversionFinished: converting = false
+    }
 }

@@ -2,6 +2,7 @@
 #define MEDIAPLAYER_MEDIAPLAYERCONTROLLER_H
 
 #include "../VideoOutputQt.h"
+#include "../VisualizerQt.h"
 #include "mediaplayer/MediaPlayer.h"
 #include <QObject>
 
@@ -13,6 +14,7 @@ class MediaPlayerController : public QObject {
   Q_PROPERTY(double position READ position NOTIFY positionChanged)
   Q_PROPERTY(double volume READ volume WRITE setVolume NOTIFY volumeChanged)
   Q_PROPERTY(VideoOutputQt *videoOutput READ videoOutput CONSTANT)
+  Q_PROPERTY(VisualizerQt *visualizer READ visualizer CONSTANT)
 public:
   explicit MediaPlayerController(QObject *parent = nullptr);
 
@@ -28,6 +30,7 @@ public:
   double volume() const;
 
   VideoOutputQt *videoOutput() const { return m_videoOutput; }
+  VisualizerQt *visualizer() const { return m_visualizer; }
 
 signals:
   void playbackStateChanged();
@@ -38,6 +41,7 @@ signals:
 private:
   MediaPlayer m_player;
   VideoOutputQt *m_videoOutput{nullptr};
+  VisualizerQt *m_visualizer{nullptr};
 };
 
 } // namespace mediaplayer

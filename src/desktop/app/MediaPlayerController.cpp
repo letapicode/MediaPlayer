@@ -1,5 +1,7 @@
 #include "MediaPlayerController.h"
 #include "../VideoOutputQt.h"
+#include "../VisualizerQt.h"
+#include "mediaplayer/ProjectMVisualizer.h"
 
 using namespace mediaplayer;
 
@@ -7,6 +9,10 @@ MediaPlayerController::MediaPlayerController(QObject *parent) : QObject(parent) 
   auto output = std::make_unique<VideoOutputQt>();
   m_videoOutput = output.get();
   m_player.setVideoOutput(std::move(output));
+  auto vis = std::make_shared<ProjectMVisualizer>();
+  m_player.setVisualizer(vis);
+  m_visualizer = new VisualizerQt(this);
+  m_visualizer->setVisualizer(vis);
 }
 
 void MediaPlayerController::openFile(const QString &path) {

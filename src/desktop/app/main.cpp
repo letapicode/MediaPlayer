@@ -4,6 +4,7 @@
 #ifdef Q_OS_LINUX
 #include "linux/Mpris.h"
 #endif
+#include "../FormatConverterQt.h"
 #include "../VideoOutputQt.h"
 #include "../VisualizerItem.h"
 #include "../VisualizerQt.h"
@@ -42,6 +43,7 @@ int main(int argc, char *argv[]) {
   mediaplayer::AudioDevicesModel audioDevicesModel;
   mediaplayer::SyncController syncController;
   mediaplayer::TranslationManager translation;
+  mediaplayer::FormatConverterQt converter;
 #ifdef Q_OS_LINUX
   setupMprisIntegration(&controller);
 #endif
@@ -52,6 +54,7 @@ int main(int argc, char *argv[]) {
   engine.rootContext()->setContextProperty("audioDevicesModel", &audioDevicesModel);
   engine.rootContext()->setContextProperty("sync", &syncController);
   engine.rootContext()->setContextProperty("translation", &translation);
+  engine.rootContext()->setContextProperty("formatConverter", &converter);
 
   const QUrl url = QUrl::fromLocalFile("qml/Main.qml");
   engine.load(url);
