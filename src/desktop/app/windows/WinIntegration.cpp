@@ -1,4 +1,5 @@
 #include "../MediaPlayerController.h"
+#include "Hotkeys.h"
 #include <QGuiApplication>
 #include <QIcon>
 #include <QTimer>
@@ -60,6 +61,7 @@ void setupWindowsIntegration() {
   auto controller = reinterpret_cast<MediaPlayerController *>(prop.value<quintptr>());
 
   if (controller) {
+    initHotkeys(controller);
     QObject::connect(g_playBtn, &QWinThumbnailToolButton::clicked, controller,
                      &MediaPlayerController::play);
     QObject::connect(g_pauseBtn, &QWinThumbnailToolButton::clicked, controller,
@@ -86,5 +88,7 @@ void setupWindowsIntegration() {
       if (g_pauseBtn)
         g_pauseBtn->setVisible(playing);
     });
+    QObject::connect(QGuiApplication::instance(), &QGuiApplication::aboutToQuit,
+                     []() { cleanupHotkeys(); });
   }
 }

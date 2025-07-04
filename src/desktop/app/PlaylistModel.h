@@ -19,6 +19,10 @@ public:
   Q_INVOKABLE void createPlaylist(const QString &name);
   Q_INVOKABLE void removePlaylist(const QString &name);
   Q_INVOKABLE void createSmartPlaylist(const QString &name, const QString &filter);
+  Q_INVOKABLE QList<QVariantMap> playlistItems(const QString &name) const;
+  Q_INVOKABLE void addItem(const QString &name, const QString &path);
+  Q_INVOKABLE void moveItem(const QString &name, int from, int to);
+  Q_INVOKABLE void removeFromPlaylist(const QString &name, const QString &path);
 
 private:
   LibraryDB *m_db{nullptr};

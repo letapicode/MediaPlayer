@@ -18,6 +18,9 @@ public:
   void reset();
   void enableShuffle(bool enabled);
   bool shuffleEnabled() const;
+  const std::vector<std::string> &items() const { return m_items; }
+  bool removeAt(size_t index);
+  bool moveItem(size_t from, size_t to);
 
 private:
   std::vector<std::string> m_items;

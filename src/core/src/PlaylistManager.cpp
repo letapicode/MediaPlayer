@@ -78,6 +78,26 @@ void PlaylistManager::enableShuffle(bool enabled) {
 
 bool PlaylistManager::shuffleEnabled() const { return m_shuffle; }
 
+bool PlaylistManager::removeAt(size_t index) {
+  if (index >= m_items.size())
+    return false;
+  m_items.erase(m_items.begin() + index);
+  if (!m_shuffle && index < m_index && m_index > 0)
+    --m_index;
+  resetShuffle();
+  return true;
+}
+
+bool PlaylistManager::moveItem(size_t from, size_t to) {
+  if (from >= m_items.size() || to >= m_items.size() || from == to)
+    return false;
+  auto item = m_items[from];
+  m_items.erase(m_items.begin() + from);
+  m_items.insert(m_items.begin() + to, item);
+  resetShuffle();
+  return true;
+}
+
 void PlaylistManager::resetShuffle() {
   m_unusedIndices.clear();
   if (m_shuffle)

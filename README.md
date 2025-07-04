@@ -107,3 +107,7 @@ links via `youtube-dl`. See `src/network/README.md` for examples.
 ## Contributing
 
 Please read our [Code of Conduct](CODE_OF_CONDUCT.md) before participating.
+
+### Languages
+The desktop UI currently ships English and Spanish translations. The application
+selects the language based on your system locale at startup.

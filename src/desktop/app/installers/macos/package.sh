@@ -18,6 +18,7 @@ cp -R "$APP_BUNDLE_SRC" "$APP_BUNDLE"
 
 # Deploy Qt frameworks and QML files
 macdeployqt "$APP_BUNDLE" -qmldir="${PROJECT_ROOT}/src/desktop/app/qml" -verbose=1
+cp -R "${BUILD_DIR}/translations" "$APP_BUNDLE/Contents/MacOS/" 2>/dev/null || true
 
 # Create compressed DMG
 hdiutil create "$DIST_DIR/$DMG_NAME" -volname "MediaPlayer" -srcfolder "$APP_BUNDLE" -ov -format UDZO

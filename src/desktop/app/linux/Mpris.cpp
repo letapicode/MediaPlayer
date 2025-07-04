@@ -35,6 +35,7 @@ class MprisPlayerAdaptor : public QDBusAbstractAdaptor {
   Q_PROPERTY(QString PlaybackStatus READ playbackStatus NOTIFY playbackStatusChanged)
   Q_PROPERTY(double Volume READ volume WRITE setVolume NOTIFY volumeChanged)
   Q_PROPERTY(qlonglong Position READ position NOTIFY positionChanged)
+  Q_PROPERTY(QVariantMap Metadata READ metadata NOTIFY metadataChanged)
 
 public:
   MprisPlayerAdaptor(QObject *parent, mediaplayer::MediaPlayerController *c)
@@ -47,6 +48,13 @@ public:
   void setVolume(double v) { m_controller->setVolume(v); }
   qlonglong position() const {
     return static_cast<qlonglong>(m_controller->position() * 1000000.0);
+  }
+  QVariantMap metadata() const {
+    QVariantMap m;
+    m[QStringLiteral("xesam:title")] = m_controller->title();
+    m[QStringLiteral("xesam:artist")] = m_controller->artist();
+    m[QStringLiteral("xesam:album")] = m_controller->album();
+    return m;
   }
 
 public slots:
@@ -70,12 +78,14 @@ signals:
   void playbackStatusChanged(const QString &status);
   void volumeChanged(double volume);
   void positionChanged(qlonglong position);
+  void metadataChanged(const QVariantMap &metadata);
 
 private:
   mediaplayer::MediaPlayerController *m_controller;
 };
 
 static QObject *s_mprisObject = nullptr;
+static MprisPlayerAdaptor *s_playerAdaptor = nullptr;
 
 void setupMprisIntegration(mediaplayer::MediaPlayerController *controller) {
   QDBusConnection bus = QDBusConnection::sessionBus();
@@ -86,7 +96,7 @@ void setupMprisIntegration(mediaplayer::MediaPlayerController *controller) {
 
   s_mprisObject = new QObject();
   new MprisRootAdaptor(s_mprisObject);
-  new MprisPlayerAdaptor(s_mprisObject, controller);
+  s_playerAdaptor = new MprisPlayerAdaptor(s_mprisObject, controller);
 
   const QString service = QStringLiteral("org.mpris.MediaPlayer2.mediaplayer");
   if (!bus.registerService(service)) {
@@ -96,5 +106,16 @@ void setupMprisIntegration(mediaplayer::MediaPlayerController *controller) {
     return;
   }
   bus.registerObject("/org/mpris/MediaPlayer2", s_mprisObject, QDBusConnection::ExportAdaptors);
+
+  QObject::connect(controller, &mediaplayer::MediaPlayerController::currentMetadataChanged,
+                   [](const mediaplayer::MediaMetadata &) {
+                     if (s_playerAdaptor)
+                       emit s_playerAdaptor->metadataChanged(s_playerAdaptor->metadata());
+                   });
+  QObject::connect(controller, &mediaplayer::MediaPlayerController::positionChanged,
+                   [controller]() {
+                     if (s_playerAdaptor)
+                       emit s_playerAdaptor->positionChanged(static_cast<qlonglong>(controller->position() * 1000000.0));
+                   });
 }
 #endif // Q_OS_LINUX
