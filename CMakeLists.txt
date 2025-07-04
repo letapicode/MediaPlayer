@@ -16,6 +16,8 @@ endif()
 
 add_compile_options(${SIMD_FLAGS})
 
+find_package(Qt6 REQUIRED COMPONENTS Core Gui Qml Quick QuickControls2)
+
 add_subdirectory(src/core)
 
 add_subdirectory(src/network)
@@ -27,6 +29,7 @@ add_subdirectory(src/subtitles)
 add_subdirectory(src/format_conversion)
 
 add_subdirectory(src/desktop)
+add_subdirectory(src/desktop/app)
 
 # Sync module for cross-device playback position sharing
 add_subdirectory(src/sync)
