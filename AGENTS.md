@@ -9,6 +9,7 @@ This repository hosts the early scaffolding for a cross-platform media player wr
 - Commit logically separated changes with clear messages. Pull requests are squash-merged into `main`.
 - There is currently no automated test suite or build script. Agents do not need to run tests, but should ensure modified code compiles where applicable.
 - Binary assets such as images (`*.png`, `*.jpg`) are not stored in the repository. If a task requires them, describe the intended asset instead of adding the file so maintainers can create it manually.
+- Compiled Qt translation files (`*.qm`) are treated as binary assets and should not be committed. Generate them locally when needed and exclude them from pull requests.
 
 ## Repo Structure
 

@@ -5,182 +5,182 @@
     <name>Main</name>
     <message>
         <source>MediaPlayer</source>
-        <translation type="unfinished">Reproductor</translation>
+        <translation>Reproductor</translation>
     </message>
     <message>
         <source>Search</source>
-        <translation type="unfinished"></translation>
+        <translation>Buscar</translation>
     </message>
     <message>
         <source>Open</source>
-        <translation type="unfinished"></translation>
+        <translation>Abrir</translation>
     </message>
     <message>
         <source>Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Configuración</translation>
     </message>
     <message>
         <source>Playback Error</source>
-        <translation type="unfinished"></translation>
+        <translation>Error de reproducción</translation>
     </message>
 </context>
 <context>
     <name>MainWindow</name>
     <message>
         <source>MediaPlayer</source>
-        <translation type="vanished">Reproductor</translation>
+        <translation>Reproductor</translation>
     </message>
 </context>
 <context>
     <name>NowPlayingView</name>
     <message>
         <source>Remove</source>
-        <translation type="unfinished"></translation>
+        <translation>Eliminar</translation>
     </message>
 </context>
 <context>
     <name>PlaylistItemsView</name>
     <message>
         <source>Remove</source>
-        <translation type="unfinished"></translation>
+        <translation>Eliminar</translation>
     </message>
 </context>
 <context>
     <name>PlaylistView</name>
     <message>
         <source>New playlist</source>
-        <translation type="unfinished"></translation>
+        <translation>Nueva lista de reproducción</translation>
     </message>
     <message>
         <source>Delete</source>
-        <translation type="unfinished"></translation>
+        <translation>Eliminar</translation>
     </message>
 </context>
 <context>
     <name>QObject</name>
     <message>
         <source>Previous</source>
-        <translation type="unfinished"></translation>
+        <translation>Anterior</translation>
     </message>
     <message>
         <source>Play</source>
-        <translation type="unfinished"></translation>
+        <translation>Reproducir</translation>
     </message>
     <message>
         <source>Pause</source>
-        <translation type="unfinished"></translation>
+        <translation>Pausar</translation>
     </message>
     <message>
         <source>Next</source>
-        <translation type="unfinished"></translation>
+        <translation>Siguiente</translation>
     </message>
 </context>
 <context>
     <name>SettingsDialog</name>
     <message>
         <source>Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Configuración</translation>
     </message>
     <message>
         <source>Dark theme</source>
-        <translation type="unfinished"></translation>
+        <translation>Tema oscuro</translation>
     </message>
     <message>
         <source>Audio device</source>
-        <translation type="unfinished"></translation>
+        <translation>Dispositivo de audio</translation>
     </message>
     <message>
         <source>Refresh</source>
-        <translation type="unfinished"></translation>
+        <translation>Actualizar</translation>
     </message>
     <message>
         <source>Language</source>
-        <translation type="unfinished"></translation>
+        <translation>Idioma</translation>
     </message>
     <message>
         <source>Discover Devices</source>
-        <translation type="unfinished"></translation>
+        <translation>Buscar dispositivos</translation>
     </message>
     <message>
         <source>Send</source>
-        <translation type="unfinished"></translation>
+        <translation>Enviar</translation>
     </message>
     <message>
         <source>Scan Library</source>
-        <translation type="unfinished"></translation>
+        <translation>Escanear biblioteca</translation>
     </message>
     <message>
         <source>Enable Visualization</source>
-        <translation type="unfinished"></translation>
+        <translation>Activar visualización</translation>
     </message>
     <message>
         <source>Prev Preset</source>
-        <translation type="unfinished"></translation>
+        <translation>Preajuste anterior</translation>
     </message>
     <message>
         <source>Next Preset</source>
-        <translation type="unfinished"></translation>
+        <translation>Siguiente preajuste</translation>
     </message>
     <message>
         <source>Format Converter</source>
-        <translation type="unfinished"></translation>
+        <translation>Convertidor de formato</translation>
     </message>
     <message>
         <source>Input</source>
-        <translation type="unfinished"></translation>
+        <translation>Entrada</translation>
     </message>
     <message>
         <source>Output</source>
-        <translation type="unfinished"></translation>
+        <translation>Salida</translation>
     </message>
     <message>
         <source>Audio</source>
-        <translation type="unfinished"></translation>
+        <translation>Audio</translation>
     </message>
     <message>
         <source>Video</source>
-        <translation type="unfinished"></translation>
+        <translation>Vídeo</translation>
     </message>
     <message>
         <source>Start</source>
-        <translation type="unfinished"></translation>
+        <translation>Comenzar</translation>
     </message>
 </context>
 <context>
     <name>SmartPlaylistEditor</name>
     <message>
         <source>Smart Playlist Editor</source>
-        <translation type="unfinished"></translation>
+        <translation>Editor de listas inteligentes</translation>
     </message>
     <message>
         <source>Name</source>
-        <translation type="unfinished"></translation>
+        <translation>Nombre</translation>
     </message>
     <message>
         <source>Remove</source>
-        <translation type="unfinished"></translation>
+        <translation>Eliminar</translation>
     </message>
     <message>
         <source>Add Rule</source>
-        <translation type="unfinished"></translation>
+        <translation>Agregar regla</translation>
     </message>
 </context>
 <context>
     <name>VisualizationView</name>
     <message>
         <source>Prev</source>
-        <translation type="unfinished"></translation>
+        <translation>Anterior</translation>
     </message>
     <message>
         <source>Next</source>
-        <translation type="unfinished"></translation>
+        <translation>Siguiente</translation>
     </message>
 </context>
 <context>
     <name>mediaplayer::MediaPlayerController</name>
     <message>
         <source>Failed to open file</source>
-        <translation type="unfinished"></translation>
+        <translation>No se pudo abrir el archivo</translation>
     </message>
 </context>
 </TS>
