@@ -1,0 +1,13 @@
+<RCC>
+    <!-- Icon resources (play.png, pause.png, next.png, prev.png) should be
+         added here by developers. These placeholder entries are commented out
+         because binary assets are not stored in the repository. -->
+    <!--
+    <qresource prefix="/icons">
+        <file>resources/icons/play.png</file>
+        <file>resources/icons/pause.png</file>
+        <file>resources/icons/next.png</file>
+        <file>resources/icons/prev.png</file>
+    </qresource>
+    -->
+</RCC>

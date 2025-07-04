@@ -1,0 +1,1 @@
+This directory should contain PNG icons for playback controls: play, pause, next, and previous. Because binary files are not stored in the repository, add these images manually when building the application.
