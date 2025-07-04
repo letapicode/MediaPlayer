@@ -35,6 +35,9 @@ public:
   Q_INVOKABLE void seek(double position);
   Q_INVOKABLE void setVolume(double vol);
   Q_INVOKABLE void setAudioDevice(const QAudioDevice &device);
+  Q_INVOKABLE void addToQueue(const QString &path);
+  Q_INVOKABLE void nextTrack();
+  Q_INVOKABLE void previousTrack();
   Q_INVOKABLE void removeFromQueue(int row);
   Q_INVOKABLE void moveQueueItem(int from, int to);
   void setLibrary(LibraryDB *db);

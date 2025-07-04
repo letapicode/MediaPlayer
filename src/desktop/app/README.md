@@ -20,3 +20,5 @@ Packaging scripts are available under `installers/` for Windows (PowerShell + NS
 - Visualization and video playback widgets
 - Cross device sync prototype
 - Basic queue view via `NowPlayingView`
+
+The application loads translations based on your system locale. English and Spanish `.qm` files are included in the `translations` directory.

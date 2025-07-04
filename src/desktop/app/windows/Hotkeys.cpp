@@ -13,13 +13,16 @@ public:
     if (msg->message == WM_HOTKEY && ctrl) {
       switch (msg->wParam) {
       case 1:
-        ctrl->play();
+        if (ctrl->playing())
+          ctrl->pause();
+        else
+          ctrl->play();
         break;
       case 2:
-        ctrl->moveQueueItem(0, 0); // placeholder for next
+        ctrl->nextTrack();
         break;
       case 3:
-        ctrl->removeFromQueue(0); // placeholder for prev
+        ctrl->previousTrack();
         break;
       }
       *result = 0;
