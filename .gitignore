@@ -48,6 +48,9 @@ cmake-build-*/
 *.nib
 *.plist
 
+# Packaging output
+dist/
+
 # macOS
 .DS_Store
 
