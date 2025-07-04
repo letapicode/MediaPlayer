@@ -5,6 +5,8 @@
 #include <QQmlApplicationEngine>
 #include <QQmlContext>
 #include <QTranslator>
+#ifdef Q_OS_MAC
+void setupMacIntegration();
 #ifdef _WIN32
 void setupWindowsIntegration();
 #include <QVariant>
@@ -16,6 +18,10 @@ int main(int argc, char *argv[]) {
   QTranslator translator;
   translator.load("player_en", "translations");
   app.installTranslator(&translator);
+
+#ifdef Q_OS_MAC
+  setupMacIntegration();
+#endif
 
   QQmlApplicationEngine engine;
   mediaplayer::MediaPlayerController controller;
