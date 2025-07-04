@@ -42,11 +42,19 @@ ApplicationWindow {
         VisualizationView { Layout.fillWidth: true; height: 150 }
         RowLayout {
             Layout.fillWidth: true
-            // Icon resources are omitted in the repository. Text labels are used
-            // as placeholders. Replace with icons when available.
-            Button { text: qsTr("Prev"); onClicked: player.seek(player.position() - 10) }
-            Button { text: player.playing ? qsTr("Pause") : qsTr("Play"); onClicked: player.playing ? player.pause() : player.play() }
-            Button { text: qsTr("Next"); onClicked: player.seek(player.position() + 10) }
+            ToolButton {
+                icon.source: "qrc:/icons/prev.svg"
+                onClicked: player.seek(player.position() - 10)
+            }
+            ToolButton {
+                id: playPause
+                icon.source: player.playing ? "qrc:/icons/pause.svg" : "qrc:/icons/play.svg"
+                onClicked: player.playing ? player.pause() : player.play()
+            }
+            ToolButton {
+                icon.source: "qrc:/icons/next.svg"
+                onClicked: player.seek(player.position() + 10)
+            }
             Slider { Layout.fillWidth: true; from: 0; to: 100; onMoved: player.seek(value) }
             Slider { from: 0; to: 1; value: 1; onValueChanged: player.setVolume(value) }
         }

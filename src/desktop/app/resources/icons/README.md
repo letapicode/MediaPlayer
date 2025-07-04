@@ -1,1 +1,2 @@
-This directory should contain PNG icons for playback controls: play, pause, next, and previous. Because binary files are not stored in the repository, add these images manually when building the application.
+Open-source SVG icons for playback controls are provided here as simple placeholders.
+Replace them with your own artwork if desired.
