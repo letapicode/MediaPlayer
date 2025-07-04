@@ -7,8 +7,15 @@ ApplicationWindow {
     width: 800
     height: 600
     title: qsTr("MediaPlayer")
+    property string errorMessage: ""
 
-    MediaPlayerController { id: player }
+    MediaPlayerController {
+        id: player
+        onErrorOccurred: {
+            win.errorMessage = message
+            errorDialog.open()
+        }
+    }
     LibraryModel { id: libraryModel }
     PlaylistModel { id: playlistModel }
 
@@ -25,6 +32,16 @@ ApplicationWindow {
     }
 
     SettingsDialog { id: settings }
+
+    Dialog {
+        id: errorDialog
+        title: qsTr("Playback Error")
+        standardButtons: Dialog.Ok
+        Column {
+            spacing: 8
+            Label { text: win.errorMessage }
+        }
+    }
 
     focus: true
     Keys.onPressed: {
