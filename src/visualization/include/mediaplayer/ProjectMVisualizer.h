@@ -4,6 +4,7 @@
 #include "mediaplayer/Visualizer.h"
 #include <memory>
 #include <projectM.hpp>
+#include <string>
 
 namespace mediaplayer {
 
@@ -16,6 +17,13 @@ public:
     int meshY{24};
     int fps{60};
     int textureSize{512};
+    std::string presetPath{};
+    std::string titleFont{};
+    std::string menuFont{};
+    int smoothPresetDuration{5};
+    int presetDuration{30};
+    float beatSensitivity{0.0f};
+    bool shuffle{true};
   };
 
   explicit ProjectMVisualizer(const Config &cfg = {});
@@ -26,10 +34,13 @@ public:
   void render();
   void nextPreset();
   void previousPreset();
+  void loadPreset(const std::string &file);
   unsigned texture() const { return m_texture; }
   int textureSize() const { return m_config.textureSize; }
   void setMeshSize(int x, int y);
   void setFPS(int fps);
+  void setPresetPath(const std::string &path);
+  void setFonts(const std::string &title, const std::string &menu);
 
 private:
   void init();
