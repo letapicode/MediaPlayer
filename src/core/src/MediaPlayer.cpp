@@ -493,6 +493,21 @@ bool MediaPlayer::nextTrack() {
   return true;
 }
 
+bool MediaPlayer::previousTrack() {
+  std::string path;
+  {
+    std::lock_guard<std::mutex> lock(m_mutex);
+    path = m_playlist.previous();
+    if (path.empty())
+      return false;
+  }
+  stop();
+  if (!open(path))
+    return false;
+  play();
+  return true;
+}
+
 void MediaPlayer::demuxLoop() {
   AVPacket pkt;
   while (true) {

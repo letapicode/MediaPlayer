@@ -46,6 +46,7 @@ public:
   void addToPlaylist(const std::string &path);
   void clearPlaylist();
   bool nextTrack();
+  bool previousTrack();
   void enableShuffle(bool enabled);
   bool shuffleEnabled() const;
   std::vector<std::string> queue() const;

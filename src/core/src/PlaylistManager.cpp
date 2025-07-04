@@ -6,6 +6,8 @@ void PlaylistManager::set(const std::vector<std::string> &paths) {
   m_items = paths;
   m_index = 0;
   resetShuffle();
+  m_history.clear();
+  m_historyPos = 0;
 }
 
 void PlaylistManager::add(const std::string &path) {
@@ -43,21 +45,44 @@ void PlaylistManager::clear() {
   m_items.clear();
   m_index = 0;
   m_unusedIndices.clear();
+  m_history.clear();
+  m_historyPos = 0;
 }
 
 std::string PlaylistManager::next() {
-  if (m_shuffle) {
-    if (m_unusedIndices.empty())
-      return {};
-    std::uniform_int_distribution<size_t> dist(0, m_unusedIndices.size() - 1);
-    size_t pos = dist(m_rng);
-    size_t idx = m_unusedIndices[pos];
-    m_unusedIndices.erase(m_unusedIndices.begin() + pos);
-    return m_items[idx];
+  size_t idx = static_cast<size_t>(-1);
+  if (m_historyPos + 1 < m_history.size()) {
+    ++m_historyPos;
+    idx = m_history[m_historyPos];
+  } else {
+    if (m_shuffle) {
+      if (m_unusedIndices.empty())
+        return {};
+      std::uniform_int_distribution<size_t> dist(0, m_unusedIndices.size() - 1);
+      size_t pos = dist(m_rng);
+      idx = m_unusedIndices[pos];
+      m_unusedIndices.erase(m_unusedIndices.begin() + pos);
+    } else {
+      if (m_index >= m_items.size())
+        return {};
+      idx = m_index++;
+    }
+    m_history.push_back(idx);
+    m_historyPos = m_history.size() - 1;
   }
-  if (m_index < m_items.size())
-    return m_items[m_index++];
-  return {};
+  if (idx >= m_items.size())
+    return {};
+  return m_items[idx];
+}
+
+std::string PlaylistManager::previous() {
+  if (m_historyPos == 0 || m_history.empty())
+    return {};
+  --m_historyPos;
+  size_t idx = m_history[m_historyPos];
+  if (idx >= m_items.size())
+    return {};
+  return m_items[idx];
 }
 
 bool PlaylistManager::empty() const {
@@ -69,6 +94,8 @@ bool PlaylistManager::empty() const {
 void PlaylistManager::reset() {
   m_index = 0;
   resetShuffle();
+  m_history.clear();
+  m_historyPos = 0;
 }
 
 void PlaylistManager::enableShuffle(bool enabled) {
@@ -84,6 +111,19 @@ bool PlaylistManager::removeAt(size_t index) {
   m_items.erase(m_items.begin() + index);
   if (!m_shuffle && index < m_index && m_index > 0)
     --m_index;
+  for (auto it = m_history.begin(); it != m_history.end();) {
+    if (*it == index) {
+      size_t pos = std::distance(m_history.begin(), it);
+      it = m_history.erase(it);
+      if (pos <= m_historyPos && m_historyPos > 0)
+        --m_historyPos;
+      continue;
+    } else {
+      if (*it > index)
+        --(*it);
+    }
+    ++it;
+  }
   resetShuffle();
   return true;
 }
@@ -94,6 +134,14 @@ bool PlaylistManager::moveItem(size_t from, size_t to) {
   auto item = m_items[from];
   m_items.erase(m_items.begin() + from);
   m_items.insert(m_items.begin() + to, item);
+  for (auto &idx : m_history) {
+    if (idx == from)
+      idx = to;
+    else if (from < to && idx > from && idx <= to)
+      --idx;
+    else if (to < from && idx >= to && idx < from)
+      ++idx;
+  }
   resetShuffle();
   return true;
 }
