@@ -23,4 +23,10 @@ ListView {
                 playlistModel.addItem(playlistName, drop.mimeData.path)
         }
     }
+
+    Connections {
+        target: playlistModel
+        onPlaylistItemsChanged: if (name === playlistName)
+            playlistItems.model = playlistModel.playlistItems(name)
+    }
 }

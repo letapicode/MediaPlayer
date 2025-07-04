@@ -95,7 +95,7 @@ void MediaPlayerController::moveQueueItem(int from, int to) {
 
 void MediaPlayerController::setLibrary(LibraryDB *db) { m_player.setLibrary(db); }
 
-bool MediaPlayerController::playing() const { return m_player.position() > 0.0; }
+bool MediaPlayerController::playing() const { return m_player.isPlaying(); }
 double MediaPlayerController::position() const { return m_player.position(); }
 double MediaPlayerController::volume() const { return m_player.volume(); }
 QString MediaPlayerController::title() const { return QString::fromStdString(m_meta.title); }

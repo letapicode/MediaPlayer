@@ -84,6 +84,7 @@ void PlaylistModel::addItem(const QString &name, const QString &path) {
   if (!m_db)
     return;
   m_db->addToPlaylist(name.toStdString(), path.toStdString());
+  emit playlistItemsChanged(name);
 }
 
 void PlaylistModel::moveItem(const QString &name, int from, int to) {
@@ -101,10 +102,12 @@ void PlaylistModel::moveItem(const QString &name, int from, int to) {
   for (const auto &p : items)
     updated.addItem(p);
   m_db->savePlaylist(updated);
+  emit playlistItemsChanged(name);
 }
 
 void PlaylistModel::removeFromPlaylist(const QString &name, const QString &path) {
   if (!m_db)
     return;
   m_db->removeFromPlaylist(name.toStdString(), path.toStdString());
+  emit playlistItemsChanged(name);
 }

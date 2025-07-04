@@ -65,6 +65,19 @@ static void setupMediaKeyTap() {
   CGEventTapEnable(sEventTap, true);
 }
 
+static void cleanupMacIntegration() {
+  if (!sEventTap)
+    return;
+  CFRunLoopSourceRef source = CFMachPortCreateRunLoopSource(kCFAllocatorDefault, sEventTap, 0);
+  if (source) {
+    CFRunLoopRemoveSource(CFRunLoopGetMain(), source, kCFRunLoopCommonModes);
+    CFRelease(source);
+  }
+  CFMachPortInvalidate(sEventTap);
+  CFRelease(sEventTap);
+  sEventTap = nullptr;
+}
+
 void updateNowPlayingInfo(const MediaMetadata &meta) {
   NSMutableDictionary *info = [NSMutableDictionary dictionary];
   if (!meta.title.empty())
@@ -90,4 +103,6 @@ void setupMacIntegration(mediaplayer::MediaPlayerController *c) {
   setupMediaKeyTap();
   if (c)
     setupTouchBar(c);
+  QObject::connect(QGuiApplication::instance(), &QGuiApplication::aboutToQuit,
+                   []() { cleanupMacIntegration(); });
 }

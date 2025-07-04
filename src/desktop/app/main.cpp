@@ -11,6 +11,7 @@
 #include "../VisualizerItem.h"
 #include "../VisualizerQt.h"
 #include "AudioDevicesModel.h"
+#include "SettingsManager.h"
 #include "SyncController.h"
 #include "TranslationManager.h"
 #include "VideoItem.h"
@@ -31,6 +32,8 @@ void setupWindowsIntegration();
 
 int main(int argc, char *argv[]) {
   QGuiApplication app(argc, argv);
+
+  mediaplayer::SettingsManager settings;
 
   QQmlApplicationEngine engine;
   mediaplayer::registerVideoOutputQtQmlType();
@@ -54,6 +57,22 @@ int main(int argc, char *argv[]) {
   mediaplayer::TranslationManager translation;
   translation.switchLanguage(QLocale::system().name());
   mediaplayer::FormatConverterQt converter;
+
+  // Apply saved settings
+  QString theme = settings.theme();
+  if (!theme.isEmpty())
+    app.setProperty("theme", theme);
+  controller.setVolume(settings.volume());
+  QAudioDevice dev = audioDevicesModel.defaultDevice();
+  for (int i = 0; i < audioDevicesModel.rowCount({}); ++i) {
+    if (audioDevicesModel
+            .data(audioDevicesModel.index(i, 0), mediaplayer::AudioDevicesModel::NameRole)
+            .toString() == settings.audioDevice()) {
+      dev = audioDevicesModel.deviceAt(i);
+      break;
+    }
+  }
+  controller.setAudioDevice(dev);
 #ifdef Q_OS_MAC
   setupMacIntegration(&controller);
 #endif
@@ -68,8 +87,12 @@ int main(int argc, char *argv[]) {
   engine.rootContext()->setContextProperty("audioDevicesModel", &audioDevicesModel);
   engine.rootContext()->setContextProperty("sync", &syncController);
   engine.rootContext()->setContextProperty("translation", &translation);
+  engine.rootContext()->setContextProperty("settings", &settings);
   engine.rootContext()->setContextProperty("formatConverter", &converter);
   engine.rootContext()->setContextProperty("nowPlayingModel", controller.nowPlaying());
+
+  QObject::connect(&controller, &mediaplayer::MediaPlayerController::volumeChanged,
+                   [&settings, &controller]() { settings.setVolume(controller.volume()); });
 
   const QUrl url = QUrl::fromLocalFile("qml/Main.qml");
   engine.load(url);

@@ -325,6 +325,11 @@ double MediaPlayer::volume() const {
   return m_volume;
 }
 
+bool MediaPlayer::isPlaying() const {
+  std::lock_guard<std::mutex> lock(m_mutex);
+  return m_running && !m_paused;
+}
+
 void MediaPlayer::setNetworkBufferSize(size_t size) {
   std::lock_guard<std::mutex> lock(m_mutex);
   m_networkBufferSize = size;

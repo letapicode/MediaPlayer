@@ -64,6 +64,7 @@ public:
   void removeAudioEffect(std::shared_ptr<AudioEffect> effect);
   void setVolume(double volume); // 0.0 - 1.0
   double volume() const;
+  bool isPlaying() const;
   double position() const; // seconds
   void setNetworkBufferSize(size_t size);
   size_t networkBufferSize() const;
