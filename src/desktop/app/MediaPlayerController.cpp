@@ -1,6 +1,11 @@
 #include "MediaPlayerController.h"
+#include "../AudioOutputQt.h"
 #include "../VideoOutputQt.h"
 #include "../VisualizerQt.h"
+#include <QAudioDevice>
+#ifdef Q_OS_MAC
+void updateNowPlayingInfo(const mediaplayer::MediaMetadata &meta);
+#endif
 #include "mediaplayer/ProjectMVisualizer.h"
 
 using namespace mediaplayer;
@@ -13,6 +18,19 @@ MediaPlayerController::MediaPlayerController(QObject *parent) : QObject(parent) 
   m_player.setVisualizer(vis);
   m_visualizer = new VisualizerQt(this);
   m_visualizer->setVisualizer(vis);
+  PlaybackCallbacks cb;
+  cb.onPlay = [this]() { emit playbackStateChanged(); };
+  cb.onPause = [this]() { emit playbackStateChanged(); };
+  cb.onStop = [this]() { emit playbackStateChanged(); };
+  cb.onTrackLoaded = [this](const MediaMetadata &meta) {
+    m_meta = meta;
+    emit currentMetadataChanged(meta);
+#ifdef Q_OS_MAC
+    updateNowPlayingInfo(meta);
+#endif
+  };
+  cb.onPosition = [this](double) { emit positionChanged(); };
+  m_player.setCallbacks(cb);
 }
 
 void MediaPlayerController::openFile(const QString &path) {
@@ -39,6 +57,17 @@ void MediaPlayerController::setVolume(double vol) {
   emit volumeChanged();
 }
 
+void MediaPlayerController::setAudioDevice(const QAudioDevice &device) {
+  auto out = std::make_unique<AudioOutputQt>(device);
+  m_player.setAudioOutput(std::move(out));
+}
+
+void MediaPlayerController::setLibrary(LibraryDB *db) { m_player.setLibrary(db); }
+
 bool MediaPlayerController::playing() const { return m_player.position() > 0.0; }
 double MediaPlayerController::position() const { return m_player.position(); }
 double MediaPlayerController::volume() const { return m_player.volume(); }
+QString MediaPlayerController::title() const { return QString::fromStdString(m_meta.title); }
+QString MediaPlayerController::artist() const { return QString::fromStdString(m_meta.artist); }
+QString MediaPlayerController::album() const { return QString::fromStdString(m_meta.album); }
+double MediaPlayerController::duration() const { return m_meta.duration; }

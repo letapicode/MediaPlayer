@@ -11,6 +11,8 @@
 using mediaplayer::MediaPlayerController;
 
 static QWinTaskbarProgress *g_progress = nullptr;
+static QWinThumbnailToolButton *g_playBtn = nullptr;
+static QWinThumbnailToolButton *g_pauseBtn = nullptr;
 
 void setupWindowsIntegration() {
   if (!QtWin::isCompositionEnabled())
@@ -37,39 +39,37 @@ void setupWindowsIntegration() {
   prevBtn->setToolTip(QObject::tr("Previous"));
   prevBtn->setIcon(QIcon::fromTheme("media-skip-backward"));
 
-  auto *playBtn = new QWinThumbnailToolButton(thumbBar);
-  playBtn->setToolTip(QObject::tr("Play"));
-  playBtn->setIcon(QIcon::fromTheme("media-playback-start"));
+  g_playBtn = new QWinThumbnailToolButton(thumbBar);
+  g_playBtn->setToolTip(QObject::tr("Play"));
+  g_playBtn->setIcon(QIcon::fromTheme("media-playback-start"));
 
-  auto *pauseBtn = new QWinThumbnailToolButton(thumbBar);
-  pauseBtn->setToolTip(QObject::tr("Pause"));
-  pauseBtn->setIcon(QIcon::fromTheme("media-playback-pause"));
+  g_pauseBtn = new QWinThumbnailToolButton(thumbBar);
+  g_pauseBtn->setToolTip(QObject::tr("Pause"));
+  g_pauseBtn->setIcon(QIcon::fromTheme("media-playback-pause"));
 
   auto *nextBtn = new QWinThumbnailToolButton(thumbBar);
   nextBtn->setToolTip(QObject::tr("Next"));
   nextBtn->setIcon(QIcon::fromTheme("media-skip-forward"));
 
   thumbBar->addButton(prevBtn);
-  thumbBar->addButton(playBtn);
-  thumbBar->addButton(pauseBtn);
+  thumbBar->addButton(g_playBtn);
+  thumbBar->addButton(g_pauseBtn);
   thumbBar->addButton(nextBtn);
 
   auto prop = QGuiApplication::instance()->property("playerController");
   auto controller = reinterpret_cast<MediaPlayerController *>(prop.value<quintptr>());
 
   if (controller) {
-    QObject::connect(playBtn, &QWinThumbnailToolButton::clicked, controller,
+    QObject::connect(g_playBtn, &QWinThumbnailToolButton::clicked, controller,
                      &MediaPlayerController::play);
-    QObject::connect(pauseBtn, &QWinThumbnailToolButton::clicked, controller,
+    QObject::connect(g_pauseBtn, &QWinThumbnailToolButton::clicked, controller,
                      &MediaPlayerController::pause);
     QObject::connect(prevBtn, &QWinThumbnailToolButton::clicked, controller,
                      [controller]() { controller->seek(controller->position() - 10); });
     QObject::connect(nextBtn, &QWinThumbnailToolButton::clicked, controller,
                      [controller]() { controller->seek(controller->position() + 10); });
 
-    QTimer *timer = new QTimer(thumbBar);
-    timer->setInterval(1000);
-    QObject::connect(timer, &QTimer::timeout, [controller]() {
+    QObject::connect(controller, &MediaPlayerController::positionChanged, [controller]() {
       if (!g_progress)
         return;
       int value = static_cast<int>(controller->position());
@@ -79,6 +79,12 @@ void setupWindowsIntegration() {
         value = 100;
       g_progress->setValue(value);
     });
-    timer->start();
+    QObject::connect(controller, &MediaPlayerController::playbackStateChanged, [controller]() {
+      bool playing = controller->playing();
+      if (g_playBtn)
+        g_playBtn->setVisible(!playing);
+      if (g_pauseBtn)
+        g_pauseBtn->setVisible(playing);
+    });
   }
 }

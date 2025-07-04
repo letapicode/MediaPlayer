@@ -3,18 +3,22 @@
 This document describes the intended layout of the repository. Each directory is accompanied by a short explanation or placeholder.
 
 ```
-/core/           - C++ engine
-/ui/desktop/     - Qt/QML interface
-/ui/android/     - Kotlin + JNI
-/ui/ios/         - Swift components
-/tests/          - unit/integration tests
-/docs/           - planning and contribution docs
+/core/        - cross-platform playback engine
+/desktop/     - desktop Qt UI and helpers
+/android/     - Android frontend (Kotlin)
+/ios/         - iOS frontend (Swift)
+/library/     - SQLite based media library
+/network/     - networking utilities
+/sync/        - device sync service
 ```
 
-- **/core/** – Contains the cross-platform C++17 engine responsible for media decoding and playback. Implementations are yet to be added.
-- **/ui/desktop/** – Desktop user interface built with Qt and QML. This folder will hold all desktop-specific source files and resources.
-- **/ui/android/** – Android application code written in Kotlin with JNI bindings to the core engine.
-- **/ui/ios/** – iOS interface components written in Swift, linked to the core through native bindings.
-- **/tests/** – Placeholder for unit and integration tests across modules. Includes test media files and scripts.
-- **/docs/** – Documentation for planning, contribution guidelines, and design notes. This file lives here along with other docs.
+- **/core/** – Cross-platform C++17 engine with audio/video decoders, outputs and player logic already implemented.
+- **/desktop/** – Qt/QML desktop interface and platform integrations.
+- **/android/** – Android application using JNI to the core engine.
+- **/ios/** – iOS interface components in Swift tied to the core.
+- **/library/** – Database layer providing media and playlist management.
+- **/network/** – Network helpers and streaming utilities.
+- **/sync/** – Local network sync service.
+- **/tests/** – Placeholder for unit and integration tests.
+- **/docs/** – Project documentation and guides.
 

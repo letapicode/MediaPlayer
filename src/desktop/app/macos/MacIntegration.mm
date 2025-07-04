@@ -78,4 +78,11 @@ void updateNowPlayingInfo(const MediaMetadata &meta) {
   [[MPNowPlayingInfoCenter defaultCenter] setNowPlayingInfo:info];
 }
 
+#include "../MediaPlayerController.h"
+
+void connectNowPlayingInfo(mediaplayer::MediaPlayerController *controller) {
+  QObject::connect(controller, &mediaplayer::MediaPlayerController::currentMetadataChanged,
+                   [](const mediaplayer::MediaMetadata &meta) { updateNowPlayingInfo(meta); });
+}
+
 void setupMacIntegration() { setupMediaKeyTap(); }

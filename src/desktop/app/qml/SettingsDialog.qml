@@ -11,7 +11,12 @@ Dialog {
         Row {
             spacing: 4
             Label { text: qsTr("Audio device") }
-            ComboBox { id: deviceBox; model: audioDevicesModel; textRole: "name" }
+            ComboBox {
+                id: deviceBox
+                model: audioDevicesModel
+                textRole: "name"
+                onActivated: player.setAudioDevice(audioDevicesModel.deviceAt(currentIndex))
+            }
             Button { text: qsTr("Refresh"); onClicked: audioDevicesModel.refresh() }
         }
         Row {
@@ -40,6 +45,18 @@ Dialog {
                     text: qsTr("Send")
                     onClicked: sync.sendSync(address, port, win.currentFile, player.position())
                 }
+            }
+        }
+        Row {
+            spacing: 4
+            Button {
+                text: qsTr("Scan Library")
+                onClicked: scanDialog.open()
+            }
+            ProgressBar {
+                id: scanProgress
+                value: 0
+                visible: libraryQt.scanRunning()
             }
         }
         CheckBox {
@@ -89,8 +106,20 @@ Dialog {
     property string convOutput: ""
     property bool converting: false
 
+    FileDialog {
+        id: scanDialog
+        selectFolder: true
+        onAccepted: libraryQt.startScan(folder)
+    }
+
     FileDialog { id: inDialog; onAccepted: convInput = file }
     FileDialog { id: outDialog; onAccepted: convOutput = file }
+
+    Connections {
+        target: libraryQt
+        onScanProgress: scanProgress.value = total > 0 ? current / total : 0
+        onScanFinished: scanProgress.value = 1
+    }
 
     Connections {
         target: formatConverter
