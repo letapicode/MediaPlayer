@@ -4,12 +4,20 @@
 #ifdef Q_OS_LINUX
 #include "linux/Mpris.h"
 #endif
+#include "../VideoOutputQt.h"
+#include "../VisualizerItem.h"
+#include "../VisualizerQt.h"
+#include "AudioDevicesModel.h"
+#include "SyncController.h"
+#include "TranslationManager.h"
+#include "VideoItem.h"
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
 #include <QQmlContext>
-#include <QTranslator>
+#include <QtQml/qqml.h>
 #ifdef Q_OS_MAC
 void setupMacIntegration();
+#endif
 #ifdef _WIN32
 void setupWindowsIntegration();
 #include <QVariant>
@@ -18,18 +26,22 @@ void setupWindowsIntegration();
 
 int main(int argc, char *argv[]) {
   QGuiApplication app(argc, argv);
-  QTranslator translator;
-  translator.load("player_en", "translations");
-  app.installTranslator(&translator);
 
 #ifdef Q_OS_MAC
   setupMacIntegration();
 #endif
 
   QQmlApplicationEngine engine;
+  mediaplayer::registerVideoOutputQtQmlType();
+  mediaplayer::registerVisualizerQtQmlType();
+  mediaplayer::registerVisualizerItemQmlType();
+  qmlRegisterType<mediaplayer::VideoItem>("MediaPlayer", 1, 0, "VideoItem");
   mediaplayer::MediaPlayerController controller;
   mediaplayer::LibraryModel libraryModel;
   mediaplayer::PlaylistModel playlistModel;
+  mediaplayer::AudioDevicesModel audioDevicesModel;
+  mediaplayer::SyncController syncController;
+  mediaplayer::TranslationManager translation;
 #ifdef Q_OS_LINUX
   setupMprisIntegration(&controller);
 #endif
@@ -37,6 +49,9 @@ int main(int argc, char *argv[]) {
   engine.rootContext()->setContextProperty("player", &controller);
   engine.rootContext()->setContextProperty("libraryModel", &libraryModel);
   engine.rootContext()->setContextProperty("playlistModel", &playlistModel);
+  engine.rootContext()->setContextProperty("audioDevicesModel", &audioDevicesModel);
+  engine.rootContext()->setContextProperty("sync", &syncController);
+  engine.rootContext()->setContextProperty("translation", &translation);
 
   const QUrl url = QUrl::fromLocalFile("qml/Main.qml");
   engine.load(url);

@@ -1,5 +1,6 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.15
+import QtQuick.Dialogs 1.3
 
 ApplicationWindow {
     id: win
@@ -8,6 +9,7 @@ ApplicationWindow {
     height: 600
     title: qsTr("MediaPlayer")
     property string errorMessage: ""
+    property string currentFile: ""
 
     MediaPlayerController {
         id: player
@@ -15,6 +17,7 @@ ApplicationWindow {
             win.errorMessage = message
             errorDialog.open()
         }
+        onPositionChanged: sync.updateStatus(win.currentFile, position)
     }
     LibraryModel { id: libraryModel }
     PlaylistModel { id: playlistModel }
@@ -27,7 +30,20 @@ ApplicationWindow {
                 placeholderText: qsTr("Search")
                 onTextChanged: libraryModel.search(text)
             }
+            Button {
+                text: qsTr("Open")
+                onClicked: fileDialog.open()
+            }
             Button { text: qsTr("Settings"); onClicked: settings.open() }
+        }
+    }
+
+    FileDialog {
+        id: fileDialog
+        onAccepted: {
+            player.openFile(fileDialog.file)
+            win.currentFile = fileDialog.file
+            sync.updateStatus(win.currentFile, 0)
         }
     }
 
