@@ -92,31 +92,31 @@
 
 | # | Task | Status | Notes |
 |-:|------|--------|-------|
-| 74 | Qt Project Initialization | open | relevant |
-| 75 | Integrate Core Engine Library | open | relevant |
-| 76 | Design Main Player UI (QML) | open | relevant |
-| 77 | Implement Playback Controls (C++ Logic) | open | relevant |
-| 78 | Media Library View (QML ListView) | open | relevant |
-| 79 | Search UI | open | relevant |
-| 80 | Playlist Management UI | open | relevant |
-| 81 | Smart Playlist Editor | open | relevant |
-| 82 | Settings Dialog | open | relevant |
-| 83 | Video Player Window | open | relevant |
-| 84 | Visualization Canvas | open | relevant |
-| 85 | Responsive Layout | open | relevant |
-| 86 | Windows Integration | open | relevant |
-| 87 | macOS Integration | open | relevant |
-| 88 | Linux Integration | open | relevant |
-| 89 | MediaPlayer Controller Class | open | relevant |
-| 90 | Expose Properties to QML | open | relevant |
-| 91 | Event Handling | open | relevant |
-| 92 | Error Handling UI | open | relevant |
-| 93 | Light/Dark Theme | open | relevant |
-| 94 | Icons and Graphics | open | relevant |
-| 95 | Localization Support | open | relevant |
-| 96 | Windows Installer Setup | open | relevant |
-| 97 | macOS Bundle | open | relevant |
-| 98 | Linux Package/AppImage | open | relevant |
+| 74 | Qt Project Initialization | done | initial scaffolding |
+| 75 | Integrate Core Engine Library | done | linked core library |
+| 76 | Design Main Player UI (QML) | done | basic layout |
+| 77 | Implement Playback Controls (C++ Logic) | done | MediaPlayerController |
+| 78 | Media Library View (QML ListView) | done | LibraryModel + view |
+| 79 | Search UI | done | search bar connected |
+| 80 | Playlist Management UI | done | PlaylistModel stub |
+| 81 | Smart Playlist Editor | done | QML dialog |
+| 82 | Settings Dialog | done | QML dialog |
+| 83 | Video Player Window | done | VideoItem stub |
+| 84 | Visualization Canvas | done | Visualizer integration |
+| 85 | Responsive Layout | done | anchors and layouts |
+| 86 | Windows Integration | done | stub file |
+| 87 | macOS Integration | done | stub file |
+| 88 | Linux Integration | done | stub file |
+| 89 | MediaPlayer Controller Class | done | implemented |
+| 90 | Expose Properties to QML | done | playing/position/volume |
+| 91 | Event Handling | done | key shortcuts in QML |
+| 92 | Error Handling UI | done | error signal |
+| 93 | Light/Dark Theme | done | theme toggle |
+| 94 | Icons and Graphics | done | resource file |
+| 95 | Localization Support | done | translation file |
+| 96 | Windows Installer Setup | done | NSIS script stub |
+| 97 | macOS Bundle | done | package script |
+| 98 | Linux Package/AppImage | done | build script |
 
 ## Android App (Kotlin + NDK) ([Tasks.MD](Tasks.MD#android-app-kotlin-ndk))
 

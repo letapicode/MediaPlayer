@@ -8,6 +8,7 @@ This repository hosts the early scaffolding for a cross-platform media player wr
 - Tasks are enumerated in `parallel_tasks.md` and `Tasks.MD`. When adding new features or modules, reference the appropriate task.
 - Commit logically separated changes with clear messages. Pull requests are squash-merged into `main`.
 - There is currently no automated test suite or build script. Agents do not need to run tests, but should ensure modified code compiles where applicable.
+- Binary assets such as images (`*.png`, `*.jpg`) are not stored in the repository. If a task requires them, describe the intended asset instead of adding the file so maintainers can create it manually.
 
 ## Repo Structure
 
