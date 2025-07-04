@@ -5,13 +5,16 @@ add_executable(mediaplayer_desktop_app
     MediaPlayerController.cpp
     LibraryModel.cpp
     PlaylistModel.cpp
+    SyncController.cpp
+    AudioDevicesModel.cpp
+    TranslationManager.cpp
     VideoItem.cpp
     windows/WinIntegration.cpp
     macos/MacIntegration.mm
     linux/Mpris.cpp
 )
 
-find_package(Qt6 REQUIRED COMPONENTS Core Gui Qml Quick QuickControls2)
+find_package(Qt6 REQUIRED COMPONENTS Core Gui Qml Quick QuickControls2 Multimedia)
 if(UNIX AND NOT APPLE)
     find_package(Qt6 REQUIRED COMPONENTS DBus)
 endif()
@@ -25,10 +28,12 @@ target_link_libraries(mediaplayer_desktop_app PRIVATE
     Qt6::Qml
     Qt6::Quick
     Qt6::QuickControls2
+    Qt6::Multimedia
     Qt6::Gui
     Qt6::Widgets
     mediaplayer_core
     mediaplayer_desktop
+    mediaplayer_sync
 )
 if(TARGET Qt6::DBus)
     target_link_libraries(mediaplayer_desktop_app PRIVATE Qt6::DBus)
