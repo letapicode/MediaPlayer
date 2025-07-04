@@ -1,22 +1,30 @@
 #ifndef MEDIAPLAYER_VIDEOITEM_H
 #define MEDIAPLAYER_VIDEOITEM_H
 
-#include "mediaplayer/VideoOutput.h"
 #include <QQuickFramebufferObject>
 
 namespace mediaplayer {
 
+class VideoOutputQt;
 class VideoItemRenderer;
 
 class VideoItem : public QQuickFramebufferObject {
   Q_OBJECT
+  Q_PROPERTY(
+      VideoOutputQt *videoOutput READ videoOutput WRITE setVideoOutput NOTIFY videoOutputChanged)
+
 public:
-  VideoItem();
+  explicit VideoItem(QQuickItem *parent = nullptr);
   Renderer *createRenderer() const override;
-  void setVideoOutput(std::unique_ptr<VideoOutput> output);
+
+  VideoOutputQt *videoOutput() const { return m_output; }
+  void setVideoOutput(VideoOutputQt *output);
+
+signals:
+  void videoOutputChanged();
 
 private:
-  std::unique_ptr<VideoOutput> m_output;
+  VideoOutputQt *m_output{nullptr};
 };
 
 } // namespace mediaplayer
