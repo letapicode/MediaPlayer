@@ -13,7 +13,7 @@ Ensure the following packages are installed:
 - **TagLib** development headers
 - **PulseAudio** (`libpulse` and `libpulse-simple`)
 - **SQLite** development library
-- **projectM** development headers (`libprojectM-dev`) or the bundled submodule
+- **projectM** development headers (`libprojectM-dev`)
 - Optional: Qt 6, OpenGL and GLFW for the desktop UI
 
 On Ubuntu the packages can be installed with:
@@ -26,11 +26,7 @@ sudo apt-get install -y build-essential cmake git \
     libprojectM-dev
 ```
 
-If you prefer using the bundled projectM sources, initialize the submodule with:
 
-```bash
-git submodule update --init --recursive
-```
 
 ## Audio Output Backends
 

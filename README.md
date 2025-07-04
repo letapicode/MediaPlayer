@@ -26,9 +26,7 @@ A detailed breakdown of planned modules and tasks can be found in [Tasks.MD](Tas
 - Qt 6 development files
 - OpenGL headers and GLFW 3
 - SQLite3 built with FTS5 support
-- projectM development headers (`libprojectM-dev`) or initialize the projectM submodule
-
-If using the submodule, run `git submodule update --init --recursive` after cloning.
+- projectM development headers (`libprojectM-dev`)
 
 See [docs/building.md](docs/building.md) for a complete build walkthrough,
 including how to compile the sample test programs.

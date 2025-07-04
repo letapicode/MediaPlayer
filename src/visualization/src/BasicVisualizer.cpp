@@ -23,6 +23,9 @@ void BasicVisualizer::onAudioPCM(const int16_t *samples, size_t count, int /*sam
   }
 }
 
-const std::vector<float> &BasicVisualizer::spectrum() const { return m_spectrum; }
+std::vector<float> BasicVisualizer::spectrum() const {
+  std::lock_guard<std::mutex> lock(m_mutex);
+  return m_spectrum;
+}
 
 } // namespace mediaplayer

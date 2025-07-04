@@ -14,7 +14,7 @@ public:
   BasicVisualizer() = default;
   void onAudioPCM(const int16_t *samples, size_t count, int sampleRate, int channels) override;
 
-  const std::vector<float> &spectrum() const;
+  std::vector<float> spectrum() const;
 
 private:
   std::vector<float> m_spectrum;
