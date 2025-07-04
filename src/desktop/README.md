@@ -67,6 +67,10 @@ visualization inside QML. Call `setEnabled(true)` and invoke `render()` each
 frame to update the texture. Use `nextPreset()` or `previousPreset()` to cycle
 through projectM presets.
 
+`ProjectMVisualizer` now accepts paths for presets and fonts so the desktop UI
+can load custom collections. Expose these via `setPresetPath()` or
+`setFonts()` before starting rendering.
+
 ## VisualizerItem
 
 `VisualizerItem` is a `QQuickItem` that displays the texture produced by

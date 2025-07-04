@@ -9,3 +9,8 @@ to an off-screen framebuffer. The resulting texture ID can be retrieved with
 `texture()` for display in the UI. The constructor accepts a configuration where
 you can reduce `meshX`, `meshY` or `fps` to lower quality on constrained devices
 such as mobile phones.
+
+Additional configuration options include `presetPath`, `titleFont` and
+`menuFont` to point projectM to custom preset directories or font files. You can
+change these at runtime using `setPresetPath()` or `setFonts()` which will
+reinitialize the projectM context with the new settings.
