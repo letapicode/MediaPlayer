@@ -109,7 +109,7 @@ ApplicationWindow {
             Layout.fillWidth: true
             ToolButton {
                 icon.source: "qrc:/icons/prev.svg"
-                onClicked: player.seek(player.position() - 10)
+                onClicked: player.seek(player.position - 10)
             }
             ToolButton {
                 id: playPause
@@ -118,7 +118,7 @@ ApplicationWindow {
             }
             ToolButton {
                 icon.source: "qrc:/icons/next.svg"
-                onClicked: player.seek(player.position() + 10)
+                onClicked: player.seek(player.position + 10)
             }
             Label { text: Math.floor(player.position) }
             Slider {
