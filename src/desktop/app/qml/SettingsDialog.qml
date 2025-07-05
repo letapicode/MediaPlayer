@@ -76,7 +76,7 @@ Dialog {
                 Text { text: name }
                 Button {
                     text: qsTr("Send")
-                    onClicked: sync.sendSync(address, port, win.currentFile, player.position())
+                    onClicked: sync.sendSync(address, port, win.currentFile, player.position)
                 }
             }
         }
