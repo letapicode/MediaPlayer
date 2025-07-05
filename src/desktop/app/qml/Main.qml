@@ -1,6 +1,7 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Dialogs 1.3
+import "NowPlayingView.qml" as NowPlayingView
 
 ApplicationWindow {
     id: win
@@ -99,6 +100,10 @@ ApplicationWindow {
         }
         LibraryView { Layout.fillWidth: true; Layout.fillHeight: true }
         PlaylistView { Layout.fillWidth: true; height: 100 }
+        NowPlayingView {
+            Layout.fillWidth: true
+            Layout.preferredHeight: 120
+        }
         VisualizationView { Layout.fillWidth: true; height: 150 }
         RowLayout {
             Layout.fillWidth: true
