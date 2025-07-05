@@ -37,6 +37,8 @@ public:
   MediaPlayer();
   ~MediaPlayer();
 
+  static std::string version();
+
   bool open(const std::string &path);
   void play();
   void pause();

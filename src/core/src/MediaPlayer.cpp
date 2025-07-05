@@ -711,4 +711,6 @@ void MediaPlayer::subtitleLoop() {
   }
 }
 
+std::string MediaPlayer::version() { return "0.1.0"; }
+
 } // namespace mediaplayer
