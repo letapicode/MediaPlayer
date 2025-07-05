@@ -61,6 +61,11 @@ target_include_directories(mediaplayer_desktop_app PRIVATE
 )
 
 file(COPY qml DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+file(COPY
+    qml/PlaylistItemsDialog.qml
+    qml/PlaylistItemsView.qml
+    qml/SmartPlaylistEditor.qml
+    DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/qml)
 set(TS_FILES translations/player_en.ts translations/player_es.ts)
 qt6_add_translations(QM_FILES ${TS_FILES})
 add_custom_target(trans_qm ALL DEPENDS ${QM_FILES})

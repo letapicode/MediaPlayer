@@ -4,5 +4,11 @@
         <file>resources/icons/pause.svg</file>
         <file>resources/icons/next.svg</file>
         <file>resources/icons/prev.svg</file>
+</qresource>
+    <qresource prefix="/qml">
+        <file>qml/PlaylistItemsDialog.qml</file>
+        <file>qml/PlaylistItemsView.qml</file>
+        <file>qml/SmartPlaylistEditor.qml</file>
+        <file>qml/PlaylistView.qml</file>
     </qresource>
 </RCC>

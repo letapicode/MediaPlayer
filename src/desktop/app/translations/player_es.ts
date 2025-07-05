@@ -52,6 +52,14 @@
         <translation>Nueva lista de reproducción</translation>
     </message>
     <message>
+        <source>New smart playlist</source>
+        <translation>Nueva lista inteligente</translation>
+    </message>
+    <message>
+        <source>Open</source>
+        <translation>Abrir</translation>
+    </message>
+    <message>
         <source>Delete</source>
         <translation>Eliminar</translation>
     </message>

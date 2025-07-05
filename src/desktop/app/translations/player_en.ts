@@ -52,6 +52,14 @@
         <translation>New playlist</translation>
     </message>
     <message>
+        <source>New smart playlist</source>
+        <translation>New smart playlist</translation>
+    </message>
+    <message>
+        <source>Open</source>
+        <translation>Open</translation>
+    </message>
+    <message>
         <source>Delete</source>
         <translation>Delete</translation>
     </message>
