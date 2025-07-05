@@ -57,6 +57,7 @@ target_sources(mediaplayer_desktop_app PRIVATE ${mediaplayer_desktop_app_resourc
 
 target_include_directories(mediaplayer_desktop_app PRIVATE
     ${CMAKE_SOURCE_DIR}/src/core/include
+    ${CMAKE_SOURCE_DIR}/src/core
     ${CMAKE_SOURCE_DIR}/src/desktop
 )
 

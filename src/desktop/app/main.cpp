@@ -15,6 +15,8 @@
 #include "SyncController.h"
 #include "TranslationManager.h"
 #include "VideoItem.h"
+#include "mediaplayer/MediaPlayer.h"
+#include <QDebug>
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
 #include <QQmlContext>
@@ -32,6 +34,9 @@ void setupWindowsIntegration();
 
 int main(int argc, char *argv[]) {
   QGuiApplication app(argc, argv);
+
+  qInfo() << "MediaPlayer core version:"
+          << QString::fromStdString(mediaplayer::MediaPlayer::version());
 
   mediaplayer::SettingsManager settings;
 
