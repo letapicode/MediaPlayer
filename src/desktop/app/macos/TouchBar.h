@@ -9,3 +9,4 @@ class MediaPlayerController;
 @end
 
 void setupTouchBar(mediaplayer::MediaPlayerController *controller);
+void cleanupTouchBar();

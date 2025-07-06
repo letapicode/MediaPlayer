@@ -66,16 +66,18 @@ static void setupMediaKeyTap() {
 }
 
 static void cleanupMacIntegration() {
-  if (!sEventTap)
-    return;
-  CFRunLoopSourceRef source = CFMachPortCreateRunLoopSource(kCFAllocatorDefault, sEventTap, 0);
-  if (source) {
-    CFRunLoopRemoveSource(CFRunLoopGetMain(), source, kCFRunLoopCommonModes);
-    CFRelease(source);
+  if (sEventTap) {
+    CFRunLoopSourceRef source = CFMachPortCreateRunLoopSource(kCFAllocatorDefault, sEventTap, 0);
+    if (source) {
+      CFRunLoopRemoveSource(CFRunLoopGetMain(), source, kCFRunLoopCommonModes);
+      CFRelease(source);
+    }
+    CFMachPortInvalidate(sEventTap);
+    CFRelease(sEventTap);
+    sEventTap = nullptr;
   }
-  CFMachPortInvalidate(sEventTap);
-  CFRelease(sEventTap);
-  sEventTap = nullptr;
+  cleanupTouchBar();
+  cleanupMenu();
 }
 
 void updateNowPlayingInfo(const MediaMetadata &meta) {
@@ -94,6 +96,65 @@ void updateNowPlayingInfo(const MediaMetadata &meta) {
 #include "../MediaPlayerController.h"
 #include "TouchBar.h"
 
+@interface MPMenuHandler : NSObject
+- (instancetype)initWithController:(mediaplayer::MediaPlayerController *)controller;
+- (void)openFile:(id)sender;
+@end
+
+@implementation MPMenuHandler {
+  mediaplayer::MediaPlayerController *m_controller;
+}
+
+- (instancetype)initWithController:(mediaplayer::MediaPlayerController *)controller {
+  self = [super init];
+  if (self)
+    m_controller = controller;
+  return self;
+}
+
+- (void)openFile:(id)sender {
+  NSOpenPanel *panel = [NSOpenPanel openPanel];
+  if ([panel runModal] == NSModalResponseOK) {
+    NSString *path = panel.URL.path;
+    if (path)
+      m_controller->openFile(QString::fromUtf8(path.UTF8String));
+  }
+}
+@end
+
+static MPMenuHandler *s_menuHandler = nil;
+
+static void setupMenu(mediaplayer::MediaPlayerController *controller) {
+  s_menuHandler = [[MPMenuHandler alloc] initWithController:controller];
+  NSMenu *mainMenu = [[NSMenu alloc] initWithTitle:@"MainMenu"];
+
+  NSMenuItem *appItem = [[NSMenuItem alloc] init];
+  [mainMenu addItem:appItem];
+  NSMenu *appMenu = [[NSMenu alloc] initWithTitle:@"MediaPlayer"];
+  [appItem setSubmenu:appMenu];
+  [appMenu addItemWithTitle:@"About MediaPlayer"
+                     action:@selector(orderFrontStandardAboutPanel:)
+              keyEquivalent:@""];
+  [appMenu addItem:[NSMenuItem separatorItem]];
+  [appMenu addItemWithTitle:@"Quit MediaPlayer" action:@selector(terminate:) keyEquivalent:@"q"];
+
+  NSMenuItem *fileItem = [[NSMenuItem alloc] init];
+  [mainMenu addItem:fileItem];
+  NSMenu *fileMenu = [[NSMenu alloc] initWithTitle:@"File"];
+  [fileItem setSubmenu:fileMenu];
+  NSMenuItem *openItem = [[NSMenuItem alloc] initWithTitle:@"Open…"
+                                                    action:@selector(openFile:)
+                                             keyEquivalent:@"o"];
+  [openItem setTarget:s_menuHandler];
+  [fileMenu addItem:openItem];
+
+  [NSApp setMainMenu:mainMenu];
+}
+
+static void cleanupMenu() {
+  s_menuHandler = nil;
+  [NSApp setMainMenu:nil];
+}
 void connectNowPlayingInfo(mediaplayer::MediaPlayerController *controller) {
   QObject::connect(controller, &mediaplayer::MediaPlayerController::currentMetadataChanged,
                    [](const mediaplayer::MediaMetadata &meta) { updateNowPlayingInfo(meta); });
@@ -101,8 +162,10 @@ void connectNowPlayingInfo(mediaplayer::MediaPlayerController *controller) {
 
 void setupMacIntegration(mediaplayer::MediaPlayerController *c) {
   setupMediaKeyTap();
-  if (c)
+  if (c) {
+    setupMenu(c);
     setupTouchBar(c);
+  }
   QObject::connect(QGuiApplication::instance(), &QGuiApplication::aboutToQuit,
                    []() { cleanupMacIntegration(); });
 }
