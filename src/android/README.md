@@ -16,3 +16,12 @@ Run instrumented tests with `./gradlew connectedAndroidTest`.
 The binary `gradle-wrapper.jar` is not included in the repository. If the
 wrapper fails to run, install Gradle locally and execute `gradle wrapper` in
 this directory to regenerate the jar.
+
+## Native calls on background threads
+
+`MediaPlayerNative` exposes the C++ engine through JNI. Some of these calls
+perform disk or decoding work and must not run on the UI thread. Fragments
+and activities call the `open`, `play` and `listMedia` methods inside
+`lifecycleScope.launch(Dispatchers.IO)` blocks to ensure the operations are
+executed on a worker thread. Always wrap any potentially blocking native call
+with `Dispatchers.IO` when extending the app.
