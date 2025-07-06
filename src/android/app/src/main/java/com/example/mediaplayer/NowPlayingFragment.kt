@@ -1,6 +1,10 @@
 package com.example.mediaplayer
 
+import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
+import android.speech.RecognizerIntent
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.SurfaceHolder
 import android.view.SurfaceView
@@ -11,6 +15,8 @@ import android.view.ViewGroup
 import android.widget.ImageButton
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -18,6 +24,21 @@ class NowPlayingFragment : Fragment(), SurfaceHolder.Callback {
 
     private var surface: SurfaceView? = null
     private lateinit var detector: GestureDetector
+    private lateinit var voiceLauncher: ActivityResultLauncher<Intent>
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        voiceLauncher = registerForActivityResult(
+            ActivityResultContracts.StartActivityForResult()
+        ) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                val text = result.data?.getStringArrayListExtra(
+                    RecognizerIntent.EXTRA_RESULTS
+                )?.firstOrNull()
+                Log.d("VoiceControl", "Recognized: $text")
+            }
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -42,6 +63,9 @@ class NowPlayingFragment : Fragment(), SurfaceHolder.Callback {
             lifecycleScope.launch(Dispatchers.IO) {
                 MediaPlayerNative.nativePlay()
             }
+        }
+        view.findViewById<ImageButton>(R.id.voiceCommand).setOnClickListener {
+            VoiceControl.startVoiceCommand(voiceLauncher)
         }
         view.setOnTouchListener { _, event -> detector.onTouchEvent(event) }
     }
