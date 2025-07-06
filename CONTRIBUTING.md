@@ -59,6 +59,7 @@ Only work on one unclaimed task per branch. This keeps merges straightforward an
 - **Other Languages**: Use the conventions of the language (Kotlin for Android, Swift for iOS, QML/JS for Qt). Keep code consistently formatted.
 - Avoid unsafe functions and prefer modern C++ practices such as smart pointers and RAII.
 - Write unit tests where applicable. New features should include tests if the module has a test suite.
+- **Assets**: Do not commit images (`*.png`, `*.jpg`) or other binary assets. Reference the asset or describe it so maintainers can provide the file.
 
 ## 4. Branch and PR Workflow
 
