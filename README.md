@@ -1,6 +1,7 @@
 #MediaPlayer
 
 MediaPlayer is an open-source, cross-platform AI-enabled media player focused on speed and a polished user experience.
+The tasks file is named `Tasks.MD` (note capitalization) and lists all planned work items.
 High level design is described in [Masterplan.MD](Masterplan.MD) and a breakdown of work items is in [Tasks.MD](Tasks.MD).
 For a quick index of task IDs see [parallel_tasks.md](parallel_tasks.md).
 If you modify `Tasks.MD`, regenerate that table with `python tools/generate_parallel_tasks.py > parallel_tasks.tmp && mv parallel_tasks.tmp parallel_tasks.md` to preserve existing statuses.
