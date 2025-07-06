@@ -4,6 +4,7 @@
 #include "../VisualizerQt.h"
 #include "NowPlayingModel.h"
 #include <QAudioDevice>
+#include <string>
 #ifdef Q_OS_MAC
 void updateNowPlayingInfo(const mediaplayer::MediaMetadata &meta);
 #endif
@@ -32,13 +33,11 @@ MediaPlayerController::MediaPlayerController(QObject *parent) : QObject(parent) 
 #endif
   };
   cb.onPosition = [this](double) { emit positionChanged(); };
+  cb.onError = [this](const std::string &msg) { emit errorOccurred(QString::fromStdString(msg)); };
   m_player.setCallbacks(cb);
 }
 
-void MediaPlayerController::openFile(const QString &path) {
-  if (!m_player.open(path.toStdString()))
-    emit errorOccurred(tr("Failed to open file"));
-}
+void MediaPlayerController::openFile(const QString &path) { m_player.open(path.toStdString()); }
 
 void MediaPlayerController::play() {
   m_player.play();

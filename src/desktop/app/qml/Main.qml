@@ -59,14 +59,11 @@ ApplicationWindow {
 
     SettingsDialog { id: settings }
 
-    Dialog {
+    MessageDialog {
         id: errorDialog
         title: qsTr("Playback Error")
+        text: win.errorMessage
         standardButtons: Dialog.Ok
-        Column {
-            spacing: 8
-            Label { text: win.errorMessage }
-        }
     }
 
     focus: true

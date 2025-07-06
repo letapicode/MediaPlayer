@@ -2,6 +2,7 @@
 #define MEDIAPLAYER_PLAYBACKCALLBACKS_H
 
 #include <functional>
+#include <string>
 
 #include "MediaMetadata.h"
 #include "SrtParser.h"
@@ -16,6 +17,7 @@ struct PlaybackCallbacks {
   std::function<void(const MediaMetadata &)> onTrackLoaded;
   std::function<void(double)> onPosition;
   std::function<void(const SubtitleCue &)> onSubtitle;
+  std::function<void(const std::string &)> onError;
 };
 
 } // namespace mediaplayer

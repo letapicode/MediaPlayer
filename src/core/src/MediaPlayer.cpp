@@ -76,18 +76,24 @@ static bool isUrl(const std::string &path) {
 bool MediaPlayer::open(const std::string &path) {
   m_demuxer.setBufferSize(m_networkBufferSize);
   if (!m_demuxer.open(path)) {
+    if (m_callbacks.onError)
+      m_callbacks.onError("Failed to open media");
     return false;
   }
   AVFormatContext *fmtCtx = m_demuxer.context();
   if (m_demuxer.audioStream() >= 0) {
     if (!m_audioDecoder.open(fmtCtx, m_demuxer.audioStream())) {
       std::cerr << "Failed to open audio decoder\n";
+      if (m_callbacks.onError)
+        m_callbacks.onError("Failed to open audio decoder");
       m_demuxer.close();
       m_audioDecoder = AudioDecoder();
       return false;
     }
     if (m_output && !m_output->init(m_audioDecoder.sampleRate(), m_audioDecoder.channels())) {
       std::cerr << "Failed to init audio output\n";
+      if (m_callbacks.onError)
+        m_callbacks.onError("Failed to init audio output");
       m_demuxer.close();
       m_audioDecoder = AudioDecoder();
       return false;
@@ -100,6 +106,8 @@ bool MediaPlayer::open(const std::string &path) {
     if (!m_videoDecoder.open(fmtCtx, m_demuxer.videoStream())) {
 #endif
       std::cerr << "Failed to open video decoder\n";
+      if (m_callbacks.onError)
+        m_callbacks.onError("Failed to open video decoder");
       m_demuxer.close();
       m_audioDecoder = AudioDecoder();
       m_videoDecoder = VideoDecoder();
@@ -107,6 +115,8 @@ bool MediaPlayer::open(const std::string &path) {
     }
     if (m_videoOutput && !m_videoOutput->init(m_videoDecoder.width(), m_videoDecoder.height())) {
       std::cerr << "Failed to init video output\n";
+      if (m_callbacks.onError)
+        m_callbacks.onError("Failed to init video output");
       m_demuxer.close();
       m_audioDecoder = AudioDecoder();
       m_videoDecoder = VideoDecoder();
