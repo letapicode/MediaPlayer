@@ -13,6 +13,14 @@ Supported ABIs are `arm64-v8a`, `armeabi-v7a` and `x86_64`.
 
 Run instrumented tests with `./gradlew connectedAndroidTest`.
 
-The binary `gradle-wrapper.jar` is not included in the repository. If the
-wrapper fails to run, install Gradle locally and execute `gradle wrapper` in
-this directory to regenerate the jar.
+The binary `gradle-wrapper.jar` is intentionally omitted from version control.
+If `./gradlew` fails because the jar is missing, run the following command in
+this directory to download it again:
+
+```bash
+gradle wrapper --gradle-version 8.1.1 --distribution-type bin
+```
+
+The command recreates `gradle/wrapper/gradle-wrapper.jar` so the wrapper script
+can be used normally. CI environments can invoke the helper script
+`devops/update_android_wrapper.sh` to automate this step.

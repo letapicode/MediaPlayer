@@ -1,11 +1,9 @@
 package com.example.mediaplayer
 
+/**
+ * Listener interface for playback events coming from the native player.
+ */
 interface PlaybackListener {
-    fun onPlay() {}
-    fun onPause() {}
-    fun onStop() {}
-    fun onFinished() {}
-    fun onTrackLoaded(path: String) {}
-    fun onPosition(position: Double) {}
-    fun onError(message: String) {}
+    fun onPlaybackFinished()
+    fun onPositionChanged(pos: Double)
 }
