@@ -38,12 +38,26 @@ QSGNode *VisualizerItem::updatePaintNode(QSGNode *node, UpdatePaintNodeData *) {
           window()->createTextureFromId(texId, QSize(size, size), QQuickWindow::TextureIsExternal);
       n->setTexture(texture);
       n->setRect(boundingRect());
+      if (m_texture && m_texture != texture)
+        delete m_texture;
+      m_texture = texture;
+    }
+  } else {
+    if (m_texture) {
+      delete m_texture;
+      m_texture = nullptr;
+      n->setTexture(nullptr);
     }
   }
   return n;
 }
 
-void VisualizerItem::releaseResources() {}
+void VisualizerItem::releaseResources() {
+  if (m_texture) {
+    delete m_texture;
+    m_texture = nullptr;
+  }
+}
 
 void mediaplayer::registerVisualizerItemQmlType() {
   qmlRegisterType<VisualizerItem>("MediaPlayer", 1, 0, "VisualizerItem");
