@@ -137,7 +137,7 @@
 | 111 | Permission Handling | done | relevant |
 | 112 | Gesture Detection | done | relevant |
 | 113 | Voice Control (Android) | done | relevant |
-| 114 | Instrumented UI Tests | open | relevant |
+| 114 | Instrumented UI Tests | done | relevant |
 | 115 | Compatibility Testing | open | relevant |
 
 ## iOS App (Swift UI/UIKit + Core bridging) ([Tasks.MD](Tasks.MD#ios-app-swift-uiuikit-core-bridging))
