@@ -12,4 +12,11 @@ object MediaPlayerNative {
     external fun nativeSeek(position: Double)
     external fun nativeSetSurface(surface: Any?)
     external fun nativeListMedia(): Array<String>
+    external fun nativeRegisterListener(listener: PlaybackListener?)
+    external fun nativeUnregisterListener()
+}
+
+interface PlaybackListener {
+    fun onPlaybackComplete()
+    fun onPositionChanged(position: Double)
 }
