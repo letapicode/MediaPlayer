@@ -10,6 +10,7 @@ add_executable(mediaplayer_desktop_app
     AudioDevicesModel.cpp
     TranslationManager.cpp
     SettingsManager.cpp
+    SmartPlaylistManager.cpp
     VideoItem.cpp
     windows/WinIntegration.cpp
     windows/Hotkeys.cpp

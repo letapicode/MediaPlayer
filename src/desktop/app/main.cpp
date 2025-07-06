@@ -12,6 +12,7 @@
 #include "../VisualizerQt.h"
 #include "AudioDevicesModel.h"
 #include "SettingsManager.h"
+#include "SmartPlaylistManager.h"
 #include "SyncController.h"
 #include "TranslationManager.h"
 #include "VideoItem.h"
@@ -49,12 +50,14 @@ int main(int argc, char *argv[]) {
   mediaplayer::LibraryModel libraryModel;
   mediaplayer::PlaylistModel playlistModel;
   mediaplayer::LibraryQt libraryQt;
+  mediaplayer::SmartPlaylistManager spManager;
   mediaplayer::LibraryDB libraryDb(
       QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation).toStdString() +
       "/library.db");
   libraryDb.open();
   libraryModel.setLibrary(&libraryDb);
   playlistModel.setLibrary(&libraryDb);
+  spManager.setPlaylistModel(&playlistModel);
   libraryQt.setLibrary(&libraryDb);
   controller.setLibrary(&libraryDb);
   mediaplayer::AudioDevicesModel audioDevicesModel;
@@ -88,6 +91,7 @@ int main(int argc, char *argv[]) {
   engine.rootContext()->setContextProperty("player", &controller);
   engine.rootContext()->setContextProperty("libraryModel", &libraryModel);
   engine.rootContext()->setContextProperty("playlistModel", &playlistModel);
+  engine.rootContext()->setContextProperty("smartPlaylistManager", &spManager);
   engine.rootContext()->setContextProperty("libraryQt", &libraryQt);
   engine.rootContext()->setContextProperty("audioDevicesModel", &audioDevicesModel);
   engine.rootContext()->setContextProperty("sync", &syncController);
