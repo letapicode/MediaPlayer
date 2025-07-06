@@ -9,6 +9,7 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.Dispatchers
@@ -43,7 +44,19 @@ class NowPlayingFragment : Fragment(), SurfaceHolder.Callback {
                 MediaPlayerNative.nativePlay()
             }
         }
+        MediaPlayerNative.nativeSetListener(object : PlaybackListener {
+            override fun onFinished() {
+                lifecycleScope.launch(Dispatchers.Main) {
+                    Toast.makeText(requireContext(), "Playback finished", Toast.LENGTH_SHORT).show()
+                }
+            }
+        })
         view.setOnTouchListener { _, event -> detector.onTouchEvent(event) }
+    }
+
+    override fun onDestroyView() {
+        MediaPlayerNative.nativeSetListener(null)
+        super.onDestroyView()
     }
 
     override fun surfaceCreated(holder: SurfaceHolder) {
