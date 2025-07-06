@@ -1,0 +1,6 @@
+<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+  <path d="M10 20 H30 L70 80 H90" fill="none" stroke="black" stroke-width="10"/>
+  <polygon points="80,75 90,80 80,85" fill="black"/>
+  <path d="M10 80 H30 L70 20 H90" fill="none" stroke="black" stroke-width="10"/>
+  <polygon points="80,15 90,20 80,25" fill="black"/>
+</svg>

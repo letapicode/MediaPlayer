@@ -4,6 +4,8 @@
         <file>resources/icons/pause.svg</file>
         <file>resources/icons/next.svg</file>
         <file>resources/icons/prev.svg</file>
+        <file>resources/icons/stop.svg</file>
+        <file>resources/icons/shuffle.svg</file>
 </qresource>
     <qresource prefix="/qml">
         <file>qml/PlaylistItemsDialog.qml</file>
