@@ -15,6 +15,24 @@ static QWinTaskbarProgress *g_progress = nullptr;
 static QWinThumbnailToolButton *g_playBtn = nullptr;
 static QWinThumbnailToolButton *g_pauseBtn = nullptr;
 
+void updateTaskbarProgress(double value) {
+  if (!g_progress)
+    return;
+  int v = static_cast<int>(value);
+  if (v < 0)
+    v = 0;
+  if (v > 100)
+    v = 100;
+  g_progress->setValue(v);
+}
+
+void updateThumbnailButtons(bool playing) {
+  if (g_playBtn)
+    g_playBtn->setVisible(!playing);
+  if (g_pauseBtn)
+    g_pauseBtn->setVisible(playing);
+}
+
 void setupWindowsIntegration() {
   if (!QtWin::isCompositionEnabled())
     return;
