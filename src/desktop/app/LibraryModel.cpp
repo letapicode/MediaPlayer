@@ -28,6 +28,16 @@ QVariant LibraryModel::data(const QModelIndex &index, int role) const {
     return QString::fromStdString(m.path);
   case TitleRole:
     return QString::fromStdString(m.title);
+  case ArtistRole:
+    return QString::fromStdString(m.artist);
+  case AlbumRole:
+    return QString::fromStdString(m.album);
+  case GenreRole:
+    return QString::fromStdString(m.genre);
+  case DurationRole:
+    return m.duration;
+  case RatingRole:
+    return m.rating;
   }
   return {};
 }
@@ -36,6 +46,11 @@ QHash<int, QByteArray> LibraryModel::roleNames() const {
   QHash<int, QByteArray> roles;
   roles[PathRole] = "path";
   roles[TitleRole] = "title";
+  roles[ArtistRole] = "artist";
+  roles[AlbumRole] = "album";
+  roles[GenreRole] = "genre";
+  roles[DurationRole] = "duration";
+  roles[RatingRole] = "rating";
   return roles;
 }
 
