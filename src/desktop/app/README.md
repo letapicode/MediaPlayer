@@ -24,7 +24,7 @@ The `installers` directory contains helper scripts to produce distributable pack
 
 - `installers/windows/package.ps1` – Runs `windeployqt` and builds the NSIS installer. Set `BUILD_DIR` to your build output directory before running.
 - `installers/macos/package.sh` – Uses `macdeployqt` to bundle Qt frameworks then creates a DMG. Requires `BUILD_DIR` pointing at the build folder.
-- `installers/linux/build_appimage.sh` – Invokes `linuxdeployqt` to create an AppImage or `.deb`. Set `BUILD_DIR` accordingly and pass `appimage` or `deb` as the first argument.
+- `installers/linux/build_appimage.sh` – Invokes `linuxdeployqt` (with `-qmldir` to include QML files) to create an AppImage or `.deb`. Set `BUILD_DIR` accordingly and pass `appimage` or `deb` as the first argument.
 
 Ensure `windeployqt`, `macdeployqt` or `linuxdeployqt` are available in your `PATH` depending on platform.
 
