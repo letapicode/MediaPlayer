@@ -58,6 +58,10 @@ dist/
 Thumbs.db
 Desktop.ini
 
+# Qt translation binaries
+*.qm
+
 # Binary assets (images)
 *.png
 *.jpg
+
