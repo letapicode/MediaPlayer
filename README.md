@@ -9,6 +9,8 @@ See `docs/` for additional documentation and `src/` for module code. The
 new [library integration guide](docs/library_integration.md) describes how the
 SQLite library ties into the core engine and UI.
 
+The canonical list of tasks is maintained in [Tasks.MD](Tasks.MD).
+
 ## Project Goals
 
 The [Masterplan](Masterplan.MD) outlines an ambitious roadmap. In summary, the project aims to:
