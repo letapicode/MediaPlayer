@@ -31,6 +31,7 @@ protected:
 private:
   VisualizerQt *m_visualizer{nullptr};
   bool m_running{true};
+  QSGTexture *m_texture{nullptr};
 };
 
 void registerVisualizerItemQmlType();
