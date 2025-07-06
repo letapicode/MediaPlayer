@@ -1,136 +1,55 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.15
-import QtQuick.Dialogs 1.3
-import "NowPlayingView.qml" as NowPlayingView
+import QtQuick.Layouts 1.15
 
 ApplicationWindow {
-    id: win
+    id: window
     visible: true
     width: 800
     height: 600
-    title: qsTr("MediaPlayer")
-    property string errorMessage: ""
-    property string currentFile: ""
-
-    Connections {
-        target: sync
-        function onSyncReceived(path, position) {
-            player.openFile(path)
-            player.seek(position)
-            win.currentFile = path
-        }
-    }
+    title: qsTr("Media Player")
 
     MediaPlayerController {
         id: player
-        onErrorOccurred: {
-            win.errorMessage = message
-            errorDialog.open()
-        }
-        onPositionChanged: sync.updateStatus(win.currentFile, position)
-    }
-    LibraryModel { id: libraryModel }
-    PlaylistModel { id: playlistModel }
-
-    header: ToolBar {
-        RowLayout {
-            anchors.fill: parent
-            TextField {
-                id: search
-                placeholderText: qsTr("Search")
-                onTextChanged: libraryModel.search(text)
-            }
-            Button {
-                text: qsTr("Open")
-                onClicked: fileDialog.open()
-            }
-            Button { text: qsTr("Settings"); onClicked: settings.open() }
-        }
-    }
-
-    FileDialog {
-        id: fileDialog
-        onAccepted: {
-            player.openFile(fileDialog.file)
-            win.currentFile = fileDialog.file
-            sync.updateStatus(win.currentFile, 0)
-        }
-    }
-
-    SettingsDialog { id: settings }
-
-    Dialog {
-        id: errorDialog
-        title: qsTr("Playback Error")
-        standardButtons: Dialog.Ok
-        Column {
-            spacing: 8
-            Label { text: win.errorMessage }
-        }
-    }
-
-    focus: true
-    Keys.onPressed: {
-        if (event.key === Qt.Key_Space) {
-            player.playing ? player.pause() : player.play();
-            event.accepted = true;
-        } else if (event.key === Qt.Key_Left) {
-            player.seek(player.position - 5)
-            event.accepted = true;
-        } else if (event.key === Qt.Key_Right) {
-            player.seek(player.position + 5)
-            event.accepted = true;
-        } else if (event.key === Qt.Key_MediaNext) {
-            player.seek(player.position + 10)
-            event.accepted = true;
-        } else if (event.key === Qt.Key_MediaPrevious) {
-            player.seek(player.position - 10)
-            event.accepted = true;
-        }
     }
 
     ColumnLayout {
         anchors.fill: parent
-        VideoPlayer { Layout.fillWidth: true; height: 300 }
+        spacing: 8
+
+        VideoPlayer {
+            id: video
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+        }
+
         RowLayout {
+            Layout.fillWidth: true
             spacing: 8
-            Label { text: player.title }
-            Label { text: player.artist }
-            Label { text: player.album }
-        }
-        LibraryView { Layout.fillWidth: true; Layout.fillHeight: true }
-        PlaylistView { Layout.fillWidth: true; height: 100 }
-        NowPlayingView {
-            Layout.fillWidth: true
-            Layout.preferredHeight: 120
-        }
-        VisualizationView { Layout.fillWidth: true; height: 150 }
-        RowLayout {
-            Layout.fillWidth: true
-            ToolButton {
-                icon.source: "qrc:/icons/prev.svg"
-                onClicked: player.seek(player.position - 10)
-            }
+
             ToolButton {
                 id: playPause
                 icon.source: player.playing ? "qrc:/icons/pause.svg" : "qrc:/icons/play.svg"
                 onClicked: player.playing ? player.pause() : player.play()
             }
-            ToolButton {
-                icon.source: "qrc:/icons/next.svg"
-                onClicked: player.seek(player.position + 10)
-            }
-            Label { text: Math.floor(player.position) }
+
             Slider {
-                id: seekSlider
+                id: seek
                 Layout.fillWidth: true
                 from: 0
                 to: player.duration
                 value: player.position
                 onMoved: player.seek(value)
             }
-            Label { text: Math.floor(player.duration) }
-            Slider { from: 0; to: 1; value: 1; onValueChanged: player.setVolume(value) }
+
+            Slider {
+                id: volume
+                width: 100
+                from: 0
+                to: 1
+                value: player.volume
+                onValueChanged: player.setVolume(value)
+            }
         }
     }
 }
