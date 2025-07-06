@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<preferences xmlns:android="http://schemas.android.com/apk/res/android">
+    <SwitchPreferenceCompat
+        android:key="pref_visualization"
+        android:title="Enable Visualization"
+        android:defaultValue="true" />
+</preferences>

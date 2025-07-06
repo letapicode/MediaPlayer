@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:startDestination="@id/libraryFragment">
+
+    <fragment
+        android:id="@+id/libraryFragment"
+        android:name="com.example.mediaplayer.LibraryFragment"
+        android:label="Library"/>
+
+    <fragment
+        android:id="@+id/nowPlayingFragment"
+        android:name="com.example.mediaplayer.NowPlayingFragment"
+        android:label="Now Playing"/>
+
+    <fragment
+        android:id="@+id/playlistsFragment"
+        android:name="com.example.mediaplayer.PlaylistsFragment"
+        android:label="Playlists"/>
+
+</navigation>
