@@ -57,3 +57,7 @@ dist/
 # Windows
 Thumbs.db
 Desktop.ini
+
+# Binary assets (images)
+*.png
+*.jpg

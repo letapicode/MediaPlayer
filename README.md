@@ -112,3 +112,6 @@ Please read our [Code of Conduct](CODE_OF_CONDUCT.md) before participating.
 ### Languages
 The desktop UI currently ships English and Spanish translations. The application
 selects the language based on your system locale at startup.
+
+### Assets
+Binary assets such as images are not stored in the repository. Instead reference the required asset or describe it so maintainers can add the file.
