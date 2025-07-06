@@ -23,9 +23,8 @@ Packaging scripts are available under `installers/` for Windows (PowerShell + NS
 The `installers` directory contains helper scripts to produce distributable packages.
 
 - `installers/windows/package.ps1` – Runs `windeployqt` and builds the NSIS installer. Set `BUILD_DIR` to your build output directory before running.
-- `installers/macos/package.sh` – Uses `macdeployqt` to bundle Qt frameworks then creates a DMG. Requires `BUILD_DIR` pointing at the build folder.
-- `installers/linux/build_appimage.sh` – Invokes `linuxdeployqt` (with `-qmldir` to include QML files) to create an AppImage or `.deb`. Set `BUILD_DIR` accordingly and pass `appimage` or `deb` as the first argument.
-
+- `installers/macos/package.sh` – Runs `macdeployqt` and optionally signs the bundle when `CODE_SIGN_IDENTITY` is set, then creates a DMG. Set `BUILD_DIR` and signing variables before running.
+- `installers/linux/build_appimage.sh` – Invokes `linuxdeployqt` to create an AppImage or `.deb`. Set `BUILD_DIR` accordingly and pass `appimage` or `deb` as the first argument.
 Ensure `windeployqt`, `macdeployqt` or `linuxdeployqt` are available in your `PATH` depending on platform.
 
 Example commands run from the repository root:
@@ -38,6 +37,7 @@ $env:BUILD_DIR="build\Release"
 
 ```bash
 # macOS
+CODE_SIGN_IDENTITY="Developer ID Application: Example" \
 BUILD_DIR=build ./src/desktop/app/installers/macos/package.sh
 
 # Linux (AppImage)

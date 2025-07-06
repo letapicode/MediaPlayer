@@ -7,12 +7,13 @@ Dialog {
     standardButtons: Dialog.Ok | Dialog.Cancel
     property var rules: []
     property string playlistName: ""
-    Column {
+    ColumnLayout {
+        anchors.fill: parent
         spacing: 8
         TextField { id: nameField; placeholderText: qsTr("Name"); text: dlg.playlistName }
         Repeater {
             model: dlg.rules
-            delegate: Row {
+            delegate: RowLayout {
                 spacing: 4
                 ComboBox {
                     id: fieldBox

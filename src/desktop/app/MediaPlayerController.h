@@ -9,6 +9,7 @@
 #include "mediaplayer/MediaPlayer.h"
 #include <QAudioDevice>
 #include <QObject>
+#include <QVariantMap>
 #include <memory>
 
 namespace mediaplayer {
@@ -16,8 +17,8 @@ namespace mediaplayer {
 class MediaPlayerController : public QObject {
   Q_OBJECT
   Q_PROPERTY(bool playing READ playing NOTIFY playbackStateChanged)
-  Q_PROPERTY(PlaybackState playbackState READ playbackState NOTIFY playbackStateChanged)
   Q_PROPERTY(double position READ position NOTIFY positionChanged)
+  Q_PROPERTY(QVariantMap currentTrack READ currentTrack NOTIFY currentMetadataChanged)
   Q_PROPERTY(double volume READ volume WRITE setVolume NOTIFY volumeChanged)
   Q_PROPERTY(VideoOutputQt *videoOutput READ videoOutput CONSTANT)
   Q_PROPERTY(VisualizerQt *visualizer READ visualizer CONSTANT)
@@ -28,9 +29,6 @@ class MediaPlayerController : public QObject {
   Q_PROPERTY(NowPlayingModel *nowPlaying READ nowPlaying CONSTANT)
 public:
   explicit MediaPlayerController(QObject *parent = nullptr);
-
-  enum PlaybackState { Stopped, Playing, Paused };
-  Q_ENUM(PlaybackState)
 
   Q_INVOKABLE void openFile(const QString &path);
   Q_INVOKABLE void play();
@@ -55,7 +53,7 @@ public:
   double duration() const;
   NowPlayingModel *nowPlaying() const { return m_nowPlaying; }
 
-  PlaybackState playbackState() const { return m_state; }
+  QVariantMap currentTrack() const;
 
   VideoOutputQt *videoOutput() const { return m_videoOutput; }
   VisualizerQt *visualizer() const { return m_visualizer; }
@@ -70,15 +68,15 @@ signals:
 
 private:
   MediaPlayer m_player;
+  bool m_playing{false};
+  double m_position{0.0};
   VideoOutputQt *m_videoOutput{nullptr};
   VisualizerQt *m_visualizer{nullptr};
   MediaMetadata m_meta;
   NowPlayingModel *m_nowPlaying{nullptr};
-  PlaybackState m_state{Stopped};
 };
 
 void registerMediaPlayerControllerQmlType();
-
 } // namespace mediaplayer
 
 #endif // MEDIAPLAYER_MEDIAPLAYERCONTROLLER_H

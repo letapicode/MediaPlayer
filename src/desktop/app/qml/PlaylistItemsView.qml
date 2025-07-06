@@ -4,6 +4,8 @@ import QtQuick.Controls 2.15
 ListView {
     id: playlistItems
     anchors.fill: parent
+    Layout.fillWidth: true
+    Layout.fillHeight: true
     property string playlistName: ""
     model: playlistModel.playlistItems(playlistName)
     delegate: Row {
