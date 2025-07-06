@@ -20,6 +20,7 @@
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
 #include <QQmlContext>
+#include <QQuickStyle>
 #include <QStandardPaths>
 #include <QtQml/qqml.h>
 #ifdef Q_OS_MAC
@@ -33,6 +34,7 @@ void setupWindowsIntegration();
 #endif
 
 int main(int argc, char *argv[]) {
+  QQuickStyle::setStyle("Material");
   QGuiApplication app(argc, argv);
 
   qInfo() << "MediaPlayer core version:"

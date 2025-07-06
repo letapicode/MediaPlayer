@@ -1,5 +1,6 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.15
+import QtQuick.Controls.Material 2.15
 import QtQuick.Dialogs 1.3
 import "NowPlayingView.qml" as NowPlayingView
 
@@ -9,6 +10,7 @@ ApplicationWindow {
     width: 800
     height: 600
     title: qsTr("MediaPlayer")
+    Material.theme: settings.theme === "dark" ? Material.Dark : Material.Light
     property string errorMessage: ""
     property string currentFile: ""
 

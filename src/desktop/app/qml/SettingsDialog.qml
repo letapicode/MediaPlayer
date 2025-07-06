@@ -22,10 +22,7 @@ Dialog {
         CheckBox {
             id: themeBox
             text: qsTr("Dark theme")
-            onToggled: {
-                Qt.application.theme = checked ? "dark" : "light"
-                settings.theme = checked ? "dark" : "light"
-            }
+            onToggled: settings.theme = checked ? "dark" : "light"
         }
 
         Row {
