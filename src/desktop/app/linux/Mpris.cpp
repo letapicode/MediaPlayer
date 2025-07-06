@@ -1,9 +1,11 @@
 #include "Mpris.h"
 #ifdef Q_OS_LINUX
 #include "MediaPlayerController.h"
+#include <QCoreApplication>
 #include <QDBusAbstractAdaptor>
 #include <QDBusConnection>
 #include <QDBusError>
+#include <QDBusObjectPath>
 #include <QDebug>
 
 class MprisRootAdaptor : public QDBusAbstractAdaptor {
@@ -26,16 +28,27 @@ public:
 
 public slots:
   void Raise() {}
-  void Quit() {}
+  void Quit() { QCoreApplication::quit(); }
 };
 
 class MprisPlayerAdaptor : public QDBusAbstractAdaptor {
   Q_OBJECT
   Q_CLASSINFO("D-Bus Interface", "org.mpris.MediaPlayer2.Player")
   Q_PROPERTY(QString PlaybackStatus READ playbackStatus NOTIFY playbackStatusChanged)
+  Q_PROPERTY(QString LoopStatus READ loopStatus CONSTANT)
+  Q_PROPERTY(double Rate READ rate CONSTANT)
+  Q_PROPERTY(bool Shuffle READ shuffle CONSTANT)
   Q_PROPERTY(double Volume READ volume WRITE setVolume NOTIFY volumeChanged)
   Q_PROPERTY(qlonglong Position READ position NOTIFY positionChanged)
   Q_PROPERTY(QVariantMap Metadata READ metadata NOTIFY metadataChanged)
+  Q_PROPERTY(double MinimumRate READ minimumRate CONSTANT)
+  Q_PROPERTY(double MaximumRate READ maximumRate CONSTANT)
+  Q_PROPERTY(bool CanGoNext READ canGoNext CONSTANT)
+  Q_PROPERTY(bool CanGoPrevious READ canGoPrevious CONSTANT)
+  Q_PROPERTY(bool CanPlay READ canPlay CONSTANT)
+  Q_PROPERTY(bool CanPause READ canPause CONSTANT)
+  Q_PROPERTY(bool CanSeek READ canSeek CONSTANT)
+  Q_PROPERTY(bool CanControl READ canControl CONSTANT)
 
 public:
   MprisPlayerAdaptor(QObject *parent, mediaplayer::MediaPlayerController *c)
@@ -44,6 +57,9 @@ public:
   QString playbackStatus() const {
     return m_controller->playing() ? QStringLiteral("Playing") : QStringLiteral("Paused");
   }
+  QString loopStatus() const { return QStringLiteral("None"); }
+  double rate() const { return 1.0; }
+  bool shuffle() const { return false; }
   double volume() const { return m_controller->volume(); }
   void setVolume(double v) { m_controller->setVolume(v); }
   qlonglong position() const {
@@ -56,6 +72,14 @@ public:
     m[QStringLiteral("xesam:album")] = m_controller->album();
     return m;
   }
+  double minimumRate() const { return 1.0; }
+  double maximumRate() const { return 1.0; }
+  bool canGoNext() const { return true; }
+  bool canGoPrevious() const { return true; }
+  bool canPlay() const { return true; }
+  bool canPause() const { return true; }
+  bool canSeek() const { return true; }
+  bool canControl() const { return true; }
 
 public slots:
   void Play() { m_controller->play(); }
@@ -73,12 +97,18 @@ public slots:
     double pos = m_controller->position() + (offset / 1000000.0);
     m_controller->seek(pos);
   }
+  void SetPosition(const QDBusObjectPath &, qlonglong pos) {
+    m_controller->seek(pos / 1000000.0);
+    emit Seeked(pos);
+  }
+  void OpenUri(const QString &uri) { m_controller->openFile(uri); }
 
 signals:
   void playbackStatusChanged(const QString &status);
   void volumeChanged(double volume);
   void positionChanged(qlonglong position);
   void metadataChanged(const QVariantMap &metadata);
+  void Seeked(qlonglong position);
 
 private:
   mediaplayer::MediaPlayerController *m_controller;
@@ -118,6 +148,10 @@ void setupMprisIntegration(mediaplayer::MediaPlayerController *controller) {
                        emit s_playerAdaptor->positionChanged(
                            static_cast<qlonglong>(controller->position() * 1000000.0));
                    });
+  QObject::connect(controller, &mediaplayer::MediaPlayerController::volumeChanged, [controller]() {
+    if (s_playerAdaptor)
+      emit s_playerAdaptor->volumeChanged(controller->volume());
+  });
   QObject::connect(
       controller, &mediaplayer::MediaPlayerController::playbackStateChanged, [controller]() {
         if (s_playerAdaptor)
