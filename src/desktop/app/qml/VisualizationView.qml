@@ -4,6 +4,8 @@ import MediaPlayer 1.0
 
 Item {
     id: root
+    Layout.fillWidth: true
+    Layout.fillHeight: true
     VisualizerItem {
         id: canvas
         anchors.fill: parent

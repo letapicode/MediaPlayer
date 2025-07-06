@@ -4,6 +4,8 @@ import QtQuick.Controls 2.15
 ListView {
     id: nowPlaying
     anchors.fill: parent
+    Layout.fillWidth: true
+    Layout.fillHeight: true
     model: nowPlayingModel
     delegate: Row {
         id: row

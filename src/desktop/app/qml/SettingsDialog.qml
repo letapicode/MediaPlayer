@@ -16,19 +16,17 @@ Dialog {
         }
     }
 
-    Column {
+    ColumnLayout {
+        anchors.fill: parent
         spacing: 8
 
         CheckBox {
             id: themeBox
             text: qsTr("Dark theme")
-            onToggled: {
-                Qt.application.theme = checked ? "dark" : "light"
-                settings.theme = checked ? "dark" : "light"
-            }
+            onToggled: settings.theme = checked ? "dark" : "light"
         }
 
-        Row {
+        RowLayout {
             spacing: 4
             Label { text: qsTr("Audio device") }
             ComboBox {
@@ -47,7 +45,7 @@ Dialog {
             }
         }
 
-        Row {
+        RowLayout {
             spacing: 4
             Label { text: qsTr("Language") }
             ComboBox {
@@ -68,8 +66,8 @@ Dialog {
 
         ListView {
             id: deviceList
-            height: 100
-            width: parent.width
+            Layout.fillWidth: true
+            Layout.preferredHeight: 100
             model: discoveredDevices
             delegate: Row {
                 spacing: 4
@@ -81,7 +79,7 @@ Dialog {
             }
         }
 
-        Row {
+        RowLayout {
             spacing: 4
             Button {
                 text: qsTr("Scan Library")
@@ -101,7 +99,7 @@ Dialog {
             onToggled: player.visualizer.setEnabled(checked)
         }
 
-        Row {
+        RowLayout {
             spacing: 4
             Button {
                 text: qsTr("Prev Preset")
@@ -115,11 +113,10 @@ Dialog {
 
         GroupBox {
             title: qsTr("Format Converter")
-
-            Column {
+            ColumnLayout {
                 spacing: 4
 
-                Row {
+                RowLayout {
                     spacing: 4
                     Button {
                         text: qsTr("Input")
@@ -128,7 +125,7 @@ Dialog {
                     Label { text: convInput }
                 }
 
-                Row {
+                RowLayout {
                     spacing: 4
                     Button {
                         text: qsTr("Output")

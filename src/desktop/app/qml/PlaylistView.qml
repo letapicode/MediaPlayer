@@ -1,13 +1,14 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.15
 
-Column {
+ColumnLayout {
     spacing: 4
+    anchors.fill: parent
 
     SmartPlaylistEditor { id: smartEditor }
     PlaylistItemsDialog { id: itemsDialog }
 
-    Row {
+    RowLayout {
         spacing: 4
         TextField {
             id: nameField
@@ -44,8 +45,10 @@ Column {
 
     ListView {
         id: list
-        anchors.fill: parent
-        anchors.topMargin: removeArea.height + 4
+        Layout.fillWidth: true
+        Layout.fillHeight: true
+        Layout.fillWidth: true
+        Layout.fillHeight: true
         model: playlistModel
         delegate: Rectangle {
             width: parent.width
