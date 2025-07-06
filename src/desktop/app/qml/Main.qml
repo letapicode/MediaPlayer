@@ -72,20 +72,26 @@ ApplicationWindow {
     focus: true
     Keys.onPressed: {
         if (event.key === Qt.Key_Space) {
-            player.playing ? player.pause() : player.play();
-            event.accepted = true;
+            player.playing ? player.pause() : player.play()
+            event.accepted = true
         } else if (event.key === Qt.Key_Left) {
             player.seek(player.position - 5)
-            event.accepted = true;
+            event.accepted = true
         } else if (event.key === Qt.Key_Right) {
             player.seek(player.position + 5)
-            event.accepted = true;
+            event.accepted = true
+        } else if (event.key === Qt.Key_Up) {
+            player.setVolume(Math.min(1, player.volume + 0.05))
+            event.accepted = true
+        } else if (event.key === Qt.Key_Down) {
+            player.setVolume(Math.max(0, player.volume - 0.05))
+            event.accepted = true
         } else if (event.key === Qt.Key_MediaNext) {
-            player.seek(player.position + 10)
-            event.accepted = true;
+            player.nextTrack()
+            event.accepted = true
         } else if (event.key === Qt.Key_MediaPrevious) {
-            player.seek(player.position - 10)
-            event.accepted = true;
+            player.previousTrack()
+            event.accepted = true
         }
     }
 
