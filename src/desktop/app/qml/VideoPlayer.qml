@@ -18,6 +18,11 @@ Item {
         flags: Qt.Window | Qt.FramelessWindowHint
         visibility: Window.FullScreen
         color: "black"
+        focus: true
+        Keys.onPressed: if (event.key === Qt.Key_Escape) {
+            fsWindow.visible = false
+            event.accepted = true
+        }
         VideoItem {
             anchors.fill: parent
             videoOutput: player.videoOutput
