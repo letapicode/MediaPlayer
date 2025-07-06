@@ -118,51 +118,79 @@
 | 97 | macOS Bundle | done | package script |
 | 98 | Linux Package/AppImage | done | build script |
 
-
 ## Android App (Kotlin + NDK) ([Tasks.MD](Tasks.MD#android-app-kotlin-ndk))
 
-| #  | Task                                | Status | Notes |
-|---:|-------------------------------------|--------|-------|
-  | 99  | Create Android Studio Project      | done   | relevant |
-  | 100 | NDK Integration                    | done   | relevant |
-  | 101 | Main Activity & Navigation         | done   | relevant |
-  | 102 | Library Fragment (RecyclerView)    | done   | relevant |
-  | 103 | Now Playing Fragment               | done   | relevant |
-  | 104 | Playlists Fragment                 | done   | relevant |
-  | 105 | Settings Activity                  | done   | relevant |
-  | 106 | JNI Bridge Class                   | done   | relevant |
-  | 107 | JNI Implementations                | done   | relevant |
-  | 108 | Thread Management                  | done   | relevant |
-  | 109 | Callbacks from Native              | done   | relevant |
-  | 110 | MediaSession & Notification        | done   | relevant |
-  | 111 | Permission Handling                | done   | relevant |
-  | 112 | Gesture Detection                  | done   | relevant |
-  | 113 | Voice Control (Android)            | done   | relevant |
-  | 114 | Instrumented UI Tests              | open   | relevant |
-  | 115 | Compatibility Testing              | open   | relevant |
+| # | Task | Status | Notes |
+|-:|------|--------|-------|
+| 99 | Create Android Studio Project | done | relevant |
+| 100 | NDK Integration | done | relevant |
+| 101 | Main Activity & Navigation | done | relevant |
+| 102 | Library Fragment (RecyclerView) | done | relevant |
+| 103 | Now Playing Fragment | done | relevant |
+| 104 | Playlists Fragment | done | relevant |
+| 105 | Settings Activity | done | relevant |
+| 106 | JNI Bridge Class | done | relevant |
+| 107 | JNI Implementations | done | relevant |
+| 108 | Thread Management | done | relevant |
+| 109 | Callbacks from Native | done | relevant |
+| 110 | MediaSession & Notification | done | relevant |
+| 111 | Permission Handling | done | relevant |
+| 112 | Gesture Detection | done | relevant |
+| 113 | Voice Control (Android) | done | relevant |
+| 114 | Instrumented UI Tests | open | relevant |
+| 115 | Compatibility Testing | open | relevant |
 
 ## iOS App (Swift UI/UIKit + Core bridging) ([Tasks.MD](Tasks.MD#ios-app-swift-uiuikit-core-bridging))
 
-| #   | Task                              | Status | Notes |
-|----:|-----------------------------------|--------|-------|
-| 116 | Create Xcode Project             | open   | relevant |
-| 117 | Include Core Engine              | open   | relevant |
-| 118 | Main UI (SwiftUI ContentView)    | open   | relevant |
-| 119 | Library List View                | open   | relevant |
-| 120 | Now Playing View                 | open   | relevant |
-| 121 | Navigation and Tab Bar           | open   | relevant |
-| 122 | Settings UI                      | open   | relevant |
-| 123 | Bridging Header and Wrapper      | open   | relevant |
-| 124 | Expose to Swift                  | open   | relevant |
-| 125 | Callbacks from Core              | open   | relevant |
-| 126 | Data Flow                        | open   | relevant |
-| 127 | AVAudioSession Handling          | open   | relevant |
-| 128 | Remote Command Center            | open   | relevant |
-| 129 | Gesture Support                  | open   | relevant |
-| 130 | Siri / Voice                     | open   | relevant |
-| 131 | Unit Tests (Swift)               | open   | relevant |
-| 132 | UI Tests (XCTest/UIAutomation)   | open   | relevant |
+| # | Task | Status | Notes |
+|-:|------|--------|-------|
+| 116 | Create Xcode Project | open | relevant |
+| 117 | Include Core Engine | open | relevant |
+| 118 | Main UI (SwiftUI ContentView) | open | relevant |
+| 119 | Library List View | open | relevant |
+| 120 | Now Playing View | open | relevant |
+| 121 | Navigation and Tab Bar | open | relevant |
+| 122 | Settings UI | open | relevant |
+| 123 | Bridging Header and Wrapper | open | relevant |
+| 124 | Expose to Swift | open | relevant |
+| 125 | Callbacks from Core | open | relevant |
+| 126 | Data Flow | open | relevant |
+| 127 | AVAudioSession Handling | open | relevant |
+| 128 | Remote Command Center | open | relevant |
+| 129 | Gesture Support | open | relevant |
+| 130 | Siri / Voice | open | relevant |
+| 131 | Unit Tests (Swift) | open | relevant |
+| 132 | UI Tests (XCTest/UIAutomation) | open | relevant |
 
+## Gesture & Voice Control Module ([Tasks.MD](Tasks.MD#gesture-voice-control-module))
+
+| # | Task | Status | Notes |
+|-:|------|--------|-------|
+| 133 | Desktop Mouse Gestures | open |  |
+| 134 | Mobile Touch Gestures | open |  |
+| 135 | Shake to Shuffle (Mobile) | open |  |
+| 136 | Custom Gesture Mapping UI | open |  |
+| 137 | Integrate Vosk Speech Library (C++ or Python) | open |  |
+| 138 | Voice Command Grammar | open |  |
+| 139 | Microphone Capture (Desktop) | open |  |
+| 140 | Voice Input (Mobile) | open |  |
+| 141 | Voice Command Processing | open |  |
+| 142 | Feedback & Error Handling | open |  |
+| 143 | Simulate Voice Commands | open |  |
+| 144 | Gesture Unit Tests | open |  |
+
+## AI Tagging Service (AI Metadata Module) ([Tasks.MD](Tasks.MD#ai-tagging-service-ai-metadata-module))
+
+| # | Task | Status | Notes |
+|-:|------|--------|-------|
+| 145 | Choose AI Framework | open |  |
+| 146 | Environment for AI | open |  |
+| 147 | Music Genre Classification | open |  |
+| 148 | Audio Fingerprinting (Song ID) | open |  |
+| 149 | Speech-to-Text (for Videos) | open |  |
+| 150 | Mood Detection | open |  |
+| 151 | Object & Scene Recognition | open |  |
+| 152 | Face Recognition (Optional) | open |  |
 | 153 | Video Scene Segmentation | open | relevant |
 | 154 | Service API | open | relevant |
 | 155 | Asynchronous Tagging | open | relevant |
@@ -173,48 +201,48 @@
 
 ## Streaming & Networking Module ([Tasks.MD](Tasks.MD#streaming-networking-module))
 
-| #   | Task                               | Status | Notes |
-|----:|------------------------------------|--------|-------|
-| 160 | Open URL UI                        | open   | relevant |
-| 161 | YouTube DL Integration             | done   | `YouTubeDL` helper in network module |
-| 162 | Local DLNA/UPnP Support            | open   | relevant |
-| 163 | HTTP Server for Remote Control    | open   | relevant |
-| 164 | Discovery (mDNS)                  | open   | relevant |
-| 165 | Announcement & Discovery Handlers | open   | relevant |
-| 166 | Device Info Exchange              | open   | relevant |
-| 167 | Sync Playback Position            | open   | relevant |
-| 168 | Cloud Sync Option                 | open   | relevant |
-| 169 | Testing Sync                      | open   | relevant |
+| # | Task | Status | Notes |
+|-:|------|--------|-------|
+| 160 | Open URL UI | open | relevant |
+| 161 | YouTube DL Integration | done | `YouTubeDL` helper in network module |
+| 162 | Local DLNA/UPnP Support | open | relevant |
+| 163 | HTTP Server for Remote Control | open | relevant |
+| 164 | Discovery (mDNS) | open | relevant |
+| 165 | Announcement & Discovery Handlers | open | relevant |
+| 166 | Device Info Exchange | open | relevant |
+| 167 | Sync Playback Position | open | relevant |
+| 168 | Cloud Sync Option | open | relevant |
+| 169 | Testing Sync | open | relevant |
 
 ## DevOps & Infrastructure ([Tasks.MD](Tasks.MD#devops-infrastructure))
 
-| #   | Task                              | Status | Notes |
-|----:|-----------------------------------|--------|-------|
-| 170 | Dockerfile for Core/C++           | done   | Dockerfile.core added |
-| 171 | Dockerfile for Qt                 | done   | Dockerfile.qt added |
-| 172 | Android Build Environment        | open   | relevant |
-| 173 | iOS Build Setup                  | open   | relevant |
-| 174 | GitHub Actions CI Workflow       | done   | relevant |
-| 175 | Automated Tests in CI            | open   | relevant |
-| 176 | Static Analysis & Lint           | open   | relevant |
-| 177 | Code Formatting                  | done   | relevant |
-| 178 | Git Submodules for Libraries     | open   | relevant |
+| # | Task | Status | Notes |
+|-:|------|--------|-------|
+| 170 | Dockerfile for Core/C++ | done | Dockerfile.core added |
+| 171 | Dockerfile for Qt | done | Dockerfile.qt added |
+| 172 | Android Build Environment | open | relevant |
+| 173 | iOS Build Setup | open | relevant |
+| 174 | GitHub Actions CI Workflow | done | relevant |
+| 175 | Automated Tests in CI | open | relevant |
+| 176 | Static Analysis & Lint | open | relevant |
+| 177 | Code Formatting | done | relevant |
+| 178 | Git Submodules for Libraries | open | relevant |
 | 179 | Issue Templates and Contribution Guide | open | relevant |
-| 180 | Merge Strategy for AI Agents     | open   | relevant |
+| 180 | Merge Strategy for AI Agents | open | relevant |
 
 ## Testing & Quality Assurance ([Tasks.MD](Tasks.MD#testing-quality-assurance))
 
-| #   | Task                              | Status | Notes |
-|----:|-----------------------------------|--------|-------|
-| 181 | Core Unit Tests Setup            | open   | relevant |
-| 182 | Library Module Tests             | open   | relevant |
-| 183 | Visualization Tests              | open   | relevant |
-| 184 | Playback Integration Test        | open   | relevant |
-| 185 | End-to-End Script                | open   | relevant |
-| 186 | Startup Time Test                | open   | relevant |
-| 187 | Memory/CPU Profiling             | open   | relevant |
-| 188 | Battery Test (Mobile)            | open   | relevant |
-| 189 | Formats Compatibility Test       | open   | relevant |
-| 190 | UI Responsiveness Test           | open   | relevant |
-| 191 | Automate Regression Suite       | open   | relevant |
+| # | Task | Status | Notes |
+|-:|------|--------|-------|
+| 181 | Core Unit Tests Setup | open | relevant |
+| 182 | Library Module Tests | open | relevant |
+| 183 | Visualization Tests | open | relevant |
+| 184 | Playback Integration Test | open | relevant |
+| 185 | End-to-End Script | open | relevant |
+| 186 | Startup Time Test | open | relevant |
+| 187 | Memory/CPU Profiling | open | relevant |
+| 188 | Battery Test (Mobile) | open | relevant |
+| 189 | Formats Compatibility Test | open | relevant |
+| 190 | UI Responsiveness Test | open | relevant |
+| 191 | Automate Regression Suite | open | relevant |
 

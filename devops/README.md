@@ -2,6 +2,10 @@
 
 This directory contains container definitions and helper scripts for building MediaPlayer.
 
+### Android wrapper utility
+
+`update_android_wrapper.sh` regenerates the Gradle wrapper jar used by the Android project. Run it from the repository root when CI needs a fresh wrapper.
+
 ## Qt build container
 
 `Dockerfile.qt` provides an Ubuntu image with the Qt 6 SDK installed. Use it when you want to compile the desktop application without installing Qt locally.

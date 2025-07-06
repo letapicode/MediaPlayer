@@ -9,66 +9,19 @@ using mediaplayer::MediaPlayer;
 
 static std::unique_ptr<MediaPlayer> g_player;
 static jobject g_callback = nullptr;
+static jmethodID g_onFinished = nullptr;
+static jmethodID g_onPosition = nullptr;
 static JavaVM *g_vm = nullptr;
 
-static JNIEnv *getEnv() {
+static JNIEnv *getEnv(bool *detach) {
   JNIEnv *env = nullptr;
-  if (g_vm->GetEnv(reinterpret_cast<void **>(&env), JNI_VERSION_1_6) != JNI_OK) {
-    g_vm->AttachCurrentThread(&env, nullptr);
+  if (g_vm->GetEnv(reinterpret_cast<void **>(&env), JNI_VERSION_1_6) == JNI_EDETACHED) {
+    if (g_vm->AttachCurrentThread(&env, nullptr) != 0)
+      return nullptr;
+    if (detach)
+      *detach = true;
   }
   return env;
-}
-
-static void callVoid(const char *name) {
-  if (!g_callback)
-    return;
-  JNIEnv *env = getEnv();
-  jclass cls = env->GetObjectClass(g_callback);
-  jmethodID mid = env->GetMethodID(cls, name, "()V");
-  if (mid)
-    env->CallVoidMethod(g_callback, mid);
-  env->DeleteLocalRef(cls);
-}
-
-static void callDouble(const char *name, double value) {
-  if (!g_callback)
-    return;
-  JNIEnv *env = getEnv();
-  jclass cls = env->GetObjectClass(g_callback);
-  jmethodID mid = env->GetMethodID(cls, name, "(D)V");
-  if (mid)
-    env->CallVoidMethod(g_callback, mid, value);
-  env->DeleteLocalRef(cls);
-}
-
-static void callString(const char *name, const std::string &str) {
-  if (!g_callback)
-    return;
-  JNIEnv *env = getEnv();
-  jclass cls = env->GetObjectClass(g_callback);
-  jmethodID mid = env->GetMethodID(cls, name, "(Ljava/lang/String;)V");
-  if (mid) {
-    jstring jstr = env->NewStringUTF(str.c_str());
-    env->CallVoidMethod(g_callback, mid, jstr);
-    env->DeleteLocalRef(jstr);
-  }
-  env->DeleteLocalRef(cls);
-}
-
-static void updateCallbacks() {
-  if (!g_player)
-    return;
-  mediaplayer::PlaybackCallbacks cb{};
-  cb.onPlay = []() { callVoid("onPlay"); };
-  cb.onPause = []() { callVoid("onPause"); };
-  cb.onStop = []() { callVoid("onStop"); };
-  cb.onFinished = []() { callVoid("onFinished"); };
-  cb.onTrackLoaded = [](const mediaplayer::MediaMetadata &m) {
-    callString("onTrackLoaded", m.path);
-  };
-  cb.onPosition = [](double p) { callDouble("onPosition", p); };
-  cb.onError = [](const std::string &msg) { callString("onError", msg); };
-  g_player->setCallbacks(std::move(cb));
 }
 
 extern "C" jint JNI_OnLoad(JavaVM *vm, void *) {
@@ -88,21 +41,61 @@ extern "C" void Java_com_example_mediaplayer_MediaPlayerNative_nativePause(JNIEn
 
 extern "C" jboolean Java_com_example_mediaplayer_MediaPlayerNative_nativeOpen(JNIEnv *env, jclass,
                                                                               jstring path) {
+  if (!path)
+    return JNI_FALSE;
+
+  const char *cpath = env->GetStringUTFChars(path, nullptr);
+  if (!cpath)
+    return JNI_FALSE;
+  std::string cppPath(cpath);
+  env->ReleaseStringUTFChars(path, cpath);
+
   if (!g_player)
     g_player = std::make_unique<MediaPlayer>();
-  const char *cpath = env->GetStringUTFChars(path, nullptr);
-  updateCallbacks();
-  bool ok = g_player->open(cpath);
-  env->ReleaseStringUTFChars(path, cpath);
+  bool ok = g_player->open(cppPath);
   return ok ? JNI_TRUE : JNI_FALSE;
 }
 
 extern "C" void
-Java_com_example_mediaplayer_MediaPlayerNative_nativeSetListener(JNIEnv *env, jclass, jobject cb) {
-  if (g_callback)
+Java_com_example_mediaplayer_MediaPlayerNative_nativeSetCallback(JNIEnv *env, jclass, jobject cb) {
+  if (g_callback) {
     env->DeleteGlobalRef(g_callback);
-  g_callback = cb ? env->NewGlobalRef(cb) : nullptr;
-  updateCallbacks();
+    g_callback = nullptr;
+  }
+  g_onFinished = nullptr;
+  g_onPosition = nullptr;
+
+  if (cb) {
+    g_callback = env->NewGlobalRef(cb);
+    jclass cls = env->GetObjectClass(cb);
+    g_onFinished = env->GetMethodID(cls, "onPlaybackFinished", "()V");
+    g_onPosition = env->GetMethodID(cls, "onPositionChanged", "(D)V");
+    env->DeleteLocalRef(cls);
+  }
+
+  if (!g_player)
+    g_player = std::make_unique<MediaPlayer>();
+
+  mediaplayer::PlaybackCallbacks cbs;
+  if (g_callback) {
+    cbs.onFinished = []() {
+      bool detach = false;
+      JNIEnv *envCb = getEnv(&detach);
+      if (envCb && g_callback && g_onFinished)
+        envCb->CallVoidMethod(g_callback, g_onFinished);
+      if (detach)
+        g_vm->DetachCurrentThread();
+    };
+    cbs.onPosition = [](double pos) {
+      bool detach = false;
+      JNIEnv *envCb = getEnv(&detach);
+      if (envCb && g_callback && g_onPosition)
+        envCb->CallVoidMethod(g_callback, g_onPosition, pos);
+      if (detach)
+        g_vm->DetachCurrentThread();
+    };
+  }
+  g_player->setCallbacks(cbs);
 }
 
 extern "C" void Java_com_example_mediaplayer_MediaPlayerNative_nativeStop(JNIEnv *, jclass) {

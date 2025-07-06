@@ -44,18 +44,20 @@ class NowPlayingFragment : Fragment(), SurfaceHolder.Callback {
                 MediaPlayerNative.nativePlay()
             }
         }
-        MediaPlayerNative.nativeSetListener(object : PlaybackListener {
-            override fun onFinished() {
+        MediaPlayerNative.nativeSetCallback(object : PlaybackListener {
+            override fun onPlaybackFinished() {
                 lifecycleScope.launch(Dispatchers.Main) {
                     Toast.makeText(requireContext(), "Playback finished", Toast.LENGTH_SHORT).show()
                 }
             }
+
+            override fun onPositionChanged(pos: Double) {}
         })
         view.setOnTouchListener { _, event -> detector.onTouchEvent(event) }
     }
 
     override fun onDestroyView() {
-        MediaPlayerNative.nativeSetListener(null)
+        MediaPlayerNative.nativeSetCallback(null)
         super.onDestroyView()
     }
 

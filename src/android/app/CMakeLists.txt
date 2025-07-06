@@ -4,6 +4,7 @@ project(mediaplayer_android)
 add_library(mediaplayer SHARED
     ../../core/src/AudioDecoder.cpp
     ../../core/src/VideoDecoder.cpp
+    ../jni/MediaPlayerJNI.cpp
 )
 
 # Simplified: link to core library if built separately

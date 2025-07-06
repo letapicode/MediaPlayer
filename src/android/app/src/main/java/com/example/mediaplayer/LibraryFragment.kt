@@ -46,8 +46,8 @@ private class MediaAdapter(private val items: List<String>) :
         (holder.itemView as android.widget.TextView).text = items[position]
         holder.itemView.setOnClickListener {
             holder.itemView.context.let { ctx ->
-                (ctx as? androidx.fragment.app.FragmentActivity)?.lifecycleScope?.launch {
-                    MediaPlayerNative.open(items[position])
+                (ctx as? androidx.fragment.app.FragmentActivity)?.lifecycleScope?.launch(Dispatchers.IO) {
+                    MediaPlayerNative.nativeOpen(items[position])
                 }
             }
         }

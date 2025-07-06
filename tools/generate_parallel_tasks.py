@@ -7,7 +7,7 @@ def parse_existing(path: Path):
     statuses = {}
     if not path.exists():
         return statuses
-    pattern = re.compile(r"^\|\s*\d+\s*\|\s*(.*?)\s*\|\s*(\w+)\s*\|\s*(.*?)\s*\|")
+    pattern = re.compile(r"^\s*\|\s*\d+\s*\|\s*(.*?)\s*\|\s*(\w+)\s*\|\s*(.*?)\s*\|")
     with path.open(encoding="utf-8") as f:
         for line in f:
             m = pattern.match(line)
