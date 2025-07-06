@@ -4,6 +4,7 @@
 #include "../VisualizerQt.h"
 #include "NowPlayingModel.h"
 #include <QAudioDevice>
+#include <QtQml/qqml.h>
 #ifdef Q_OS_MAC
 void updateNowPlayingInfo(const mediaplayer::MediaMetadata &meta);
 #endif
@@ -21,9 +22,18 @@ MediaPlayerController::MediaPlayerController(QObject *parent) : QObject(parent) 
   m_visualizer->setVisualizer(vis);
   m_nowPlaying = new NowPlayingModel(&m_player, this);
   PlaybackCallbacks cb;
-  cb.onPlay = [this]() { emit playbackStateChanged(); };
-  cb.onPause = [this]() { emit playbackStateChanged(); };
-  cb.onStop = [this]() { emit playbackStateChanged(); };
+  cb.onPlay = [this]() {
+    m_state = Playing;
+    emit playbackStateChanged();
+  };
+  cb.onPause = [this]() {
+    m_state = Paused;
+    emit playbackStateChanged();
+  };
+  cb.onStop = [this]() {
+    m_state = Stopped;
+    emit playbackStateChanged();
+  };
   cb.onTrackLoaded = [this](const MediaMetadata &meta) {
     m_meta = meta;
     emit currentMetadataChanged(meta);
@@ -42,14 +52,17 @@ void MediaPlayerController::openFile(const QString &path) {
 
 void MediaPlayerController::play() {
   m_player.play();
+  m_state = Playing;
   emit playbackStateChanged();
 }
 void MediaPlayerController::pause() {
   m_player.pause();
+  m_state = Paused;
   emit playbackStateChanged();
 }
 void MediaPlayerController::stop() {
   m_player.stop();
+  m_state = Stopped;
   emit playbackStateChanged();
 }
 void MediaPlayerController::seek(double position) { m_player.seek(position); }
@@ -107,3 +120,7 @@ QString MediaPlayerController::title() const { return QString::fromStdString(m_m
 QString MediaPlayerController::artist() const { return QString::fromStdString(m_meta.artist); }
 QString MediaPlayerController::album() const { return QString::fromStdString(m_meta.album); }
 double MediaPlayerController::duration() const { return m_meta.duration; }
+
+void mediaplayer::registerMediaPlayerControllerQmlType() {
+  qmlRegisterType<MediaPlayerController>("MediaPlayer", 1, 0, "MediaPlayerController");
+}

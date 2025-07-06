@@ -45,6 +45,7 @@ int main(int argc, char *argv[]) {
   mediaplayer::registerVideoOutputQtQmlType();
   mediaplayer::registerVisualizerQtQmlType();
   mediaplayer::registerVisualizerItemQmlType();
+  mediaplayer::registerMediaPlayerControllerQmlType();
   qmlRegisterType<mediaplayer::VideoItem>("MediaPlayer", 1, 0, "VideoItem");
   mediaplayer::MediaPlayerController controller;
   mediaplayer::LibraryModel libraryModel;
