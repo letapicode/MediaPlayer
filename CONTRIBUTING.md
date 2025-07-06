@@ -50,6 +50,8 @@ Tasks are organized in `parallel_tasks.md`. To claim a task:
 2. Assign the issue to yourself (or request assignment from a maintainer).
 3. Create a feature branch named after the task, e.g. `feature/123-audio-decoder`.
 4. When the task is complete, open a pull request referencing the issue.
+5. If you edit `Tasks.MD`, regenerate `parallel_tasks.md` using
+   `python tools/generate_parallel_tasks.py > parallel_tasks.md` so the task table stays in sync.
 
 Only work on one unclaimed task per branch. This keeps merges straightforward and mirrors the parallel development model described in the task list.
 
