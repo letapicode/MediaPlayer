@@ -8,7 +8,20 @@ using mediaplayer::MediaPlayer;
 
 static std::unique_ptr<MediaPlayer> g_player;
 static jobject g_callback = nullptr;
+static jmethodID g_onFinished = nullptr;
+static jmethodID g_onPosition = nullptr;
 static JavaVM *g_vm = nullptr;
+
+static JNIEnv *getEnv(bool *detach) {
+  JNIEnv *env = nullptr;
+  if (g_vm->GetEnv(reinterpret_cast<void **>(&env), JNI_VERSION_1_6) == JNI_EDETACHED) {
+    if (g_vm->AttachCurrentThread(&env, nullptr) != 0)
+      return nullptr;
+    if (detach)
+      *detach = true;
+  }
+  return env;
+}
 
 extern "C" jint JNI_OnLoad(JavaVM *vm, void *) {
   g_vm = vm;
@@ -25,7 +38,14 @@ extern "C" void Java_com_example_mediaplayer_MediaPlayerNative_nativePause(JNIEn
     g_player->pause();
 }
 
-extern "C" jboolean Java_com_example_mediaplayer_MediaPlayerNative_nativeOpen(JNIEnv *env, jclass) {
+extern "C" jboolean Java_com_example_mediaplayer_MediaPlayerNative_nativeOpen(JNIEnv *env, jclass,
+                                                                              jstring path) {
+  const char *cpath = env->GetStringUTFChars(path, nullptr);
+  if (!g_player)
+    g_player = std::make_unique<MediaPlayer>();
+  bool ok = g_player->open(cpath);
+  env->ReleaseStringUTFChars(path, cpath);
+  return ok ? JNI_TRUE : JNI_FALSE;
 }
 
 extern "C" void Java_com_example_mediaplayer_MediaPlayerNative_nativeStop(JNIEnv *, jclass) {
@@ -33,12 +53,56 @@ extern "C" void Java_com_example_mediaplayer_MediaPlayerNative_nativeStop(JNIEnv
     g_player->stop();
 }
 
-extern "C" void Java_com_example_mediaplayer_MediaPlayerNative_nativeSeek(JNIEnv *, jclass, jdouble pos) {
+extern "C" void Java_com_example_mediaplayer_MediaPlayerNative_nativeSeek(JNIEnv *, jclass,
+                                                                          jdouble pos) {
   if (g_player)
     g_player->seek(pos);
 }
 
-extern "C" jobjectArray Java_com_example_mediaplayer_MediaPlayerNative_nativeListMedia(JNIEnv *env, jclass) {
+extern "C" void
+Java_com_example_mediaplayer_MediaPlayerNative_nativeSetCallback(JNIEnv *env, jclass, jobject cb) {
+  if (g_callback) {
+    env->DeleteGlobalRef(g_callback);
+    g_callback = nullptr;
+  }
+  g_onFinished = nullptr;
+  g_onPosition = nullptr;
+
+  if (cb) {
+    g_callback = env->NewGlobalRef(cb);
+    jclass cls = env->GetObjectClass(cb);
+    g_onFinished = env->GetMethodID(cls, "onPlaybackFinished", "()V");
+    g_onPosition = env->GetMethodID(cls, "onPositionChanged", "(D)V");
+    env->DeleteLocalRef(cls);
+  }
+
+  if (!g_player)
+    g_player = std::make_unique<MediaPlayer>();
+
+  mediaplayer::PlaybackCallbacks cbs;
+  if (g_callback) {
+    cbs.onFinished = []() {
+      bool detach = false;
+      JNIEnv *envCb = getEnv(&detach);
+      if (envCb && g_callback && g_onFinished)
+        envCb->CallVoidMethod(g_callback, g_onFinished);
+      if (detach)
+        g_vm->DetachCurrentThread();
+    };
+    cbs.onPosition = [](double pos) {
+      bool detach = false;
+      JNIEnv *envCb = getEnv(&detach);
+      if (envCb && g_callback && g_onPosition)
+        envCb->CallVoidMethod(g_callback, g_onPosition, pos);
+      if (detach)
+        g_vm->DetachCurrentThread();
+    };
+  }
+  g_player->setCallbacks(cbs);
+}
+
+extern "C" jobjectArray Java_com_example_mediaplayer_MediaPlayerNative_nativeListMedia(JNIEnv *env,
+                                                                                       jclass) {
   if (!g_player)
     g_player = std::make_unique<MediaPlayer>();
   auto items = g_player->allMedia();
@@ -49,7 +113,8 @@ extern "C" jobjectArray Java_com_example_mediaplayer_MediaPlayerNative_nativeLis
   return arr;
 }
 
-extern "C" void Java_com_example_mediaplayer_MediaPlayerNative_nativeSetSurface(JNIEnv *env, jclass, jobject surface) {
+extern "C" void Java_com_example_mediaplayer_MediaPlayerNative_nativeSetSurface(JNIEnv *env, jclass,
+                                                                                jobject surface) {
   if (!g_player)
     g_player = std::make_unique<MediaPlayer>();
 

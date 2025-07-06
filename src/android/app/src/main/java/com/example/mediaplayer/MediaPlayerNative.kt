@@ -11,5 +11,6 @@ object MediaPlayerNative {
     external fun nativeStop()
     external fun nativeSeek(position: Double)
     external fun nativeSetSurface(surface: Any?)
+    external fun nativeSetCallback(listener: PlaybackListener?)
     external fun nativeListMedia(): Array<String>
 }
