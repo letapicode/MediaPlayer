@@ -10,17 +10,33 @@ ListView {
         spacing: 4
         property int itemIndex: index
         Text { text: model.title }
-        Button { text: qsTr("Remove"); onClicked: playlistModel.removeFromPlaylist(playlistName, model.path) }
+        Button {
+            text: qsTr("Remove")
+            onClicked: playlistModel.removeFromPlaylist(playlistName, model.path)
+        }
         Drag.active: drag.active
-        Drag.mimeData: { "index": itemIndex }
+        Drag.mimeData: {
+            "index": itemIndex,
+            "path": model.path,
+            "sourcePlaylist": playlistName
+        }
     }
     DropArea {
         anchors.fill: parent
         onDropped: {
             if (drop.mimeData.hasOwnProperty("index"))
-                playlistModel.moveItem(playlistName, drop.mimeData.index, playlistItems.indexAt(drop.position.x, drop.position.y))
-            else if (drop.mimeData.hasOwnProperty("path"))
+                playlistModel.moveItem(
+                    playlistName,
+                    drop.mimeData.index,
+                    playlistItems.indexAt(drop.position.x, drop.position.y))
+            else if (drop.mimeData.hasOwnProperty("path")) {
                 playlistModel.addItem(playlistName, drop.mimeData.path)
+                if (drop.mimeData.hasOwnProperty("sourcePlaylist") &&
+                        drop.mimeData.sourcePlaylist !== playlistName)
+                    playlistModel.removeFromPlaylist(
+                        drop.mimeData.sourcePlaylist,
+                        drop.mimeData.path)
+            }
         }
     }
 
