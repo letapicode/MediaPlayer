@@ -57,7 +57,7 @@ Item {
     }
 }
 ```
-\nThis example relates to Task #182 in Tasks.MD.
+\nThis example relates to Task #78 (Media Library View) in Tasks.MD.
 
 ## VisualizerQt
 
