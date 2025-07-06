@@ -25,7 +25,22 @@ extern "C" void Java_com_example_mediaplayer_MediaPlayerNative_nativePause(JNIEn
     g_player->pause();
 }
 
-extern "C" jboolean Java_com_example_mediaplayer_MediaPlayerNative_nativeOpen(JNIEnv *env, jclass) {
+extern "C" jboolean Java_com_example_mediaplayer_MediaPlayerNative_nativeOpen(JNIEnv *env, jclass,
+                                                                              jstring path) {
+  if (!path)
+    return JNI_FALSE;
+
+  if (!g_player)
+    g_player = std::make_unique<MediaPlayer>();
+
+  const char *cpath = env->GetStringUTFChars(path, nullptr);
+  if (!cpath)
+    return JNI_FALSE;
+  std::string cppPath(cpath);
+  env->ReleaseStringUTFChars(path, cpath);
+
+  bool ok = g_player->open(cppPath);
+  return ok ? JNI_TRUE : JNI_FALSE;
 }
 
 extern "C" void Java_com_example_mediaplayer_MediaPlayerNative_nativeStop(JNIEnv *, jclass) {
@@ -33,12 +48,14 @@ extern "C" void Java_com_example_mediaplayer_MediaPlayerNative_nativeStop(JNIEnv
     g_player->stop();
 }
 
-extern "C" void Java_com_example_mediaplayer_MediaPlayerNative_nativeSeek(JNIEnv *, jclass, jdouble pos) {
+extern "C" void Java_com_example_mediaplayer_MediaPlayerNative_nativeSeek(JNIEnv *, jclass,
+                                                                          jdouble pos) {
   if (g_player)
     g_player->seek(pos);
 }
 
-extern "C" jobjectArray Java_com_example_mediaplayer_MediaPlayerNative_nativeListMedia(JNIEnv *env, jclass) {
+extern "C" jobjectArray Java_com_example_mediaplayer_MediaPlayerNative_nativeListMedia(JNIEnv *env,
+                                                                                       jclass) {
   if (!g_player)
     g_player = std::make_unique<MediaPlayer>();
   auto items = g_player->allMedia();
@@ -49,7 +66,8 @@ extern "C" jobjectArray Java_com_example_mediaplayer_MediaPlayerNative_nativeLis
   return arr;
 }
 
-extern "C" void Java_com_example_mediaplayer_MediaPlayerNative_nativeSetSurface(JNIEnv *env, jclass, jobject surface) {
+extern "C" void Java_com_example_mediaplayer_MediaPlayerNative_nativeSetSurface(JNIEnv *env, jclass,
+                                                                                jobject surface) {
   if (!g_player)
     g_player = std::make_unique<MediaPlayer>();
 
