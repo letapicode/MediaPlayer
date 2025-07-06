@@ -37,12 +37,6 @@ Dialog {
         Button { text: qsTr("Add Rule"); onClicked: dlg.rules.push({field:"title", op:"contains", value:""}) }
     }
     onAccepted: {
-        var query = "";
-        for (var i=0; i<rules.length; ++i) {
-            var r = rules[i];
-            if (i > 0) query += " AND ";
-            query += r.field + " " + r.op + " " + r.value;
-        }
-        playlistModel.createSmartPlaylist(nameField.text, query)
+        smartPlaylistManager.createSmartPlaylist(nameField.text, dlg.rules)
     }
 }
