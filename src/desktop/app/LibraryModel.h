@@ -9,7 +9,15 @@ namespace mediaplayer {
 class LibraryModel : public QAbstractListModel {
   Q_OBJECT
 public:
-  enum Roles { PathRole = Qt::UserRole + 1, TitleRole };
+  enum Roles {
+    PathRole = Qt::UserRole + 1,
+    TitleRole,
+    ArtistRole,
+    AlbumRole,
+    GenreRole,
+    DurationRole,
+    RatingRole
+  };
 
   explicit LibraryModel(QObject *parent = nullptr);
   void setLibrary(LibraryDB *db);

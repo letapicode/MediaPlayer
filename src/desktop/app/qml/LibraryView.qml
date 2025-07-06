@@ -7,9 +7,17 @@ ListView {
     model: libraryModel
     delegate: Item {
         width: parent.width
-        height: 24
+        height: 40
         property string path: model.path
-        Text { text: model.title; anchors.verticalCenter: parent.verticalCenter }
+        Column {
+            anchors.verticalCenter: parent.verticalCenter
+            Text { text: model.title }
+            Text {
+                text: model.artist
+                font.pixelSize: 10
+                color: "#666"
+            }
+        }
         MouseArea {
             id: dragArea
             anchors.fill: parent
