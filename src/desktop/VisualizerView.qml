@@ -4,8 +4,7 @@ import MediaPlayer 1.0
 
 Item {
     id: root
-    width: 640
-    height: 480
+    anchors.fill: parent
 
     VisualizerQt { id: vis }
     VisualizerItem {

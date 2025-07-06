@@ -2,7 +2,8 @@ import QtQuick 2.15
 import MediaPlayer 1.0
 
 Item {
-    width: 640; height: 360
+    Layout.fillWidth: true
+    Layout.preferredHeight: 360
     VideoItem {
         id: item
         anchors.fill: parent

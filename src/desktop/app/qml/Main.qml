@@ -91,20 +91,32 @@ ApplicationWindow {
 
     ColumnLayout {
         anchors.fill: parent
-        VideoPlayer { Layout.fillWidth: true; height: 300 }
+        VideoPlayer {
+            Layout.fillWidth: true
+            Layout.preferredHeight: 300
+        }
         RowLayout {
             spacing: 8
             Label { text: player.title }
             Label { text: player.artist }
             Label { text: player.album }
         }
-        LibraryView { Layout.fillWidth: true; Layout.fillHeight: true }
-        PlaylistView { Layout.fillWidth: true; height: 100 }
+        LibraryView {
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+        }
+        PlaylistView {
+            Layout.fillWidth: true
+            Layout.preferredHeight: 100
+        }
         NowPlayingView {
             Layout.fillWidth: true
             Layout.preferredHeight: 120
         }
-        VisualizationView { Layout.fillWidth: true; height: 150 }
+        VisualizationView {
+            Layout.fillWidth: true
+            Layout.preferredHeight: 150
+        }
         RowLayout {
             Layout.fillWidth: true
             ToolButton {

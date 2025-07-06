@@ -4,10 +4,12 @@ import QtQuick.Controls 2.15
 ListView {
     id: view
     anchors.fill: parent
+    Layout.fillWidth: true
+    Layout.fillHeight: true
     model: libraryModel
     delegate: Item {
         width: parent.width
-        height: 24
+        implicitHeight: 24
         property string path: model.path
         Text { text: model.title; anchors.verticalCenter: parent.verticalCenter }
         MouseArea {
