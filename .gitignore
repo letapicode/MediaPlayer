@@ -57,3 +57,6 @@ dist/
 # Windows
 Thumbs.db
 Desktop.ini
+
+# Qt translation binaries
+*.qm
