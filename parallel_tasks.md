@@ -132,8 +132,8 @@
   | 105 | Settings Activity                  | done   | relevant |
   | 106 | JNI Bridge Class                   | done   | relevant |
   | 107 | JNI Implementations                | done   | relevant |
-  | 108 | Thread Management                  | open   | relevant |
-  | 109 | Callbacks from Native              | open   | relevant |
+  | 108 | Thread Management                  | done   | relevant |
+  | 109 | Callbacks from Native              | done   | relevant |
   | 110 | MediaSession & Notification        | done   | relevant |
   | 111 | Permission Handling                | done   | relevant |
   | 112 | Gesture Detection                  | done   | relevant |
