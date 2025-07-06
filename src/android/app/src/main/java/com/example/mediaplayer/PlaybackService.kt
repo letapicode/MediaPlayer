@@ -10,7 +10,7 @@ import android.os.IBinder
 import androidx.core.app.NotificationCompat
 import androidx.media.session.MediaButtonReceiver
 import androidx.media.app.NotificationCompat as MediaStyle
-import android.support.v4.media.session.MediaSessionCompat
+import androidx.media.session.MediaSessionCompat
 
 class PlaybackService : Service() {
     private lateinit var session: MediaSessionCompat
