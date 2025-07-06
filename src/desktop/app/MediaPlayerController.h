@@ -17,6 +17,7 @@ class MediaPlayerController : public QObject {
   Q_OBJECT
   Q_PROPERTY(bool playing READ playing NOTIFY playbackStateChanged)
   Q_PROPERTY(double position READ position NOTIFY positionChanged)
+  Q_PROPERTY(QVariantMap currentTrack READ currentTrack NOTIFY currentMetadataChanged)
   Q_PROPERTY(double volume READ volume WRITE setVolume NOTIFY volumeChanged)
   Q_PROPERTY(VideoOutputQt *videoOutput READ videoOutput CONSTANT)
   Q_PROPERTY(VisualizerQt *visualizer READ visualizer CONSTANT)
@@ -51,6 +52,8 @@ public:
   double duration() const;
   NowPlayingModel *nowPlaying() const { return m_nowPlaying; }
 
+  QVariantMap currentTrack() const;
+
   VideoOutputQt *videoOutput() const { return m_videoOutput; }
   VisualizerQt *visualizer() const { return m_visualizer; }
 
@@ -64,6 +67,8 @@ signals:
 
 private:
   MediaPlayer m_player;
+  bool m_playing{false};
+  double m_position{0.0};
   VideoOutputQt *m_videoOutput{nullptr};
   VisualizerQt *m_visualizer{nullptr};
   MediaMetadata m_meta;
