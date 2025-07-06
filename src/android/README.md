@@ -12,3 +12,7 @@ Minimum SDK version is 24 and the project targets the latest API level.
 Supported ABIs are `arm64-v8a`, `armeabi-v7a` and `x86_64`.
 
 Run instrumented tests with `./gradlew connectedAndroidTest`.
+
+The binary `gradle-wrapper.jar` is not included in the repository. If the
+wrapper fails to run, install Gradle locally and execute `gradle wrapper` in
+this directory to regenerate the jar.
