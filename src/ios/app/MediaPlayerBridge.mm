@@ -1,7 +1,9 @@
 #import "MediaPlayerBridge.h"
 #include "mediaplayer/LibraryDB.h"
 #include "mediaplayer/MediaPlayer.h"
+#include <filesystem>
 #include <memory>
+#include <string>
 
 using namespace mediaplayer;
 
@@ -98,12 +100,20 @@ NSString *const MediaPlayerTrackLoadedNotification = @"MediaPlayerTrackLoaded";
   if (!_player)
     return @{};
   const auto &m = _player->metadata();
+  std::filesystem::path art(m.path);
+  art.replace_extension("jpg");
+  NSString *artPath = nil;
+  if (std::filesystem::exists(art)) {
+    std::string s = art.string();
+    artPath = [NSString stringWithUTF8String:s.c_str()];
+  }
   return @{
     @"path" : [NSString stringWithUTF8String:m.path.c_str()],
     @"title" : [NSString stringWithUTF8String:m.title.c_str()],
     @"artist" : [NSString stringWithUTF8String:m.artist.c_str()],
     @"album" : [NSString stringWithUTF8String:m.album.c_str()],
-    @"duration" : @(m.duration)
+    @"duration" : @(m.duration),
+    @"artwork" : artPath ?: [NSNull null]
   };
 }
 
@@ -114,6 +124,19 @@ NSString *const MediaPlayerTrackLoadedNotification = @"MediaPlayerTrackLoaded";
 - (void)previousTrack {
   if (_player)
     _player->previousTrack();
+}
+
+- (NSString *)currentArtworkPath {
+  if (!_player)
+    return nil;
+  const auto &meta = _player->metadata();
+  std::filesystem::path p(meta.path);
+  p.replace_extension("jpg");
+  if (std::filesystem::exists(p)) {
+    std::string s = p.string();
+    return [NSString stringWithUTF8String:s.c_str()];
+  }
+  return nil;
 }
 
 - (void)setCallbacks {
@@ -131,12 +154,20 @@ NSString *const MediaPlayerTrackLoadedNotification = @"MediaPlayerTrackLoaded";
                     userInfo:@{@"position" : @(pos)}];
   };
   cbs.onTrackLoaded = [](const MediaMetadata &meta) {
+    std::filesystem::path art(meta.path);
+    art.replace_extension("jpg");
+    NSString *artPath = nil;
+    if (std::filesystem::exists(art)) {
+      std::string s = art.string();
+      artPath = [NSString stringWithUTF8String:s.c_str()];
+    }
     NSDictionary *info = @{
       @"path" : [NSString stringWithUTF8String:meta.path.c_str()],
       @"title" : [NSString stringWithUTF8String:meta.title.c_str()],
       @"artist" : [NSString stringWithUTF8String:meta.artist.c_str()],
       @"album" : [NSString stringWithUTF8String:meta.album.c_str()],
-      @"duration" : @(meta.duration)
+      @"duration" : @(meta.duration),
+      @"artwork" : artPath ?: [NSNull null]
     };
     [[NSNotificationCenter defaultCenter] postNotificationName:MediaPlayerTrackLoadedNotification
                                                         object:nil

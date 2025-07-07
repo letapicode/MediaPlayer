@@ -1,6 +1,7 @@
 import Foundation
 import Combine
 import MediaPlayer
+import UIKit
 
 struct MediaItem: Identifiable {
     let id = UUID()
@@ -21,6 +22,7 @@ class MediaPlayerViewModel: ObservableObject {
     @Published var library: [MediaItem] = []
     @Published var shuffleEnabled: Bool = false
     @Published var currentDuration: Double = 0
+    @Published var artwork: UIImage? = nil
 
     init(bridge: MediaPlayerBridge = MediaPlayerBridge(), nowPlaying: MPNowPlayingInfoCenter = MPNowPlayingInfoCenter.default()) {
         self.bridge = bridge
@@ -40,6 +42,11 @@ class MediaPlayerViewModel: ObservableObject {
             self.currentArtist = n.userInfo?["artist"] as? String ?? ""
             if let dur = n.userInfo?["duration"] as? Double {
                 self.currentDuration = dur
+            }
+            if let artPath = n.userInfo?["artwork"] as? String {
+                self.artwork = UIImage(contentsOfFile: artPath)
+            } else {
+                self.artwork = nil
             }
             self.updateNowPlayingInfo()
         })
@@ -112,6 +119,10 @@ class MediaPlayerViewModel: ObservableObject {
     private func updateNowPlayingInfo() {
         var info: [String: Any] = [MPMediaItemPropertyTitle: currentTitle,
                                    MPMediaItemPropertyArtist: currentArtist]
+        if let img = artwork {
+            let art = MPMediaItemArtwork(boundsSize: img.size) { _ in img }
+            info[MPMediaItemPropertyArtwork] = art
+        }
         info[MPNowPlayingInfoPropertyElapsedPlaybackTime] = position
         info[MPMediaItemPropertyPlaybackDuration] = currentDuration
         nowPlayingCenter.nowPlayingInfo = info

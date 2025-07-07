@@ -19,6 +19,7 @@ extern NSString *const MediaPlayerTrackLoadedNotification;
 - (NSDictionary *)currentMetadata;
 - (void)nextTrack;
 - (void)previousTrack;
+- (nullable NSString *)currentArtworkPath;
 - (void)setCallbacks;
 - (void)setLibraryPath:(NSString *)path;
 - (void)enableShuffle:(BOOL)enabled;
