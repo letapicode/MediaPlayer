@@ -21,6 +21,11 @@ class MediaPlayerViewModel: ObservableObject {
     @Published var currentArtist: String = ""
     @Published var library: [MediaItem] = []
     @Published var shuffleEnabled: Bool = false
+    @Published var aiTaggingEnabled: Bool = UserDefaults.standard.bool(forKey: "enableAITagging") {
+        didSet {
+            UserDefaults.standard.set(aiTaggingEnabled, forKey: "enableAITagging")
+        }
+    }
     @Published var currentDuration: Double = 0
     @Published var artwork: UIImage? = nil
 
@@ -28,6 +33,7 @@ class MediaPlayerViewModel: ObservableObject {
         self.bridge = bridge
         self.nowPlayingCenter = nowPlaying
         shuffleEnabled = bridge.shuffleEnabled()
+        aiTaggingEnabled = UserDefaults.standard.bool(forKey: "enableAITagging")
         observers.append(NotificationCenter.default.addObserver(forName: .trackFinished, object: nil, queue: .main) { _ in
             self.isPlaying = false
         })
