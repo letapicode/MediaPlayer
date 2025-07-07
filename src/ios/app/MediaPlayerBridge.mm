@@ -1,4 +1,5 @@
 #import "MediaPlayerBridge.h"
+#include "mediaplayer/LibraryDB.h"
 #include "mediaplayer/MediaPlayer.h"
 #include <memory>
 
@@ -10,6 +11,7 @@ NSString *const MediaPlayerTrackLoadedNotification = @"MediaPlayerTrackLoaded";
 
 @interface MediaPlayerBridge () {
   std::unique_ptr<MediaPlayer> _player;
+  std::unique_ptr<LibraryDB> _library;
 }
 @end
 
@@ -141,6 +143,15 @@ NSString *const MediaPlayerTrackLoadedNotification = @"MediaPlayerTrackLoaded";
                                                       userInfo:info];
   };
   _player->setCallbacks(cbs);
+}
+
+- (void)setLibraryPath:(NSString *)path {
+  _library = std::make_unique<LibraryDB>(path.UTF8String);
+  if (_library->open()) {
+    if (!_player)
+      _player = std::make_unique<MediaPlayer>();
+    _player->setLibrary(_library.get());
+  }
 }
 
 - (void)enableShuffle:(BOOL)enabled {

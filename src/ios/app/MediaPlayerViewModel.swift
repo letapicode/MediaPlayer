@@ -11,6 +11,7 @@ struct MediaItem: Identifiable {
 
 class MediaPlayerViewModel: ObservableObject {
     private let bridge: MediaPlayerBridge
+    private let nowPlayingCenter: MPNowPlayingInfoCenter
     private var observers: [NSObjectProtocol] = []
 
     @Published var isPlaying: Bool = false
@@ -19,20 +20,27 @@ class MediaPlayerViewModel: ObservableObject {
     @Published var currentArtist: String = ""
     @Published var library: [MediaItem] = []
     @Published var shuffleEnabled: Bool = false
+    @Published var currentDuration: Double = 0
 
-    init(bridge: MediaPlayerBridge = MediaPlayerBridge()) {
+    init(bridge: MediaPlayerBridge = MediaPlayerBridge(), nowPlaying: MPNowPlayingInfoCenter = MPNowPlayingInfoCenter.default()) {
         self.bridge = bridge
+        self.nowPlayingCenter = nowPlaying
+        shuffleEnabled = bridge.shuffleEnabled()
         observers.append(NotificationCenter.default.addObserver(forName: .trackFinished, object: nil, queue: .main) { _ in
             self.isPlaying = false
         })
         observers.append(NotificationCenter.default.addObserver(forName: .positionChanged, object: nil, queue: .main) { n in
             if let pos = n.userInfo?["position"] as? Double {
                 self.position = pos
+                self.updateNowPlayingInfo()
             }
         })
         observers.append(NotificationCenter.default.addObserver(forName: .trackLoaded, object: nil, queue: .main) { n in
             self.currentTitle = n.userInfo?["title"] as? String ?? ""
             self.currentArtist = n.userInfo?["artist"] as? String ?? ""
+            if let dur = n.userInfo?["duration"] as? Double {
+                self.currentDuration = dur
+            }
             self.updateNowPlayingInfo()
         })
     }
@@ -43,6 +51,10 @@ class MediaPlayerViewModel: ObservableObject {
 
     func configureCallbacks() {
         bridge.setCallbacks()
+        if let dir = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first {
+            let path = dir.appendingPathComponent("media_library.db").path
+            bridge.setLibraryPath(path)
+        }
     }
 
     func open(_ path: String) -> Bool {
@@ -101,7 +113,8 @@ class MediaPlayerViewModel: ObservableObject {
         var info: [String: Any] = [MPMediaItemPropertyTitle: currentTitle,
                                    MPMediaItemPropertyArtist: currentArtist]
         info[MPNowPlayingInfoPropertyElapsedPlaybackTime] = position
-        MPNowPlayingInfoCenter.default().nowPlayingInfo = info
+        info[MPMediaItemPropertyPlaybackDuration] = currentDuration
+        nowPlayingCenter.nowPlayingInfo = info
     }
 
     func setupRemoteCommands() {

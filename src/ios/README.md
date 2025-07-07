@@ -36,5 +36,14 @@ The **Settings** tab now includes toggles for swipe gestures and the
 to issue voice commands such as "play", "pause" or "next". The Now Playing
 screen includes a microphone button that activates recognition and dispatches
 the recognized text to `MediaPlayerViewModel.handleVoiceCommand(_:)`.
-Ensure the app Info.plist declares the `NSSpeechRecognitionUsageDescription`
-key so iOS prompts the user for permission to use speech recognition.
+
+The app requires the following keys in **Info.plist** so iOS prompts the user
+for access to speech and Siri functionality:
+
+```
+NSSpeechRecognitionUsageDescription
+NSSiriUsageDescription
+```
+
+`devops/build_ios.sh` builds the project from the command line using
+`xcodebuild`.
