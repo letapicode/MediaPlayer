@@ -77,6 +77,15 @@ class MediaPlayerViewModel: ObservableObject {
         }
     }
 
+    func search(_ query: String) {
+        let items = bridge.search(query) as? [[String: Any]] ?? []
+        library = items.map { dict in
+            MediaItem(path: dict["path"] as? String ?? "",
+                      title: dict["title"] as? String ?? "",
+                      artist: dict["artist"] as? String ?? "")
+        }
+    }
+
     func nextTrack() { bridge.nextTrack() }
     func previousTrack() { bridge.previousTrack() }
     func enableShuffle(_ enabled: Bool) {
