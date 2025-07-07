@@ -10,6 +10,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.Toast
+import com.example.mediaplayer.ShakeDetector
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.Dispatchers
@@ -19,6 +20,7 @@ class NowPlayingFragment : Fragment(), SurfaceHolder.Callback {
 
     private var surface: SurfaceView? = null
     private lateinit var detector: GestureDetector
+    private lateinit var shakeDetector: ShakeDetector
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -39,6 +41,10 @@ class NowPlayingFragment : Fragment(), SurfaceHolder.Callback {
                 return true
             }
         })
+        shakeDetector = ShakeDetector(requireContext())
+        shakeDetector.onShake = {
+            lifecycleScope.launch(Dispatchers.IO) { MediaPlayerNative.nativeEnableShuffle(true) }
+        }
         view.findViewById<ImageButton>(R.id.playPause).setOnClickListener {
             lifecycleScope.launch(Dispatchers.IO) {
                 MediaPlayerNative.nativePlay()
@@ -59,6 +65,16 @@ class NowPlayingFragment : Fragment(), SurfaceHolder.Callback {
     override fun onDestroyView() {
         MediaPlayerNative.nativeSetCallback(null)
         super.onDestroyView()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        shakeDetector.start()
+    }
+
+    override fun onPause() {
+        shakeDetector.stop()
+        super.onPause()
     }
 
     override fun surfaceCreated(holder: SurfaceHolder) {

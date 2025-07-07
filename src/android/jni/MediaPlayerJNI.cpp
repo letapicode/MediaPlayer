@@ -121,6 +121,24 @@ extern "C" jobjectArray Java_com_example_mediaplayer_MediaPlayerNative_nativeLis
   return arr;
 }
 
+extern "C" void Java_com_example_mediaplayer_MediaPlayerNative_nativeNextTrack(JNIEnv *, jclass) {
+  if (g_player)
+    g_player->nextTrack();
+}
+
+extern "C" void Java_com_example_mediaplayer_MediaPlayerNative_nativePreviousTrack(JNIEnv *,
+                                                                                   jclass) {
+  if (g_player)
+    g_player->previousTrack();
+}
+
+extern "C" void
+Java_com_example_mediaplayer_MediaPlayerNative_nativeEnableShuffle(JNIEnv *, jclass,
+                                                                   jboolean enabled) {
+  if (g_player)
+    g_player->enableShuffle(enabled == JNI_TRUE);
+}
+
 extern "C" void Java_com_example_mediaplayer_MediaPlayerNative_nativeSetSurface(JNIEnv *env, jclass,
                                                                                 jobject surface) {
   if (!g_player)
