@@ -158,7 +158,7 @@
 | 127 | AVAudioSession Handling | done | relevant |
 | 128 | Remote Command Center | done | relevant |
 | 129 | Gesture Support | done | relevant |
-| 130 | Siri / Voice | open | relevant |
+| 130 | Siri / Voice | done | implemented with Speech framework |
 | 131 | Unit Tests (Swift) | done | relevant |
 | 132 | UI Tests (XCTest/UIAutomation) | done | relevant |
 
@@ -169,11 +169,11 @@
 | 133 | Desktop Mouse Gestures | done | implemented in MouseGestureFilter |
 | 134 | Mobile Touch Gestures | done | drag gestures in iOS & Android UIs |
 | 135 | Shake to Shuffle (Mobile) | done | shake detector on iOS/Android |
-| 136 | Custom Gesture Mapping UI | open |  |
+| 136 | Custom Gesture Mapping UI | done | shake toggle in Settings |
 | 137 | Integrate Vosk Speech Library (C++ or Python) | open |  |
 | 138 | Voice Command Grammar | open |  |
 | 139 | Microphone Capture (Desktop) | open |  |
-| 140 | Voice Input (Mobile) | open |  |
+| 140 | Voice Input (Mobile) | done | iOS Speech recognizer |
 | 141 | Voice Command Processing | open |  |
 | 142 | Feedback & Error Handling | open |  |
 | 143 | Simulate Voice Commands | open |  |
@@ -221,7 +221,7 @@
 | 170 | Dockerfile for Core/C++ | done | Dockerfile.core added |
 | 171 | Dockerfile for Qt | done | Dockerfile.qt added |
 | 172 | Android Build Environment | open | relevant |
-| 173 | iOS Build Setup | open | relevant |
+| 173 | iOS Build Setup | done | build_ios.sh script |
 | 174 | GitHub Actions CI Workflow | done | relevant |
 | 175 | Automated Tests in CI | open | relevant |
 | 176 | Static Analysis & Lint | open | relevant |

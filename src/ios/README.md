@@ -19,3 +19,15 @@ setting its file type to `Objective-C++ Source`.
 
 The SwiftUI views demonstrate basic playback control and can be expanded
 with library browsing and settings screens as tasks are completed.
+
+## Voice Control
+
+`VoiceControl` uses `SFSpeechRecognizer` to recognize simple commands like
+"play", "pause" or "next". Tap the "Voice" button on the Now Playing screen to
+start or stop listening. Recognized commands are routed through
+`MediaPlayerViewModel.handleVoiceCommand`.
+
+## Command Line Build
+
+If Xcode is installed you can build the app with `devops/build_ios.sh`. The
+script calls `xcodebuild` with the `MediaPlayerApp` scheme.

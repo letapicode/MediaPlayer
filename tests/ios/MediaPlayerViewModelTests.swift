@@ -34,4 +34,11 @@ final class MediaPlayerViewModelTests: XCTestCase {
         XCTAssertEqual(bridge.lastSearchQuery, "hello")
         XCTAssertEqual(vm.library.first?.title, "t")
     }
+
+    func testHandleVoiceCommandPlay() {
+        let bridge = DummyBridge()
+        let vm = MediaPlayerViewModel(bridge: bridge)
+        vm.handleVoiceCommand("play the music")
+        XCTAssertTrue(vm.isPlaying)
+    }
 }

@@ -97,6 +97,21 @@ class MediaPlayerViewModel: ObservableObject {
         enableShuffle(!shuffleEnabled)
     }
 
+    func handleVoiceCommand(_ text: String) {
+        let command = text.lowercased()
+        if command.contains("play") {
+            play()
+        } else if command.contains("pause") {
+            pause()
+        } else if command.contains("next") {
+            nextTrack()
+        } else if command.contains("previous") || command.contains("back") {
+            previousTrack()
+        } else if command.contains("shuffle") {
+            toggleShuffle()
+        }
+    }
+
     private func updateNowPlayingInfo() {
         var info: [String: Any] = [MPMediaItemPropertyTitle: currentTitle,
                                    MPMediaItemPropertyArtist: currentArtist]

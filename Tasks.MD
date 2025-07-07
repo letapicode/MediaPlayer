@@ -283,6 +283,7 @@ Below, each module is detailed with its tasks. Each task listing includes a shor
   * *Task:* **Remote Command Center** – Integrate with MPRemoteCommandCenter so that control center (lock screen) has play/pause/next controls working. Update now playing info via MPNowPlayingInfoCenter with current track info (title, artwork). *Language:* Swift. *Environment:* iOS MediaPlayer framework.
   * *Task:* **Gesture Support** – On iOS, e.g., a swipe gesture on album art to skip, or shake device for some action (if desired). Use SwiftUI gestures or UIKit gesture recognizers. *Language:* Swift. *Environment:* Xcode.
   * *Task:* **Siri / Voice** – Optionally, add Siri integration (SiriKit Media Intents) to control playback via voice. This requires defining Siri intents for play/pause, etc. *Language:* Swift. *Environment:* Xcode with SiriKit. (Optional advanced feature.)
+    *Status:* **Done** – Implemented using `VoiceControl` with `SFSpeechRecognizer` and an `IntentHandler` for basic play/pause intents.
 
 * **Testing:**
 
@@ -301,6 +302,7 @@ Below, each module is detailed with its tasks. Each task listing includes a shor
   * *Task:* **Mobile Touch Gestures** – Implement common gestures in mobile UIs: in Android and iOS UI code, add swipe detection on the Now Playing view (left/right for prev/next track), swipe up/down for volume or brightness (for video). Use platform gesture recognizers (Android GestureDetector, iOS SwiftUI DragGesture). *Language:* Kotlin, Swift. *Environment:* Android Studio, Xcode.
   * *Task:* **Shake to Shuffle (Mobile)** – (Fun optional) On iOS, use motion events to detect shake gesture to shuffle playback. On Android, use accelerometer sensor via SensorManager. *Language:* Swift, Kotlin. *Environment:* iOS/Android.
   * *Task:* **Custom Gesture Mapping UI** – (Optional advanced) Provide settings where user can enable/disable certain gestures. For now, likely static, so skip UI.
+    *Status:* **Done** – Settings screen now includes a toggle to enable or disable the shake-to-shuffle gesture.
 
 * **Voice Control (Speech Recognition):**
 
@@ -308,6 +310,7 @@ Below, each module is detailed with its tasks. Each task listing includes a shor
   * *Task:* **Voice Command Grammar** – Define a limited vocabulary/grammar of commands: e.g., “play”, “pause”, “next track”, “previous track”, “volume up/down”, “shuffle on/off”, “play song <name>”, etc. In Vosk, you can specify a list of key phrases for better accuracy. Configure the recognizer with these. *Language:* Depends (could be JSON config to Vosk). *Environment:* C++ or Python environment with model.
   * *Task:* **Microphone Capture (Desktop)** – Implement code to capture microphone audio from user when voice control is activated (e.g., user presses a voice button). On desktop, use PortAudio or Qt Multimedia to get audio input. Feed it to Vosk for processing. *Language:* C++17. *Libraries:* PortAudio or Qt Multimedia. *Environment:* C++ dev (install `portaudio-dev` if using PortAudio).
   * *Task:* **Voice Input (Mobile)** – On Android, optionally start a recognition using Vosk’s Android API (they provide a Gradle dependency). Or use native SpeechRecognizer (less ideal as it needs internet or Google services for offline packs). On iOS, use Vosk via an available iOS framework or Apple’s Speech framework (which can do on-device in newer iOS). For consistency, if using Vosk, integrate it similarly. *Language:* Kotlin/Swift. *Environment:* Android with Vosk .aar, iOS with Vosk via swift package or use Speech.framework for a simple approach.
+    *Status:* **Done** – iOS implementation uses `SFSpeechRecognizer` via `VoiceControl` class.
   * *Task:* **Voice Command Processing** – Once text is recognized, map it to an action. E.g., recognized text "play next song" → call core.next(); "pause" → core.pause(); "play {song}" → search library for {song} and play if found. Implement this mapping logic in whatever part receives the recognition result (could be in C++ or at a higher level in each app). *Language:* C++ (if recognition done in core) or Kotlin/Swift (if done in app). *Environment:* Corresponding dev env.
   * *Task:* **Feedback & Error Handling** – Provide some UI feedback when voice command is listening (e.g., a waveform or a beep) and if command not understood, show a message. *Language:* QML/Kotlin/Swift for UI feedback. *Environment:* All platforms UI.
 
@@ -394,6 +397,7 @@ Below, each module is detailed with its tasks. Each task listing includes a shor
   * *Task:* **Dockerfile for Qt** – Container with Qt 6 SDK and Xvfb (for any GUI build tests). This is heavier (Qt binaries \~). Alternatively, use a pre-made Qt Docker image. *Environment:* Docker – base could be `qt:6.5` image or install Qt via Qt online installer in non-GUI mode.
   * *Task:* **Android Build Environment** – Docker image or script that sets up Android SDK and NDK. E.g., use `openjdk:11` base, install commandline-tools, use sdkmanager to install platform-tools, platforms (android-33), build-tools, ndk. *Environment:* Docker with Android SDK.
   * *Task:* **iOS Build Setup** – (Cannot easily dockerize since Xcode requires macOS). Use a MacOS runner with Xcode installed. Possibly a script to setup any Ruby cocoapods if needed (if using pods, but likely not). *Environment:* MacOS VM/CI runner – ensure Xcode command-line tools present, and a script to build iOS project via xcodebuild.
+    *Status:* **Done** – `devops/build_ios.sh` provides a simple xcodebuild helper.
 
 * **Continuous Integration (CI):**
 
