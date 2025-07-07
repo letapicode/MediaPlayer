@@ -146,21 +146,21 @@
 |-:|------|--------|-------|
 | 116 | Create Xcode Project | open | relevant |
 | 117 | Include Core Engine | open | relevant |
-| 118 | Main UI (SwiftUI ContentView) | open | relevant |
-| 119 | Library List View | open | relevant |
-| 120 | Now Playing View | open | relevant |
-| 121 | Navigation and Tab Bar | open | relevant |
-| 122 | Settings UI | open | relevant |
-| 123 | Bridging Header and Wrapper | open | relevant |
-| 124 | Expose to Swift | open | relevant |
-| 125 | Callbacks from Core | open | relevant |
-| 126 | Data Flow | open | relevant |
-| 127 | AVAudioSession Handling | open | relevant |
-| 128 | Remote Command Center | open | relevant |
-| 129 | Gesture Support | open | relevant |
+| 118 | Main UI (SwiftUI ContentView) | done | relevant |
+| 119 | Library List View | done | relevant |
+| 120 | Now Playing View | done | relevant |
+| 121 | Navigation and Tab Bar | done | relevant |
+| 122 | Settings UI | done | relevant |
+| 123 | Bridging Header and Wrapper | done | relevant |
+| 124 | Expose to Swift | done | relevant |
+| 125 | Callbacks from Core | done | relevant |
+| 126 | Data Flow | done | relevant |
+| 127 | AVAudioSession Handling | done | relevant |
+| 128 | Remote Command Center | done | relevant |
+| 129 | Gesture Support | done | relevant |
 | 130 | Siri / Voice | open | relevant |
-| 131 | Unit Tests (Swift) | open | relevant |
-| 132 | UI Tests (XCTest/UIAutomation) | open | relevant |
+| 131 | Unit Tests (Swift) | done | relevant |
+| 132 | UI Tests (XCTest/UIAutomation) | done | relevant |
 
 ## Gesture & Voice Control Module ([Tasks.MD](Tasks.MD#gesture-voice-control-module))
 
