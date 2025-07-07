@@ -6,6 +6,12 @@ This directory contains container definitions and helper scripts for building Me
 
 `update_android_wrapper.sh` regenerates the Gradle wrapper jar used by the Android project. Run it from the repository root when CI needs a fresh wrapper.
 
+### iOS build helper
+
+`build_ios.sh` invokes `xcodebuild` to compile the iOS application. It expects
+an Xcode project at `src/ios/MediaPlayerApp.xcodeproj` and requires the Xcode
+command line tools to be installed.
+
 ## Qt build container
 
 `Dockerfile.qt` provides an Ubuntu image with the Qt 6 SDK installed. Use it when you want to compile the desktop application without installing Qt locally.

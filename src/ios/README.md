@@ -19,3 +19,12 @@ setting its file type to `Objective-C++ Source`.
 
 The SwiftUI views demonstrate basic playback control and can be expanded
 with library browsing and settings screens as tasks are completed.
+
+### Voice Control
+
+`VoiceControl.swift` implements a minimal wrapper around `SFSpeechRecognizer`
+to issue voice commands such as "play", "pause" or "next". The Now Playing
+screen includes a microphone button that activates recognition and dispatches
+the recognized text to `MediaPlayerViewModel.handleVoiceCommand(_:)`.
+Ensure the app Info.plist declares the `NSSpeechRecognitionUsageDescription`
+key so iOS prompts the user for permission to use speech recognition.
