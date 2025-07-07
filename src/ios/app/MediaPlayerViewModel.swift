@@ -142,29 +142,25 @@ class MediaPlayerViewModel: ObservableObject {
         cc.previousTrackCommand.addTarget { _ in self.previousTrack(); return .success }
     }
 
-    func handleVoiceCommand(_ text: String) {
+    func handleVoiceCommand(_ text: String) -> Bool {
         let command = text.lowercased()
         if command.contains("play") && !command.contains("pause") {
             play()
-            return
+            return true
         }
         if command.contains("pause") {
             pause()
-            return
+            return true
         }
         if command.contains("next") {
             nextTrack()
-            return
+            return true
         }
         if command.contains("previous") || command.contains("back") {
             previousTrack()
-            return
+            return true
         }
-        search(command)
-        if let first = library.first {
-            _ = open(first.path)
-            play()
-        }
+        return false
     }
 }
 

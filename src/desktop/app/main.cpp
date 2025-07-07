@@ -111,6 +111,7 @@ int main(int argc, char *argv[]) {
   engine.rootContext()->setContextProperty("nowPlayingModel", controller.nowPlaying());
   engine.rootContext()->setContextProperty("microphoneInput", &mic);
   engine.rootContext()->setContextProperty("voiceRecognizer", &recognizer);
+  engine.rootContext()->setContextProperty("voiceCommandProcessor", &cmdProcessor);
 
   recognizer.loadModel(QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation) +
                        "/vosk-model");

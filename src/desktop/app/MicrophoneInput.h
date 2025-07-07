@@ -18,6 +18,7 @@ public:
 
 signals:
   void audioDataReady(const QByteArray &data);
+  void errorOccurred(const QString &message);
 
 private:
   QAudioFormat m_format;
