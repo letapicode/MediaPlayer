@@ -18,6 +18,7 @@ class MediaPlayerViewModel: ObservableObject {
     @Published var currentTitle: String = ""
     @Published var currentArtist: String = ""
     @Published var library: [MediaItem] = []
+    @Published var shuffleEnabled: Bool = false
 
     init(bridge: MediaPlayerBridge = MediaPlayerBridge()) {
         self.bridge = bridge
@@ -78,6 +79,14 @@ class MediaPlayerViewModel: ObservableObject {
 
     func nextTrack() { bridge.nextTrack() }
     func previousTrack() { bridge.previousTrack() }
+    func enableShuffle(_ enabled: Bool) {
+        bridge.enableShuffle(enabled)
+        shuffleEnabled = enabled
+    }
+
+    func toggleShuffle() {
+        enableShuffle(!shuffleEnabled)
+    }
 
     private func updateNowPlayingInfo() {
         var info: [String: Any] = [MPMediaItemPropertyTitle: currentTitle,

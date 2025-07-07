@@ -19,6 +19,8 @@ extern NSString *const MediaPlayerTrackLoadedNotification;
 - (void)nextTrack;
 - (void)previousTrack;
 - (void)setCallbacks;
+- (void)enableShuffle:(BOOL)enabled;
+- (BOOL)shuffleEnabled;
 @end
 
 NS_ASSUME_NONNULL_END
