@@ -97,6 +97,7 @@ public:
   std::vector<MediaMetadata> allMedia() const;
   std::vector<std::string> allPlaylists() const;
   std::vector<MediaMetadata> playlistItems(const std::string &name) const;
+  std::vector<MediaMetadata> searchLibrary(const std::string &query) const;
 
 private:
   void demuxLoop();

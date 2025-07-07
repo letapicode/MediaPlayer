@@ -74,6 +74,24 @@ NSString *const MediaPlayerTrackLoadedNotification = @"MediaPlayerTrackLoaded";
   return arr;
 }
 
+- (NSArray<NSDictionary *> *)search:(NSString *)query {
+  if (!_player)
+    _player = std::make_unique<MediaPlayer>();
+  auto items = _player->searchLibrary(query.UTF8String);
+  NSMutableArray<NSDictionary *> *arr = [NSMutableArray arrayWithCapacity:items.size()];
+  for (const auto &m : items) {
+    NSDictionary *info = @{
+      @"path" : [NSString stringWithUTF8String:m.path.c_str()],
+      @"title" : [NSString stringWithUTF8String:m.title.c_str()],
+      @"artist" : [NSString stringWithUTF8String:m.artist.c_str()],
+      @"album" : [NSString stringWithUTF8String:m.album.c_str()],
+      @"duration" : @(m.duration)
+    };
+    [arr addObject:info];
+  }
+  return arr;
+}
+
 - (NSDictionary *)currentMetadata {
   if (!_player)
     return @{};

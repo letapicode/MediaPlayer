@@ -2,6 +2,7 @@ import SwiftUI
 
 struct LibraryView: View {
     @EnvironmentObject var player: MediaPlayerViewModel
+    @State private var searchText: String = ""
 
     var body: some View {
         List(player.library) { item in
@@ -15,5 +16,13 @@ struct LibraryView: View {
             }
         }
         .onAppear { player.loadLibrary() }
+        .searchable(text: $searchText)
+        .onChange(of: searchText) { text in
+            if text.isEmpty {
+                player.loadLibrary()
+            } else {
+                player.search(text)
+            }
+        }
     }
 }

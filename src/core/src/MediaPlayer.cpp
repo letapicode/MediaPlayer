@@ -248,6 +248,13 @@ std::vector<MediaMetadata> MediaPlayer::playlistItems(const std::string &name) c
   return {};
 }
 
+std::vector<MediaMetadata> MediaPlayer::searchLibrary(const std::string &query) const {
+  std::lock_guard<std::mutex> lock(m_mutex);
+  if (m_library)
+    return m_library->search(query);
+  return {};
+}
+
 void MediaPlayer::setAudioOutput(std::unique_ptr<AudioOutput> output) {
   std::lock_guard<std::mutex> lock(m_mutex);
   if (m_output) {

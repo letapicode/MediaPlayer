@@ -15,6 +15,7 @@ extern NSString *const MediaPlayerTrackLoadedNotification;
 - (void)seek:(double)position;
 - (NSArray<NSString *> *)listMedia;
 - (NSArray<NSDictionary *> *)allMedia;
+- (NSArray<NSDictionary *> *)search:(NSString *)query;
 - (NSDictionary *)currentMetadata;
 - (void)nextTrack;
 - (void)previousTrack;

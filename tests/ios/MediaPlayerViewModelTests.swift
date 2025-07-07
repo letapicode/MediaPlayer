@@ -4,8 +4,13 @@ import XCTest
 class DummyBridge: MediaPlayerBridge {
     var playCalled = false
     var shuffleEnabledFlag = false
+    var lastSearchQuery: String?
     override func play() { playCalled = true }
     override func enableShuffle(_ enabled: Bool) { shuffleEnabledFlag = enabled }
+    override func search(_ query: String) -> [NSDictionary] {
+        lastSearchQuery = query
+        return [["path": "p", "title": "t", "artist": "a"]]
+    }
 }
 
 final class MediaPlayerViewModelTests: XCTestCase {
@@ -20,5 +25,13 @@ final class MediaPlayerViewModelTests: XCTestCase {
         let vm = MediaPlayerViewModel(bridge: bridge)
         vm.toggleShuffle()
         XCTAssertTrue(bridge.shuffleEnabledFlag)
+    }
+
+    func testSearchUpdatesLibrary() {
+        let bridge = DummyBridge()
+        let vm = MediaPlayerViewModel(bridge: bridge)
+        vm.search("hello")
+        XCTAssertEqual(bridge.lastSearchQuery, "hello")
+        XCTAssertEqual(vm.library.first?.title, "t")
     }
 }
