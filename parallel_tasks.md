@@ -166,9 +166,9 @@
 
 | # | Task | Status | Notes |
 |-:|------|--------|-------|
-| 133 | Desktop Mouse Gestures | open |  |
-| 134 | Mobile Touch Gestures | open |  |
-| 135 | Shake to Shuffle (Mobile) | open |  |
+| 133 | Desktop Mouse Gestures | done | implemented in MouseGestureFilter |
+| 134 | Mobile Touch Gestures | done | drag gestures in iOS & Android UIs |
+| 135 | Shake to Shuffle (Mobile) | done | shake detector on iOS/Android |
 | 136 | Custom Gesture Mapping UI | open |  |
 | 137 | Integrate Vosk Speech Library (C++ or Python) | open |  |
 | 138 | Voice Command Grammar | open |  |

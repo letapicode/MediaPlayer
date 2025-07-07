@@ -12,6 +12,7 @@ add_executable(mediaplayer_desktop_app
     SettingsManager.cpp
     SmartPlaylistManager.cpp
     VideoItem.cpp
+    MouseGestureFilter.cpp
     windows/WinIntegration.cpp
     windows/Hotkeys.cpp
     macos/MacIntegration.mm

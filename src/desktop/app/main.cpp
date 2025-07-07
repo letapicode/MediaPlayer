@@ -11,6 +11,7 @@
 #include "../VisualizerItem.h"
 #include "../VisualizerQt.h"
 #include "AudioDevicesModel.h"
+#include "MouseGestureFilter.h"
 #include "SettingsManager.h"
 #include "SmartPlaylistManager.h"
 #include "SyncController.h"
@@ -110,6 +111,9 @@ int main(int argc, char *argv[]) {
   engine.load(url);
   if (engine.rootObjects().isEmpty())
     return -1;
+  QObject *rootObj = engine.rootObjects().first();
+  MouseGestureFilter gestureFilter(&controller);
+  rootObj->installEventFilter(&gestureFilter);
 #ifdef _WIN32
   app.setProperty("playerController",
                   QVariant::fromValue<quintptr>(reinterpret_cast<quintptr>(&controller)));
