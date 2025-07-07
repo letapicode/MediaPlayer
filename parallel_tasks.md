@@ -158,7 +158,7 @@
 | 127 | AVAudioSession Handling | done | relevant |
 | 128 | Remote Command Center | done | relevant |
 | 129 | Gesture Support | done | relevant |
-| 130 | Siri / Voice | open | relevant |
+| 130 | Siri / Voice | done | speech recognition button added in iOS app |
 | 131 | Unit Tests (Swift) | done | relevant |
 | 132 | UI Tests (XCTest/UIAutomation) | done | relevant |
 
@@ -221,7 +221,7 @@
 | 170 | Dockerfile for Core/C++ | done | Dockerfile.core added |
 | 171 | Dockerfile for Qt | done | Dockerfile.qt added |
 | 172 | Android Build Environment | open | relevant |
-| 173 | iOS Build Setup | open | relevant |
+| 173 | iOS Build Setup | done | build script added in devops |
 | 174 | GitHub Actions CI Workflow | done | relevant |
 | 175 | Automated Tests in CI | open | relevant |
 | 176 | Static Analysis & Lint | open | relevant |

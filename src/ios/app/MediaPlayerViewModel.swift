@@ -111,6 +111,31 @@ class MediaPlayerViewModel: ObservableObject {
         cc.nextTrackCommand.addTarget { _ in self.nextTrack(); return .success }
         cc.previousTrackCommand.addTarget { _ in self.previousTrack(); return .success }
     }
+
+    func handleVoiceCommand(_ text: String) {
+        let command = text.lowercased()
+        if command.contains("play") && !command.contains("pause") {
+            play()
+            return
+        }
+        if command.contains("pause") {
+            pause()
+            return
+        }
+        if command.contains("next") {
+            nextTrack()
+            return
+        }
+        if command.contains("previous") || command.contains("back") {
+            previousTrack()
+            return
+        }
+        search(command)
+        if let first = library.first {
+            _ = open(first.path)
+            play()
+        }
+    }
 }
 
 extension Notification.Name {
