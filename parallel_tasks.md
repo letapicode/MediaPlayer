@@ -175,7 +175,7 @@
 | 139 | Microphone Capture (Desktop) | open |  |
 | 140 | Voice Input (Mobile) | open |  |
 | 141 | Voice Command Processing | open |  |
-| 142 | Feedback & Error Handling | open |  |
+| 142 | Feedback & Error Handling | done | voice command/recognizer errors show notifications |
 | 143 | Simulate Voice Commands | open |  |
 | 144 | Gesture Unit Tests | open |  |
 

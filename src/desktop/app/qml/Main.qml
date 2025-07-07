@@ -1,6 +1,16 @@
 import QtQuick 2.15 import QtQuick.Controls 2.15 import QtQuick.Controls.Material 2.15 import QtQuick.Layouts 1.15 import QtQuick.Dialogs 1.3 import "NowPlayingView.qml" as NowPlayingView
 
-    ApplicationWindow{id:window visible: true width: 800 height: 600 title:qsTr("MediaPlayer") property string errorMessage: "" Material.theme:settings.theme == = "dark" ? Material.Dark:Material.Light property string currentFile: ""
+    ApplicationWindow{
+        id: window
+        visible: true
+        width: 800
+        height: 600
+        title: qsTr("MediaPlayer")
+        property string errorMessage: ""
+        property string notificationText: ""
+        property bool showNotification: false
+        Material.theme: settings.theme == "dark" ? Material.Dark : Material.Light
+        property string currentFile: ""
 
                                                                                 Connections{target:sync function onSyncReceived(path, position){player.openFile(path) player.seek(position) window.currentFile = path } }
 
@@ -25,6 +35,37 @@ SettingsDialog{id : settings}
 MessageDialog{
   id : errorDialog title : qsTr("Playback Error")
   text : window.errorMessage standardButtons : Dialog.Ok
+}
+Timer {
+    id: notificationTimer
+    interval: 2000
+    running: false
+    repeat: false
+    onTriggered: window.showNotification = false
+}
+Connections {
+    target: voiceCommandProcessor
+    onCommandUnknown: {
+        window.notificationText = qsTr("Command not understood.")
+        window.showNotification = true
+        notificationTimer.restart()
+    }
+}
+Connections {
+    target: microphoneInput
+    onErrorOccurred: {
+        window.notificationText = message
+        window.showNotification = true
+        notificationTimer.restart()
+    }
+}
+Connections {
+    target: voiceRecognizer
+    onError: {
+        window.notificationText = message
+        window.showNotification = true
+        notificationTimer.restart()
+    }
 }
 
 focus : true Keys.onPressed : {
@@ -91,9 +132,22 @@ ColumnLayout {
     }
   }
 }
-Rectangle {
-  anchors.fill : parent color : "#80000000" visible
-      : voiceRecognizer.running z : 10
-        Text{anchors.centerIn : parent text : qsTr("Listening...") color : "white"}
-}
+  Rectangle {
+    anchors.fill : parent color : "#80000000" visible
+        : voiceRecognizer.running z : 10
+          Text{anchors.centerIn : parent text : qsTr("Listening...") color : "white"}
+  }
+  Rectangle {
+    id: notificationBar
+    visible: window.showNotification
+    width: parent.width * 0.6
+    height: implicitHeight
+    anchors.horizontalCenter: parent.horizontalCenter
+    anchors.bottom: parent.bottom
+    anchors.bottomMargin: 20
+    color: "#323232"
+    radius: 4
+    z: 20
+    Text { anchors.centerIn: parent; color: "white"; text: window.notificationText }
+  }
 }

@@ -9,13 +9,15 @@ class VoiceControl: NSObject {
     private let recognizer = SFSpeechRecognizer()
 
     var onCommand: ((String) -> Void)?
+    var onError: ((String) -> Void)?
 
     func start() {
         SFSpeechRecognizer.requestAuthorization { auth in
-            guard auth == .authorized else { return }
-            DispatchQueue.main.async {
-                self.beginRecognition()
+            guard auth == .authorized else {
+                DispatchQueue.main.async { self.onError?("Speech permission denied") }
+                return
             }
+            DispatchQueue.main.async { self.beginRecognition() }
         }
     }
 
@@ -32,12 +34,19 @@ class VoiceControl: NSObject {
             if let text = result?.bestTranscription.formattedString {
                 self.onCommand?(text)
             }
+            if let err = error {
+                self.onError?(err.localizedDescription)
+            }
             if result?.isFinal == true || error != nil {
                 self.stop()
             }
         }
         audioEngine.prepare()
-        try? audioEngine.start()
+        do {
+            try audioEngine.start()
+        } catch {
+            onError?(error.localizedDescription)
+        }
     }
 
     func stop() {
