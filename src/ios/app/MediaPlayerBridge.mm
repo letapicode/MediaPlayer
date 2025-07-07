@@ -125,4 +125,15 @@ NSString *const MediaPlayerTrackLoadedNotification = @"MediaPlayerTrackLoaded";
   _player->setCallbacks(cbs);
 }
 
+- (void)enableShuffle:(BOOL)enabled {
+  if (_player)
+    _player->enableShuffle(enabled);
+}
+
+- (BOOL)shuffleEnabled {
+  if (_player)
+    return _player->shuffleEnabled();
+  return NO;
+}
+
 @end
