@@ -144,8 +144,8 @@
 
 | # | Task | Status | Notes |
 |-:|------|--------|-------|
-| 116 | Create Xcode Project | open | relevant |
-| 117 | Include Core Engine | open | relevant |
+| 116 | Create Xcode Project | done | relevant |
+| 117 | Include Core Engine | done | relevant |
 | 118 | Main UI (SwiftUI ContentView) | done | relevant |
 | 119 | Library List View | done | relevant |
 | 120 | Now Playing View | done | relevant |

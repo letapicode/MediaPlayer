@@ -13,5 +13,7 @@
         <string>INPlayMediaIntent</string>
         <string>INPauseMediaIntent</string>
     </array>
+    <key>EnableAITagging</key>
+    <false/>
 </dict>
 </plist>
