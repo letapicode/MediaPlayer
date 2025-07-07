@@ -5,6 +5,7 @@ import AVFoundation
 struct MediaPlayerApp: App {
     @StateObject private var player = MediaPlayerViewModel()
     private let shakeDetector = ShakeDetector()
+    @AppStorage("enableShake") private var enableShake: Bool = true
 
     init() {
         do {
@@ -37,10 +38,13 @@ struct MediaPlayerApp: App {
                     player.configureCallbacks()
                     player.setupRemoteCommands()
                     shakeDetector.onShake = { player.toggleShuffle() }
-                    shakeDetector.start()
+                    if enableShake { shakeDetector.start() }
                 }
                 .onDisappear {
                     shakeDetector.stop()
+                }
+                .onChange(of: enableShake) { val in
+                    if val { shakeDetector.start() } else { shakeDetector.stop() }
                 }
         }
     }

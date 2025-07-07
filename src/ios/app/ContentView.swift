@@ -7,6 +7,8 @@ struct ContentView: View {
                 .tabItem { Label("Library", systemImage: "music.note.list") }
             NowPlayingView()
                 .tabItem { Label("Now Playing", systemImage: "play.circle") }
+            OpenURLView()
+                .tabItem { Label("Stream", systemImage: "link") }
             SettingsView()
                 .tabItem { Label("Settings", systemImage: "gear") }
         }
