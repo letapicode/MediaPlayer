@@ -1,17 +1,15 @@
 import SwiftUI
 
 struct ContentView: View {
-    @EnvironmentObject var player: MediaPlayerViewModel
-
     var body: some View {
-        VStack {
-            Text("Position: \(player.position, specifier: "%.1f")")
-            HStack {
-                Button("Play") { player.play() }
-                Button("Pause") { player.pause() }
-            }
+        TabView {
+            LibraryView()
+                .tabItem { Label("Library", systemImage: "music.note.list") }
+            NowPlayingView()
+                .tabItem { Label("Now Playing", systemImage: "play.circle") }
+            SettingsView()
+                .tabItem { Label("Settings", systemImage: "gear") }
         }
-        .padding()
     }
 }
 
