@@ -30,6 +30,10 @@ add_subdirectory(src/format_conversion)
 
 add_subdirectory(src/desktop)
 add_subdirectory(src/desktop/app)
+
+# Voice control via Vosk
+add_subdirectory(src/gesture_voice/vosk)
+
 # Sync module for cross-device playback position sharing
 add_subdirectory(src/sync)
 

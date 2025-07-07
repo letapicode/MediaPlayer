@@ -28,13 +28,6 @@
             android:layout_height="wrap_content"
             android:src="@android:drawable/ic_media_play"/>
 
-        <ImageButton
-            android:id="@+id/voiceCommand"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@android:drawable/ic_btn_speak_now"
-            android:contentDescription="@string/voice_command"/>
-
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

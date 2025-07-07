@@ -170,14 +170,14 @@
 | 134 | Mobile Touch Gestures | done | drag gestures in iOS & Android UIs |
 | 135 | Shake to Shuffle (Mobile) | done | shake detector on iOS/Android |
 | 136 | Custom Gesture Mapping UI | done | gesture toggles in SettingsView |
-| 137 | Integrate Vosk Speech Library (C++ or Python) | open |  |
-| 138 | Voice Command Grammar | open |  |
-| 139 | Microphone Capture (Desktop) | open |  |
-| 140 | Voice Input (Mobile) | done | voice command button in Android app |
-| 141 | Voice Command Processing | open |  |
-| 142 | Feedback & Error Handling | done | voice command/recognizer errors show notifications |
-| 143 | Simulate Voice Commands | open |  |
-| 144 | Gesture Unit Tests | open |  |
+| 137 | Integrate Vosk Speech Library (C++ or Python) | done | `VoskRecognizer.cpp` |
+| 138 | Voice Command Grammar | done | `commands.json` |
+| 139 | Microphone Capture (Desktop) | done | `MicrophoneInput.cpp` |
+| 140 | Voice Input (Mobile) | done | `VoiceControl.kt` & `VoiceControl.swift` |
+| 141 | Voice Command Processing | done | `VoiceCommandProcessor.cpp` |
+| 142 | Feedback & Error Handling | done | `qml/Main.qml` overlay |
+| 143 | Simulate Voice Commands | done | `tests/voice_sim/run.py` |
+| 144 | Gesture Unit Tests | done | `tests/gesture/MouseGestureFilterTest.cpp` |
 
 ## AI Tagging Service (AI Metadata Module) ([Tasks.MD](Tasks.MD#ai-tagging-service-ai-metadata-module))
 
@@ -245,4 +245,3 @@
 | 189 | Formats Compatibility Test | open | relevant |
 | 190 | UI Responsiveness Test | open | relevant |
 | 191 | Automate Regression Suite | open | relevant |
-
