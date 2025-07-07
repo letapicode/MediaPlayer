@@ -3,6 +3,7 @@ import SwiftUI
 struct NowPlayingView: View {
     @EnvironmentObject var player: MediaPlayerViewModel
     @StateObject private var voice = VoiceControl()
+    @AppStorage("enableSwipe") private var enableSwipe: Bool = true
 
     var body: some View {
         VStack {
@@ -19,10 +20,11 @@ struct NowPlayingView: View {
                 }
             }
         }
-        .gesture(DragGesture().onEnded { value in
-            if value.translation.width < -50 { player.nextTrack() }
-            if value.translation.width > 50 { player.previousTrack() }
-        })
+        .optionalGesture(enableSwipe ?
+            DragGesture().onEnded { value in
+                if value.translation.width < -50 { player.nextTrack() }
+                if value.translation.width > 50 { player.previousTrack() }
+            } : nil)
         .onAppear { voice.onCommand = { player.handleVoiceCommand($0) } }
     }
 }

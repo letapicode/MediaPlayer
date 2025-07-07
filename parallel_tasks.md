@@ -169,7 +169,7 @@
 | 133 | Desktop Mouse Gestures | done | implemented in MouseGestureFilter |
 | 134 | Mobile Touch Gestures | done | drag gestures in iOS & Android UIs |
 | 135 | Shake to Shuffle (Mobile) | done | shake detector on iOS/Android |
-| 136 | Custom Gesture Mapping UI | open |  |
+| 136 | Custom Gesture Mapping UI | done | gesture toggles in SettingsView |
 | 137 | Integrate Vosk Speech Library (C++ or Python) | open |  |
 | 138 | Voice Command Grammar | open |  |
 | 139 | Microphone Capture (Desktop) | open |  |
@@ -203,7 +203,7 @@
 
 | # | Task | Status | Notes |
 |-:|------|--------|-------|
-| 160 | Open URL UI | open | relevant |
+| 160 | Open URL UI | done | Stream tab in iOS app |
 | 161 | YouTube DL Integration | done | `YouTubeDL` helper in network module |
 | 162 | Local DLNA/UPnP Support | open | relevant |
 | 163 | HTTP Server for Remote Control | open | relevant |
