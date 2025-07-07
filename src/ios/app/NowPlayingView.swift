@@ -7,6 +7,18 @@ struct NowPlayingView: View {
 
     var body: some View {
         VStack {
+            if let art = player.artwork {
+                Image(uiImage: art)
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .frame(maxHeight: 200)
+            } else {
+                Image(systemName: "music.note")
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .frame(maxHeight: 200)
+                    .foregroundColor(.secondary)
+            }
             Text(player.currentTitle).font(.title)
             Text(player.currentArtist).font(.subheadline)
             HStack {

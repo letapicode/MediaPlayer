@@ -9,7 +9,10 @@
 /* Begin PBXBuildFile section */
 		3A87D423F3F963F534A4D954 /* VoiceControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20C6C1ACE906232854E4FD52 /* VoiceControl.swift */; };
 		52273610D5C7F28942D7F1AF /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BCEAD7A90E71FA531D884C65 /* Foundation.framework */; };
-		5CC855AFF19300AC8055FD4F /* IntentHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56C31CF7342AB4C61722A579 /* IntentHandler.swift */; };
+                5CC855AFF19300AC8055FD4F /* IntentHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56C31CF7342AB4C61722A579 /* IntentHandler.swift */; };
+                8b6b1d4ef1824fb1bf746624 /* IntentHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56C31CF7342AB4C61722A579 /* IntentHandler.swift */; };
+                15085a15f0594b92be019b21 /* IntentsInfo.plist in Resources */ = {isa = PBXBuildFile; fileRef = 1b7d6c9218774c899532bd5f /* IntentsInfo.plist */; };
+                f7f755677da3434c818647c2 /* MediaPlayerIntents.intentdefinition in Resources */ = {isa = PBXBuildFile; fileRef = 385561f3e2ff48f89ecabbf8 /* MediaPlayerIntents.intentdefinition */; };
 		6825E0897FE5009D8E595F4C /* MediaPlayerBridge.mm in Sources */ = {isa = PBXBuildFile; fileRef = 0B4BF9352862BED1A6490208 /* MediaPlayerBridge.mm */; };
 		69CF428A128FC7D4996BAE3F /* View+OptionalGesture.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26BFA5D5AB0EFA08F2330245 /* View+OptionalGesture.swift */; };
 		8BBAF7807E246CCE7126F1AB /* MediaPlayerBridge.h in Headers */ = {isa = PBXBuildFile; fileRef = 499BB1E4C81454810BF693CB /* MediaPlayerBridge.h */; };
@@ -30,8 +33,11 @@
 		29E9420D3FCC19450C8817B5 /* Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; name = Info.plist; path = src/ios/app/Info.plist; sourceTree = "<group>"; };
 		499BB1E4C81454810BF693CB /* MediaPlayerBridge.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = MediaPlayerBridge.h; path = src/ios/app/MediaPlayerBridge.h; sourceTree = "<group>"; };
 		52321793B760335F76DE89C5 /* NowPlayingView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = NowPlayingView.swift; path = src/ios/app/NowPlayingView.swift; sourceTree = "<group>"; };
-		56C31CF7342AB4C61722A579 /* IntentHandler.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = IntentHandler.swift; path = src/ios/app/IntentHandler.swift; sourceTree = "<group>"; };
-		58524DDFD7927BA0BC66E984 /* MediaPlayerViewModel.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = MediaPlayerViewModel.swift; path = src/ios/app/MediaPlayerViewModel.swift; sourceTree = "<group>"; };
+                56C31CF7342AB4C61722A579 /* IntentHandler.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = IntentHandler.swift; path = src/ios/app/IntentHandler.swift; sourceTree = "<group>"; };
+                1b7d6c9218774c899532bd5f /* IntentsInfo.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = Info.plist; path = src/ios/intents/Info.plist; sourceTree = "<group>"; };
+                385561f3e2ff48f89ecabbf8 /* MediaPlayerIntents.intentdefinition */ = {isa = PBXFileReference; lastKnownFileType = text; path = src/ios/intents/MediaPlayerIntents.intentdefinition; sourceTree = "<group>"; };
+                f1ef7ab967974630ad04f1ee /* MediaPlayerIntents.appex */ = {isa = PBXFileReference; explicitFileType = wrapper.app-extension; includeInIndex = 0; path = MediaPlayerIntents.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+                58524DDFD7927BA0BC66E984 /* MediaPlayerViewModel.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = MediaPlayerViewModel.swift; path = src/ios/app/MediaPlayerViewModel.swift; sourceTree = "<group>"; };
 		6CDC4562D07D3105396D3FF7 /* ShakeDetector.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ShakeDetector.swift; path = src/ios/app/ShakeDetector.swift; sourceTree = "<group>"; };
 		9FC81ED3CE823AEA6CE45830 /* LibraryView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = LibraryView.swift; path = src/ios/app/LibraryView.swift; sourceTree = "<group>"; };
 		A0D26AF024CCB5A766009544 /* OpenURLView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = OpenURLView.swift; path = src/ios/app/OpenURLView.swift; sourceTree = "<group>"; };
@@ -43,33 +49,44 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		B8C07AB8C369FD01D59B0108 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				52273610D5C7F28942D7F1AF /* Foundation.framework in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
+                B8C07AB8C369FD01D59B0108 /* Frameworks */ = {
+                        isa = PBXFrameworksBuildPhase;
+                        buildActionMask = 2147483647;
+                        files = (
+                                52273610D5C7F28942D7F1AF /* Foundation.framework in Frameworks */,
+                        );
+                        runOnlyForDeploymentPostprocessing = 0;
+                };
+                0ca97bdee13e4a479e22b720 /* Frameworks */ = {
+                        isa = PBXFrameworksBuildPhase;
+                        buildActionMask = 2147483647;
+                        files = (
+                                52273610D5C7F28942D7F1AF /* Foundation.framework in Frameworks */,
+                        );
+                        runOnlyForDeploymentPostprocessing = 0;
+                };
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		1FA25CF244B7062FC77AD1B7 /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				CCD59B8C455AE2C0628BC345 /* MediaPlayerApp.app */,
-			);
-			name = Products;
-			sourceTree = "<group>";
-		};
+                1FA25CF244B7062FC77AD1B7 /* Products */ = {
+                        isa = PBXGroup;
+                        children = (
+                                CCD59B8C455AE2C0628BC345 /* MediaPlayerApp.app */,
+                                f1ef7ab967974630ad04f1ee /* MediaPlayerIntents.appex */,
+                        );
+                        name = Products;
+                        sourceTree = "<group>";
+                };
 		216E804EEF2C873349B0F594 = {
 			isa = PBXGroup;
 			children = (
 				1FA25CF244B7062FC77AD1B7 /* Products */,
 				E0121B05BEC7E42473C90650 /* Frameworks */,
 				C78C0E3A214E6C8E3FD8AE51 /* ContentView.swift */,
-				56C31CF7342AB4C61722A579 /* IntentHandler.swift */,
-				9FC81ED3CE823AEA6CE45830 /* LibraryView.swift */,
+                                56C31CF7342AB4C61722A579 /* IntentHandler.swift */,
+                                1b7d6c9218774c899532bd5f /* IntentsInfo.plist */,
+                                385561f3e2ff48f89ecabbf8 /* MediaPlayerIntents.intentdefinition */,
+                                9FC81ED3CE823AEA6CE45830 /* LibraryView.swift */,
 				B66FAF57964544F8422B7639 /* MediaPlayerApp.swift */,
 				58524DDFD7927BA0BC66E984 /* MediaPlayerViewModel.swift */,
 				52321793B760335F76DE89C5 /* NowPlayingView.swift */,
@@ -114,24 +131,41 @@
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
-		9C7C9D8F834BEDAC5DB3F825 /* MediaPlayerApp */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = B915740EE4FC30D6ACFC5FD7 /* Build configuration list for PBXNativeTarget "MediaPlayerApp" */;
-			buildPhases = (
-				CFC251DF1B1CE916E855C296 /* Sources */,
-				B8C07AB8C369FD01D59B0108 /* Frameworks */,
-				08814C9137A7E9E556783D34 /* Resources */,
-				BCC42F065A80F80B4F1301A5 /* Headers */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			name = MediaPlayerApp;
-			productName = MediaPlayerApp;
-			productReference = CCD59B8C455AE2C0628BC345 /* MediaPlayerApp.app */;
-			productType = "com.apple.product-type.application";
-		};
+                9C7C9D8F834BEDAC5DB3F825 /* MediaPlayerApp */ = {
+                        isa = PBXNativeTarget;
+                        buildConfigurationList = B915740EE4FC30D6ACFC5FD7 /* Build configuration list for PBXNativeTarget "MediaPlayerApp" */;
+                        buildPhases = (
+                                CFC251DF1B1CE916E855C296 /* Sources */,
+                                B8C07AB8C369FD01D59B0108 /* Frameworks */,
+                                08814C9137A7E9E556783D34 /* Resources */,
+                                BCC42F065A80F80B4F1301A5 /* Headers */,
+                        );
+                        buildRules = (
+                        );
+                        dependencies = (
+                        );
+                        name = MediaPlayerApp;
+                        productName = MediaPlayerApp;
+                        productReference = CCD59B8C455AE2C0628BC345 /* MediaPlayerApp.app */;
+                        productType = "com.apple.product-type.application";
+                };
+                085D2E13B9334078A12B1AD0 /* MediaPlayerIntents */ = {
+                        isa = PBXNativeTarget;
+                        buildConfigurationList = 05afed6c8dea4566883fb822 /* Build configuration list for PBXNativeTarget "MediaPlayerIntents" */;
+                        buildPhases = (
+                                6b77d0f59dd0495b9c8de716 /* Sources */,
+                                0ca97bdee13e4a479e22b720 /* Frameworks */,
+                                6e845b2392bb4ce48f6c03b4 /* Resources */,
+                        );
+                        buildRules = (
+                        );
+                        dependencies = (
+                        );
+                        name = MediaPlayerIntents;
+                        productName = MediaPlayerIntents;
+                        productReference = f1ef7ab967974630ad04f1ee /* MediaPlayerIntents.appex */;
+                        productType = "com.apple.product-type.app-extension";
+                };
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -153,42 +187,59 @@
 			productRefGroup = 1FA25CF244B7062FC77AD1B7 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
-			targets = (
-				9C7C9D8F834BEDAC5DB3F825 /* MediaPlayerApp */,
-			);
-		};
+                        targets = (
+                                9C7C9D8F834BEDAC5DB3F825 /* MediaPlayerApp */,
+                                085D2E13B9334078A12B1AD0 /* MediaPlayerIntents */,
+                        );
+                };
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		08814C9137A7E9E556783D34 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
+                08814C9137A7E9E556783D34 /* Resources */ = {
+                        isa = PBXResourcesBuildPhase;
+                        buildActionMask = 2147483647;
+                        files = (
+                        );
+                        runOnlyForDeploymentPostprocessing = 0;
+                };
+                6e845b2392bb4ce48f6c03b4 /* Resources */ = {
+                        isa = PBXResourcesBuildPhase;
+                        buildActionMask = 2147483647;
+                        files = (
+                                15085a15f0594b92be019b21 /* IntentsInfo.plist in Resources */,
+                                f7f755677da3434c818647c2 /* MediaPlayerIntents.intentdefinition in Resources */,
+                        );
+                        runOnlyForDeploymentPostprocessing = 0;
+                };
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		CFC251DF1B1CE916E855C296 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				9FB1EA3FBF9E441527BCA0E5 /* ContentView.swift in Sources */,
-				5CC855AFF19300AC8055FD4F /* IntentHandler.swift in Sources */,
-				CECD62E17410569BB5DDB38B /* LibraryView.swift in Sources */,
-				CF800780930E68863DFA99B2 /* MediaPlayerApp.swift in Sources */,
-				F560B959A4B1D429257A1493 /* MediaPlayerViewModel.swift in Sources */,
-				E79BA70BC95500C4FFE1538F /* NowPlayingView.swift in Sources */,
-				945B0B63ADCCE1B09A3396F7 /* OpenURLView.swift in Sources */,
-				E69FBB62662D0E43EDB4A928 /* SettingsView.swift in Sources */,
-				C3A21732C16636A539B083AE /* ShakeDetector.swift in Sources */,
-				69CF428A128FC7D4996BAE3F /* View+OptionalGesture.swift in Sources */,
-				3A87D423F3F963F534A4D954 /* VoiceControl.swift in Sources */,
-				6825E0897FE5009D8E595F4C /* MediaPlayerBridge.mm in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
+                CFC251DF1B1CE916E855C296 /* Sources */ = {
+                        isa = PBXSourcesBuildPhase;
+                        buildActionMask = 2147483647;
+                        files = (
+                                9FB1EA3FBF9E441527BCA0E5 /* ContentView.swift in Sources */,
+                                CECD62E17410569BB5DDB38B /* LibraryView.swift in Sources */,
+                                CF800780930E68863DFA99B2 /* MediaPlayerApp.swift in Sources */,
+                                F560B959A4B1D429257A1493 /* MediaPlayerViewModel.swift in Sources */,
+                                E79BA70BC95500C4FFE1538F /* NowPlayingView.swift in Sources */,
+                                945B0B63ADCCE1B09A3396F7 /* OpenURLView.swift in Sources */,
+                                E69FBB62662D0E43EDB4A928 /* SettingsView.swift in Sources */,
+                                C3A21732C16636A539B083AE /* ShakeDetector.swift in Sources */,
+                                69CF428A128FC7D4996BAE3F /* View+OptionalGesture.swift in Sources */,
+                                3A87D423F3F963F534A4D954 /* VoiceControl.swift in Sources */,
+                                6825E0897FE5009D8E595F4C /* MediaPlayerBridge.mm in Sources */,
+                        );
+                        runOnlyForDeploymentPostprocessing = 0;
+                };
+                6b77d0f59dd0495b9c8de716 /* Sources */ = {
+                        isa = PBXSourcesBuildPhase;
+                        buildActionMask = 2147483647;
+                        files = (
+                                8b6b1d4ef1824fb1bf746624 /* IntentHandler.swift in Sources */,
+                        );
+                        runOnlyForDeploymentPostprocessing = 0;
+                };
 /* End PBXSourcesBuildPhase section */
 
 /* Begin XCBuildConfiguration section */
@@ -198,7 +249,7 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+                               CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
@@ -255,16 +306,17 @@
 				ENABLE_BITCODE = NO;
 				HEADER_SEARCH_PATHS = "$(PROJECT_DIR)/../../build/include";
 				INFOPLIST_FILE = src/ios/app/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				OTHER_LDFLAGS = "-lmediaplayer_core";
-				SDKROOT = iphoneos;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+                               IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+                               LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+                               OTHER_LDFLAGS = "-lmediaplayer_core";
+                               SDKROOT = iphoneos;
+                               SWIFT_OBJC_BRIDGING_HEADER = src/ios/app/MediaPlayer-Bridging-Header.h;
+                               SWIFT_VERSION = 5.0;
+                               TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
 		};
-		41C9F5EB9CFA4AF566E71E2A /* Release */ = {
+                41C9F5EB9CFA4AF566E71E2A /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -273,23 +325,24 @@
 				ENABLE_BITCODE = NO;
 				HEADER_SEARCH_PATHS = "$(PROJECT_DIR)/../../build/include";
 				INFOPLIST_FILE = src/ios/app/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				OTHER_LDFLAGS = "-lmediaplayer_core";
-				SDKROOT = iphoneos;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				VALIDATE_PRODUCT = YES;
+                               IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+                               LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+                               OTHER_LDFLAGS = "-lmediaplayer_core";
+                               SDKROOT = iphoneos;
+                               SWIFT_OBJC_BRIDGING_HEADER = src/ios/app/MediaPlayer-Bridging-Header.h;
+                               SWIFT_VERSION = 5.0;
+                               TARGETED_DEVICE_FAMILY = "1,2";
+                               VALIDATE_PRODUCT = YES;
 			};
 			name = Release;
 		};
-		DF9A8E3082E1BC3FEC492686 /* Debug */ = {
+                DF9A8E3082E1BC3FEC492686 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+                               CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
@@ -341,7 +394,25 @@
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
-			};
+                };
+                9069985c25dc4eae92ddeb35 /* Debug */ = {
+                        isa = XCBuildConfiguration;
+                        buildSettings = {
+                                INFOPLIST_FILE = src/ios/intents/Info.plist;
+                                PRODUCT_NAME = "$(TARGET_NAME)";
+                                SWIFT_VERSION = 5.0;
+                        };
+                        name = Debug;
+                };
+                541cfdb14d91454981822ae4 /* Release */ = {
+                        isa = XCBuildConfiguration;
+                        buildSettings = {
+                                INFOPLIST_FILE = src/ios/intents/Info.plist;
+                                PRODUCT_NAME = "$(TARGET_NAME)";
+                                SWIFT_VERSION = 5.0;
+                        };
+                        name = Release;
+                };
 			name = Debug;
 		};
 /* End XCBuildConfiguration section */
@@ -356,15 +427,24 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		B915740EE4FC30D6ACFC5FD7 /* Build configuration list for PBXNativeTarget "MediaPlayerApp" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				41C9F5EB9CFA4AF566E71E2A /* Release */,
-				1C58D42EB6831262024DF5F9 /* Debug */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
+                B915740EE4FC30D6ACFC5FD7 /* Build configuration list for PBXNativeTarget "MediaPlayerApp" */ = {
+                        isa = XCConfigurationList;
+                        buildConfigurations = (
+                                41C9F5EB9CFA4AF566E71E2A /* Release */,
+                                1C58D42EB6831262024DF5F9 /* Debug */,
+                        );
+                        defaultConfigurationIsVisible = 0;
+                        defaultConfigurationName = Release;
+                };
+                05afed6c8dea4566883fb822 /* Build configuration list for PBXNativeTarget "MediaPlayerIntents" */ = {
+                        isa = XCConfigurationList;
+                        buildConfigurations = (
+                                541cfdb14d91454981822ae4 /* Release */,
+                                9069985c25dc4eae92ddeb35 /* Debug */,
+                        );
+                        defaultConfigurationIsVisible = 0;
+                        defaultConfigurationName = Release;
+                };
 /* End XCConfigurationList section */
 	};
 	rootObject = 85CFCE0F08E36E041B287F1F /* Project object */;

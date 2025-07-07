@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<intent-definition>
+    <intents>
+        <intent name="INPlayMediaIntent"/>
+        <intent name="INPauseMediaIntent"/>
+    </intents>
+</intent-definition>

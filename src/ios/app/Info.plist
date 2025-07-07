@@ -4,7 +4,14 @@
 <dict>
     <key>NSSpeechRecognitionUsageDescription</key>
     <string>Speech recognition is used for voice commands.</string>
+    <key>NSMicrophoneUsageDescription</key>
+    <string>Microphone access is required for voice commands.</string>
     <key>NSSiriUsageDescription</key>
     <string>Siri is used to control playback.</string>
+    <key>IntentsSupported</key>
+    <array>
+        <string>INPlayMediaIntent</string>
+        <string>INPauseMediaIntent</string>
+    </array>
 </dict>
 </plist>
