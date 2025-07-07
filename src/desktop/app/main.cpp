@@ -10,7 +10,10 @@
 #include "../VideoOutputQt.h"
 #include "../VisualizerItem.h"
 #include "../VisualizerQt.h"
+#include "../gesture_voice/VoiceCommandProcessor.h"
+#include "../gesture_voice/VoskRecognizer.h"
 #include "AudioDevicesModel.h"
+#include "MicrophoneInput.h"
 #include "MouseGestureFilter.h"
 #include "SettingsManager.h"
 #include "SmartPlaylistManager.h"
@@ -69,6 +72,9 @@ int main(int argc, char *argv[]) {
   mediaplayer::TranslationManager translation;
   translation.switchLanguage(QLocale::system().name());
   mediaplayer::FormatConverterQt converter;
+  mediaplayer::MicrophoneInput mic;
+  mediaplayer::VoskRecognizer recognizer;
+  mediaplayer::VoiceCommandProcessor cmdProcessor(&controller);
 
   // Apply saved settings
   QString theme = settings.theme();
@@ -103,6 +109,17 @@ int main(int argc, char *argv[]) {
   engine.rootContext()->setContextProperty("settings", &settings);
   engine.rootContext()->setContextProperty("formatConverter", &converter);
   engine.rootContext()->setContextProperty("nowPlayingModel", controller.nowPlaying());
+  engine.rootContext()->setContextProperty("microphoneInput", &mic);
+  engine.rootContext()->setContextProperty("voiceRecognizer", &recognizer);
+
+  recognizer.loadModel(QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation) +
+                       "/vosk-model");
+  QObject::connect(&mic, &mediaplayer::MicrophoneInput::audioDataReady, &recognizer,
+                   &mediaplayer::VoskRecognizer::feedAudio);
+  QObject::connect(&recognizer, &mediaplayer::VoskRecognizer::textRecognized, &cmdProcessor,
+                   &mediaplayer::VoiceCommandProcessor::processText);
+  QObject::connect(&cmdProcessor, &mediaplayer::VoiceCommandProcessor::commandUnknown,
+                   [](const QString &t) { qWarning() << "Unknown command" << t; });
 
   QObject::connect(&controller, &mediaplayer::MediaPlayerController::volumeChanged,
                    [&settings, &controller]() { settings.setVolume(controller.volume()); });

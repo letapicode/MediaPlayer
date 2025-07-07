@@ -13,6 +13,9 @@ add_executable(mediaplayer_desktop_app
     SmartPlaylistManager.cpp
     VideoItem.cpp
     MouseGestureFilter.cpp
+    MicrophoneInput.cpp
+    ../gesture_voice/VoskRecognizer.cpp
+    ../gesture_voice/VoiceCommandProcessor.cpp
     windows/WinIntegration.cpp
     windows/Hotkeys.cpp
     macos/MacIntegration.mm
@@ -61,6 +64,7 @@ target_include_directories(mediaplayer_desktop_app PRIVATE
     ${CMAKE_SOURCE_DIR}/src/core/include
     ${CMAKE_SOURCE_DIR}/src/core
     ${CMAKE_SOURCE_DIR}/src/desktop
+    ${CMAKE_SOURCE_DIR}/src/gesture_voice
 )
 
 file(COPY qml DESTINATION ${CMAKE_CURRENT_BINARY_DIR})

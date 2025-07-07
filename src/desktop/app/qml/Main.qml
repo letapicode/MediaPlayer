@@ -138,6 +138,18 @@ ApplicationWindow {
                 icon.source: "qrc:/icons/next.svg"
                 onClicked: player.seek(player.position + 10)
             }
+            ToolButton {
+                text: "🎤"
+                onClicked: {
+                    if (voiceRecognizer.running) {
+                        microphoneInput.stop()
+                        voiceRecognizer.stop()
+                    } else {
+                        voiceRecognizer.start()
+                        microphoneInput.start()
+                    }
+                }
+            }
             Label { text: Math.floor(player.position) }
             Slider {
                 id: seekSlider
@@ -149,6 +161,17 @@ ApplicationWindow {
             }
             Label { text: Math.floor(player.duration) }
             Slider { from: 0; to: 1; value: 1; onValueChanged: player.setVolume(value) }
+        } 
+    }
+    Rectangle {
+        anchors.fill: parent
+        color: "#80000000"
+        visible: voiceRecognizer.running
+        z: 10
+        Text {
+            anchors.centerIn: parent
+            text: qsTr("Listening...")
+            color: "white"
         }
     }
 }
