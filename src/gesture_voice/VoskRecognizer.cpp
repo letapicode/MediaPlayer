@@ -2,7 +2,6 @@
 #include <QFile>
 #include <QJsonDocument>
 #include <QJsonObject>
-#include <QObject>
 #include <QStandardPaths>
 #include <vosk_api.h>
 
@@ -28,16 +27,12 @@ bool VoskRecognizer::loadModel(const QString &modelPath) {
   if (m->model)
     vosk_model_free(m->model);
   m->model = vosk_model_new(modelPath.toUtf8().constData());
-  if (!m->model)
-    emit error(tr("Failed to load model"));
   return m->model != nullptr;
 }
 
 bool VoskRecognizer::start() {
-  if (!m->model) {
-    emit error(tr("Model not loaded"));
+  if (!m->model)
     return false;
-  }
   if (m->rec)
     vosk_recognizer_free(m->rec);
   const char *grammarStr = m->grammar.isEmpty() ? nullptr : m->grammar.constData();
@@ -45,8 +40,6 @@ bool VoskRecognizer::start() {
   m->running = m->rec != nullptr;
   if (m->running)
     emit runningChanged(true);
-  else
-    emit error(tr("Failed to start recognizer"));
   return m->running;
 }
 
@@ -60,10 +53,8 @@ void VoskRecognizer::stop() {
 }
 
 void VoskRecognizer::feedAudio(const QByteArray &data) {
-  if (!m->rec) {
-    emit error(tr("Recognizer not running"));
+  if (!m->rec)
     return;
-  }
   int r = vosk_recognizer_accept_waveform(m->rec, (const char *)data.constData(), data.size());
   if (r) {
     const char *json = vosk_recognizer_result(m->rec);
