@@ -9,3 +9,9 @@ shows the AI recommendation hook. `stress_load_test.cpp` spawns
 multiple `MediaPlayer` instances to stress test core playback.
 `library_ftssearch_test.cpp` checks full text search queries using SQLite's
 FTS5 module.
+
+Additional tests:
+
+- `voice_sim` contains a Python script that feeds prerecorded audio to the Vosk
+  recognizer and prints the resulting player action.
+- `gesture` holds Qt tests for `MouseGestureFilter`.
