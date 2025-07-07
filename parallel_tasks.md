@@ -173,7 +173,7 @@
 | 137 | Integrate Vosk Speech Library (C++ or Python) | open |  |
 | 138 | Voice Command Grammar | open |  |
 | 139 | Microphone Capture (Desktop) | open |  |
-| 140 | Voice Input (Mobile) | open |  |
+| 140 | Voice Input (Mobile) | done | voice command button in Android app |
 | 141 | Voice Command Processing | open |  |
 | 142 | Feedback & Error Handling | open |  |
 | 143 | Simulate Voice Commands | open |  |
