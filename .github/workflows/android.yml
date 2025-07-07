@@ -1,0 +1,39 @@
+name: Android Compatibility
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        api-level: [26, 33]
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+      - name: Install Android SDK
+        uses: android-actions/setup-android@v3
+        with:
+          api-level: ${{ matrix.api-level }}
+          ndk: 23.2.8568313
+      - name: Prepare Gradle Wrapper
+        run: |
+          cd src/android
+          gradle wrapper --gradle-version 8.1.1 --distribution-type bin
+      - name: Build Debug
+        run: |
+          cd src/android
+          ./gradlew assembleDebug --no-daemon
+      - name: Run instrumented tests
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: ${{ matrix.api-level }}
+          script: ./gradlew connectedAndroidTest --no-daemon
+          working-directory: src/android
