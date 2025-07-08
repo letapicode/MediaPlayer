@@ -138,7 +138,7 @@
 | 112 | Gesture Detection | done | relevant |
 | 113 | Voice Control (Android) | done | implemented in `VoiceControl.kt` |
 | 114 | Instrumented UI Tests | done | relevant |
-| 115 | Compatibility Testing | open | relevant |
+| 115 | Compatibility Testing | done | see `.github/workflows/android.yml` |
 
 ## iOS App (Swift UI/UIKit + Core bridging) ([Tasks.MD](Tasks.MD#ios-app-swift-uiuikit-core-bridging))
 
