@@ -22,6 +22,7 @@ On Ubuntu the packages can be installed with:
 sudo apt-get install -y build-essential cmake git \
     libavcodec-dev libavformat-dev libswresample-dev libswscale-dev \
     libcurl4-openssl-dev \
+    nlohmann-json3-dev \
     libsqlite3-dev libtag1-dev libpulse-dev libpulse-simple-dev \
     libprojectM-dev
 ```
@@ -108,3 +109,10 @@ cmake --build . --target mediaconvert
 ```
 
 Use it to convert audio or video files on the command line.
+
+### AI Tagging Service
+
+The C++ core communicates with a separate Python service for AI tagging.
+Ensure the service is running (see `src/ai_tagging/README.md`) when
+building features that rely on `AITagClient`. libcurl and nlohmann-json
+are required at compile time as noted above.

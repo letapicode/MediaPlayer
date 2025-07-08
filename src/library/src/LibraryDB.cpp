@@ -111,6 +111,12 @@ bool LibraryDB::initSchema() {
                     "playlist_id INTEGER PRIMARY KEY,"
                     "definition TEXT,"
                     "FOREIGN KEY(playlist_id) REFERENCES Playlist(id) ON DELETE CASCADE"
+                    ");"
+                    "CREATE TABLE IF NOT EXISTS MediaTags ("
+                    "path TEXT,"
+                    "tag TEXT,"
+                    "FOREIGN KEY(path) REFERENCES MediaItem(path) ON DELETE CASCADE,"
+                    "UNIQUE(path, tag)"
                     ");";
   char *err = nullptr;
   if (sqlite3_exec(m_db, sql, nullptr, nullptr, &err) != SQLITE_OK) {
@@ -972,6 +978,46 @@ std::vector<MediaMetadata> LibraryDB::playlistItems(const std::string &name) con
   }
   sqlite3_finalize(stmt);
   return items;
+}
+
+bool LibraryDB::addTags(const std::string &path, const std::vector<std::string> &tags) {
+  std::lock_guard<std::mutex> lock(m_mutex);
+  if (!m_db)
+    return false;
+  const char *sql = "INSERT OR REPLACE INTO MediaTags (path, tag) VALUES (?1, ?2);";
+  sqlite3_stmt *stmt = nullptr;
+  if (sqlite3_prepare_v2(m_db, sql, -1, &stmt, nullptr) != SQLITE_OK)
+    return false;
+  for (const auto &tag : tags) {
+    sqlite3_bind_text(stmt, 1, path.c_str(), -1, SQLITE_TRANSIENT);
+    sqlite3_bind_text(stmt, 2, tag.c_str(), -1, SQLITE_TRANSIENT);
+    if (sqlite3_step(stmt) != SQLITE_DONE) {
+      sqlite3_finalize(stmt);
+      return false;
+    }
+    sqlite3_reset(stmt);
+  }
+  sqlite3_finalize(stmt);
+  return true;
+}
+
+std::vector<std::string> LibraryDB::getTags(const std::string &path) const {
+  std::lock_guard<std::mutex> lock(m_mutex);
+  std::vector<std::string> tags;
+  if (!m_db)
+    return tags;
+  const char *sql = "SELECT tag FROM MediaTags WHERE path=?1;";
+  sqlite3_stmt *stmt = nullptr;
+  if (sqlite3_prepare_v2(m_db, sql, -1, &stmt, nullptr) != SQLITE_OK)
+    return tags;
+  sqlite3_bind_text(stmt, 1, path.c_str(), -1, SQLITE_TRANSIENT);
+  while (sqlite3_step(stmt) == SQLITE_ROW) {
+    const unsigned char *txt = sqlite3_column_text(stmt, 0);
+    if (txt)
+      tags.emplace_back(reinterpret_cast<const char *>(txt));
+  }
+  sqlite3_finalize(stmt);
+  return tags;
 }
 
 Playlist LibraryDB::loadPlaylist(const std::string &name) const {
