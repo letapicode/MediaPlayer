@@ -1,6 +1,8 @@
 package com.example.mediaplayer
 
+import android.content.Context
 import android.content.Intent
+import android.media.AudioManager
 import android.os.Bundle
 import android.view.GestureDetector
 import android.view.LayoutInflater
@@ -14,6 +16,7 @@ import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import androidx.preference.PreferenceManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -23,6 +26,7 @@ class NowPlayingFragment : Fragment(), SurfaceHolder.Callback {
     private lateinit var detector: GestureDetector
     private lateinit var shakeDetector: ShakeDetector
     private lateinit var voiceLauncher: ActivityResultLauncher<Intent>
+    private var enableVolumeGestures: Boolean = true
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -35,6 +39,9 @@ class NowPlayingFragment : Fragment(), SurfaceHolder.Callback {
             it.holder.addCallback(this)
         }
 
+        val prefs = PreferenceManager.getDefaultSharedPreferences(requireContext())
+        enableVolumeGestures = prefs.getBoolean("pref_volume_gestures", true)
+
         voiceLauncher = VoiceControl.registerLauncher(this) { results ->
             results.firstOrNull()?.let { handleVoiceCommand(it) }
         }
@@ -46,12 +53,7 @@ class NowPlayingFragment : Fragment(), SurfaceHolder.Callback {
                 velocityX: Float,
                 velocityY: Float,
             ): Boolean {
-                if (velocityX > 1000) {
-                    lifecycleScope.launch(Dispatchers.IO) {
-                        MediaPlayerNative.nativeSeek(0.0)
-                    }
-                }
-                return true
+                return handleFling(velocityX, velocityY)
             }
         })
 
@@ -81,6 +83,22 @@ class NowPlayingFragment : Fragment(), SurfaceHolder.Callback {
         })
 
         view.setOnTouchListener { _, event -> detector.onTouchEvent(event) }
+    }
+
+    private fun handleFling(velocityX: Float, velocityY: Float): Boolean {
+        return if (kotlin.math.abs(velocityY) > kotlin.math.abs(velocityX) && enableVolumeGestures) {
+            val audio = requireContext().getSystemService(Context.AUDIO_SERVICE) as AudioManager
+            when {
+                velocityY < -1000 -> audio.adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_RAISE, AudioManager.FLAG_SHOW_UI)
+                velocityY > 1000 -> audio.adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_LOWER, AudioManager.FLAG_SHOW_UI)
+            }
+            true
+        } else {
+            if (velocityX > 1000) {
+                lifecycleScope.launch(Dispatchers.IO) { MediaPlayerNative.nativeSeek(0.0) }
+            }
+            true
+        }
     }
 
     private fun handleVoiceCommand(text: String) {
