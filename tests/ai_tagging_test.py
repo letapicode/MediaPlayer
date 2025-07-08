@@ -18,16 +18,27 @@ def profile(func, path):
     print(result)
 
 
+def wait_result(job_id):
+    while True:
+        resp = requests.get(f'http://localhost:8000/result/{job_id}')
+        data = resp.json()
+        if data.get('status') != 'pending':
+            return data
+        time.sleep(0.5)
+
+
 def main():
     def call_audio(_):
         with open(AUDIO, 'rb') as f:
             resp = requests.post('http://localhost:8000/tag/audio', files={'file': f})
-        return resp.json()
+        job_id = resp.json()['job_id']
+        return wait_result(job_id)
 
     def call_video(_):
         with open(VIDEO, 'rb') as f:
             resp = requests.post('http://localhost:8000/tag/video', files={'file': f})
-        return resp.json()
+        job_id = resp.json()['job_id']
+        return wait_result(job_id)
 
     profile(call_audio, AUDIO)
     profile(call_video, VIDEO)

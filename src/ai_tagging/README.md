@@ -8,15 +8,17 @@ frameworks. The C++ core interacts with the Python service over a small HTTP API
 using `libcurl`.
 
 Python sources live in `src/ai_tagging/python/` and models are stored under
-`src/ai_tagging/python/models/` (not tracked in git). The service exposes two
-endpoints:
+`src/ai_tagging/python/models/` (not tracked in git). The service exposes
+asynchronous endpoints:
 
 ```
-POST /tag/audio  - returns tags for an audio file
-POST /tag/video  - returns tags for a video file
+POST /tag/audio  - queue tagging of an audio file, returns `{"job_id": N}`
+POST /tag/video  - queue tagging of a video file, returns `{"job_id": N}`
+GET  /result/{id} - retrieve the JSON tags for a completed job
 ```
 
-The C++ layer uploads a media file and receives JSON tags in response.
+The C++ layer uploads a media file, then polls `/result/{job_id}` to obtain the
+JSON tags once processing finishes.
 
 ## Setup
 
@@ -57,3 +59,6 @@ Running the test script on a small 30s audio clip typically finishes within a fe
 seconds on a desktop CPU and uses less than 200 MB of RAM. If processing becomes
 slow consider trimming input to the first 30 seconds or reducing video frame
 sampling rate in `object_scene_detector.py`.
+The asynchronous worker now uses a pool of background threads so several jobs can
+run in parallel, greatly improving throughput while still keeping requests
+non-blocking.
