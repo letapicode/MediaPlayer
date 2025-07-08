@@ -183,21 +183,21 @@
 
 | # | Task | Status | Notes |
 |-:|------|--------|-------|
-| 145 | Choose AI Framework | open |  |
-| 146 | Environment for AI | open |  |
-| 147 | Music Genre Classification | open |  |
-| 148 | Audio Fingerprinting (Song ID) | open |  |
-| 149 | Speech-to-Text (for Videos) | open |  |
-| 150 | Mood Detection | open |  |
-| 151 | Object & Scene Recognition | open |  |
-| 152 | Face Recognition (Optional) | open |  |
-| 153 | Video Scene Segmentation | open | relevant |
-| 154 | Service API | open | relevant |
-| 155 | Asynchronous Tagging | open | relevant |
-| 156 | Core–AI Communication | open | relevant |
-| 157 | Update Library with Tags | open | relevant |
-| 158 | Test on Sample Media | open | relevant |
-| 159 | Performance Check | open | relevant |
+| 145 | Choose AI Framework | done | Python with PyTorch & ONNX; see `src/ai_tagging/README.md` |
+| 146 | Environment for AI | done | `src/ai_tagging/python/requirements.txt` |
+| 147 | Music Genre Classification | done | `src/ai_tagging/python/genre_classifier.py` |
+| 148 | Audio Fingerprinting (Song ID) | done | `src/ai_tagging/python/fingerprinter.py` |
+| 149 | Speech-to-Text (for Videos) | done | `src/ai_tagging/python/speech_to_text.py` |
+| 150 | Mood Detection | done | `src/ai_tagging/python/mood_detector.py` |
+| 151 | Object & Scene Recognition | done | `src/ai_tagging/python/object_scene_detector.py` |
+| 152 | Face Recognition (Optional) | done | `src/ai_tagging/python/face_recognition.py` |
+| 153 | Video Scene Segmentation | done | `src/ai_tagging/python/scene_segmentation.py` |
+| 154 | Service API | done | `src/ai_tagging/python/service_api.py` |
+| 155 | Asynchronous Tagging | done | `src/ai_tagging/python/tag_worker.py` |
+| 156 | Core–AI Communication | done | `src/core/include/mediaplayer/AITagClient.h` |
+| 157 | Update Library with Tags | done | `src/library/src/LibraryDB.cpp` |
+| 158 | Test on Sample Media | done | `tests/ai_tagging_test.py` |
+| 159 | Performance Check | done | `tests/ai_tagging_test.py` |
 
 ## Streaming & Networking Module ([Tasks.MD](Tasks.MD#streaming-networking-module))
 
@@ -245,3 +245,4 @@
 | 189 | Formats Compatibility Test | open | relevant |
 | 190 | UI Responsiveness Test | open | relevant |
 | 191 | Automate Regression Suite | open | relevant |
+
