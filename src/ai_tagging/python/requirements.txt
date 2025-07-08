@@ -7,3 +7,4 @@ pyacoustid
 psutil
 fastapi
 uvicorn
+face_recognition
