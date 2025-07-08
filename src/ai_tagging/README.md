@@ -33,6 +33,11 @@ source venv/bin/activate
 pip install -r src/ai_tagging/python/requirements.txt
 ```
 
+The `requirements.txt` file now includes the `face_recognition` package used for
+optional face detection. Installing this dependency requires CMake and a
+compatible C++ build toolchain. If you only need audio and basic video tagging
+you may remove it from the file before installation.
+
 The models used by the individual modules are not checked in. Create the
 `src/ai_tagging/python/models/` directory (if it does not exist) and place
 downloaded model files there. Each Python module lists the specific model name
