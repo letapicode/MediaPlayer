@@ -2,6 +2,7 @@ import os
 import time
 import psutil
 import requests
+import sqlite3
 
 AUDIO = os.path.join('tests', 'sample_media', 'sample.wav')
 VIDEO = os.path.join('tests', 'sample_media', 'sample.mp4')
@@ -27,6 +28,18 @@ def wait_result(job_id):
         time.sleep(0.5)
 
 
+DB = 'media_library.db'
+
+
+def check_db(path):
+    if not os.path.exists(DB):
+        return 0
+    with sqlite3.connect(DB) as conn:
+        cur = conn.execute('SELECT COUNT(*) FROM MediaTags WHERE path=?', (path,))
+        row = cur.fetchone()
+        return row[0] if row else 0
+
+
 def main():
     def call_audio(_):
         with open(AUDIO, 'rb') as f:
@@ -41,7 +54,9 @@ def main():
         return wait_result(job_id)
 
     profile(call_audio, AUDIO)
+    print('tags in db', check_db(AUDIO))
     profile(call_video, VIDEO)
+    print('tags in db', check_db(VIDEO))
 
 
 if __name__ == '__main__':

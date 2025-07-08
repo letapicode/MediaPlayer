@@ -1,3 +1,9 @@
+"""Song mood prediction module.
+
+The :func:`detect_mood` function returns up to three mood labels for an input
+audio file path.
+"""
+
 from pathlib import Path
 from typing import List
 
@@ -29,7 +35,18 @@ _LABELS = _load_labels()
 
 
 def detect_mood(path: str) -> List[str]:
-    """Return top mood predictions for the given audio file."""
+    """Return the top three mood predictions for ``path``.
+
+    Parameters
+    ----------
+    path: str
+        Path to an audio file.
+
+    Returns
+    -------
+    List[str]
+        Best matching mood labels ordered by confidence.
+    """
     waveform, sr = torchaudio.load(path)
     if waveform.dim() > 1:
         waveform = waveform.mean(0, keepdim=True)

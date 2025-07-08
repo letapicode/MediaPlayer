@@ -22,11 +22,13 @@ public:
 
   using MediaListCallback = std::function<void(std::vector<MediaMetadata>)>;
   using PlaylistListCallback = std::function<void(std::vector<std::string>)>;
+  using TagsCallback = std::function<void(std::vector<std::string>)>;
 
   // Queue database operations on the worker thread
   void asyncAllMedia(MediaListCallback cb);
   void asyncAllPlaylists(PlaylistListCallback cb);
   void asyncPlaylistItems(const std::string &name, MediaListCallback cb);
+  void asyncTags(const std::string &path, TagsCallback cb);
 
   // Queue an arbitrary task on the worker thread
   void post(std::function<void()> task);

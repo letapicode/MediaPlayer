@@ -47,6 +47,15 @@ void LibraryWorker::asyncPlaylistItems(const std::string &name, MediaListCallbac
   m_cv.notify_one();
 }
 
+void LibraryWorker::asyncTags(const std::string &path, TagsCallback cb) {
+  std::lock_guard<std::mutex> lock(m_mutex);
+  m_tasks.push({[this, path, cb]() {
+    if (cb)
+      cb(m_db.getTags(path));
+  }});
+  m_cv.notify_one();
+}
+
 void LibraryWorker::post(std::function<void()> task) {
   std::lock_guard<std::mutex> lock(m_mutex);
   m_tasks.push({std::move(task)});

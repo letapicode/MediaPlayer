@@ -1,3 +1,5 @@
+"""Speech-to-text utilities using a HuggingFace model."""
+
 from pathlib import Path
 
 from transformers import pipeline

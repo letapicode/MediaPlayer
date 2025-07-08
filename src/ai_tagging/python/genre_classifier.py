@@ -1,3 +1,9 @@
+"""Music genre prediction using an ONNX model.
+
+The ``classify_genre`` function expects the path to an audio file and returns a
+list of the top three predicted genre labels.
+"""
+
 from pathlib import Path
 from typing import List
 
@@ -29,7 +35,18 @@ _LABELS = _load_labels()
 
 
 def classify_genre(path: str) -> List[str]:
-    """Return top genre predictions for the given audio file."""
+    """Return the top three genre labels for ``path``.
+
+    Parameters
+    ----------
+    path: str
+        Path to an audio file readable by ``torchaudio``.
+
+    Returns
+    -------
+    List[str]
+        Ordered list of genre names with the most likely first.
+    """
     waveform, sr = torchaudio.load(path)
     if waveform.dim() > 1:
         waveform = waveform.mean(0, keepdim=True)

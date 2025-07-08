@@ -1,5 +1,6 @@
 #include "mediaplayer/LibraryDB.h"
 #include "mediaplayer/AIRecommender.h"
+#include "mediaplayer/AITagClient.h"
 #include <algorithm>
 #include <cstring>
 #include <ctime>
@@ -315,8 +316,15 @@ bool LibraryDB::scanDirectoryImpl(const std::string &directory, ProgressCallback
         }
         avformat_close_input(&ctx);
       }
+      bool inserted = false;
       if (tagOk || ffOk)
-        insertMedia(pathStr, title, artist, album, genre, duration, width, height, 0);
+        inserted = insertMedia(pathStr, title, artist, album, genre, duration, width, height, 0);
+      if (inserted) {
+        AITagClient client;
+        auto tags = width > 0 ? client.tagVideo(pathStr) : client.tagAudio(pathStr);
+        if (!tags.empty())
+          addTags(pathStr, tags);
+      }
       ++processed;
       if (progress)
         progress(processed, total);
@@ -404,8 +412,13 @@ bool LibraryDB::scanFile(const std::string &path) {
   bool ok = false;
   if (tagOk || ffOk)
     ok = insertMedia(path, title, artist, album, genre, duration, width, height, 0);
-  if (ok)
+  if (ok) {
+    AITagClient client;
+    auto tags = width > 0 ? client.tagVideo(path) : client.tagAudio(path);
+    if (!tags.empty())
+      addTags(path, tags);
     scheduleSmartPlaylistUpdate();
+  }
   return ok;
 }
 
