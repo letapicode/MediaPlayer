@@ -196,4 +196,15 @@ NSString *const MediaPlayerTrackLoadedNotification = @"MediaPlayerTrackLoaded";
   return NO;
 }
 
+- (void)setVolume:(double)volume {
+  if (_player)
+    _player->setVolume(volume);
+}
+
+- (double)volume {
+  if (_player)
+    return _player->volume();
+  return 1.0;
+}
+
 @end

@@ -24,6 +24,8 @@ extern NSString *const MediaPlayerTrackLoadedNotification;
 - (void)setLibraryPath:(NSString *)path;
 - (void)enableShuffle:(BOOL)enabled;
 - (BOOL)shuffleEnabled;
+- (void)setVolume:(double)volume;
+- (double)volume;
 @end
 
 NS_ASSUME_NONNULL_END
