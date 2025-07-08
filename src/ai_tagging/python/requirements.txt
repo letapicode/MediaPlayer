@@ -1,0 +1,9 @@
+torch
+torchaudio
+opencv-python
+onnxruntime
+transformers
+pyacoustid
+psutil
+fastapi
+uvicorn

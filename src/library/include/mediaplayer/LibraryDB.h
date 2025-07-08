@@ -97,6 +97,9 @@ public:
   std::vector<MediaMetadata> recentlyAdded(int limit);
   std::vector<MediaMetadata> mostPlayed(int limit);
 
+  bool addTags(const std::string &path, const std::vector<std::string> &tags);
+  std::vector<std::string> getTags(const std::string &path) const;
+
   // AI recommendation support
   void setRecommender(AIRecommender *recommender);
   std::vector<MediaMetadata> recommendations();

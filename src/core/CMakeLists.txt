@@ -11,6 +11,7 @@ set(CORE_SOURCES
     src/RingBuffer.cpp
     src/VideoFrameQueue.cpp
     src/FramePool.cpp
+    src/AITagClient.cpp
 )
 
 if(CMAKE_SYSTEM_NAME STREQUAL "iOS")
@@ -34,12 +35,15 @@ pkg_check_modules(FFMPEG REQUIRED IMPORTED_TARGET libavformat libavcodec libavut
 pkg_check_modules(TAGLIB REQUIRED IMPORTED_TARGET taglib)
 find_package(OpenGL REQUIRED)
 find_package(glfw3 REQUIRED)
+find_package(CURL REQUIRED)
+find_package(nlohmann_json REQUIRED)
 
 target_include_directories(mediaplayer_core PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     $<INSTALL_INTERFACE:include>
     ${FFMPEG_INCLUDE_DIRS}
     ${TAGLIB_INCLUDE_DIRS}
+    ${CURL_INCLUDE_DIRS}
     ${CMAKE_SOURCE_DIR}/src/library/include/mediaplayer
     ${CMAKE_SOURCE_DIR}/src/subtitles/include
     $<$<PLATFORM_ID:Android>:${CMAKE_SOURCE_DIR}/src/android>
@@ -53,6 +57,8 @@ target_link_libraries(mediaplayer_core
     mediaplayer_subtitles
     OpenGL::GL
     glfw
+    CURL::libcurl
+    nlohmann_json::nlohmann_json
 )
 
 if(ENABLE_HW_DECODING)
