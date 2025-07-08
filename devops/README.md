@@ -38,3 +38,19 @@ docker run --rm -it \
     -v /tmp/.X11-unix:/tmp/.X11-unix \
     mediaplayer-qt /build/mediaplayer_desktop_app
 ```
+
+## Android build container
+
+`Dockerfile.android` installs the Android SDK and NDK so the app can be built without a local Android Studio install.
+
+### Build the image
+
+```bash
+docker build -f Dockerfile.android -t mediaplayer-android .
+```
+
+Run the container to access the SDK tools or execute Gradle builds:
+
+```bash
+docker run --rm -it mediaplayer-android
+```
