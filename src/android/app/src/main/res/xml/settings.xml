@@ -4,4 +4,8 @@
         android:key="pref_visualization"
         android:title="Enable Visualization"
         android:defaultValue="true" />
+    <SwitchPreferenceCompat
+        android:key="pref_volume_gestures"
+        android:title="Volume Gestures"
+        android:defaultValue="true" />
 </preferences>
