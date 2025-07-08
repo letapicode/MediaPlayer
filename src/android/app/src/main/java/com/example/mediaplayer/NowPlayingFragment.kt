@@ -26,7 +26,7 @@ class NowPlayingFragment : Fragment(), SurfaceHolder.Callback {
     private lateinit var detector: GestureDetector
     private lateinit var shakeDetector: ShakeDetector
     private lateinit var voiceLauncher: ActivityResultLauncher<Intent>
-    private var enableVolumeGestures: Boolean = true
+    private var verticalGestures: Boolean = true
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -40,7 +40,7 @@ class NowPlayingFragment : Fragment(), SurfaceHolder.Callback {
         }
 
         val prefs = PreferenceManager.getDefaultSharedPreferences(requireContext())
-        enableVolumeGestures = prefs.getBoolean("pref_volume_gestures", true)
+        verticalGestures = prefs.getBoolean("pref_vertical_gestures", true)
 
         voiceLauncher = VoiceControl.registerLauncher(this) { results ->
             results.firstOrNull()?.let { handleVoiceCommand(it) }
@@ -86,19 +86,30 @@ class NowPlayingFragment : Fragment(), SurfaceHolder.Callback {
     }
 
     private fun handleFling(velocityX: Float, velocityY: Float): Boolean {
-        return if (kotlin.math.abs(velocityY) > kotlin.math.abs(velocityX) && enableVolumeGestures) {
+        val dyAbs = kotlin.math.abs(velocityY)
+        val dxAbs = kotlin.math.abs(velocityX)
+        if (verticalGestures && dyAbs > dxAbs) {
             val audio = requireContext().getSystemService(Context.AUDIO_SERVICE) as AudioManager
-            when {
-                velocityY < -1000 -> audio.adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_RAISE, AudioManager.FLAG_SHOW_UI)
-                velocityY > 1000 -> audio.adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_LOWER, AudioManager.FLAG_SHOW_UI)
+            if (velocityY < 0) {
+                audio.adjustStreamVolume(
+                    AudioManager.STREAM_MUSIC,
+                    AudioManager.ADJUST_RAISE,
+                    AudioManager.FLAG_SHOW_UI
+                )
+            } else if (velocityY > 0) {
+                audio.adjustStreamVolume(
+                    AudioManager.STREAM_MUSIC,
+                    AudioManager.ADJUST_LOWER,
+                    AudioManager.FLAG_SHOW_UI
+                )
             }
-            true
-        } else {
-            if (velocityX > 1000) {
-                lifecycleScope.launch(Dispatchers.IO) { MediaPlayerNative.nativeSeek(0.0) }
-            }
-            true
+            return true
         }
+        if (velocityX > 1000) {
+            lifecycleScope.launch(Dispatchers.IO) { MediaPlayerNative.nativeSeek(0.0) }
+            return true
+        }
+        return true
     }
 
     private fun handleVoiceCommand(text: String) {
