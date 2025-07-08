@@ -1,13 +1,10 @@
 import SwiftUI
-import MediaPlayer
 
 struct NowPlayingView: View {
     @EnvironmentObject var player: MediaPlayerViewModel
     @StateObject private var voice = VoiceControl()
     @AppStorage("enableSwipe") private var enableSwipe: Bool = true
     @AppStorage("enableVerticalGestures") private var enableVerticalGestures: Bool = true
-
-    private let systemPlayer = MPMusicPlayerController.systemMusicPlayer
 
     var body: some View {
         VStack {
@@ -23,8 +20,10 @@ struct NowPlayingView: View {
                     .frame(maxHeight: 200)
                     .foregroundColor(.secondary)
             }
+
             Text(player.currentTitle).font(.title)
             Text(player.currentArtist).font(.subheadline)
+
             HStack {
                 Button("Prev") { player.previousTrack() }
                 Button(player.isPlaying ? "Pause" : "Play") {
@@ -36,30 +35,37 @@ struct NowPlayingView: View {
                 }
             }
         }
-        .optionalGesture(enableSwipe ? horizontalDrag : nil)
-        .optionalGesture(enableVerticalGestures ? verticalDrag : nil)
+        .optionalGesture(gesture)
         .onAppear { voice.onCommand = { player.handleVoiceCommand($0) } }
     }
 
-    private var horizontalDrag: some Gesture {
+    private var gesture: some Gesture? {
         DragGesture().onEnded { value in
-            if value.translation.width < -50 { player.nextTrack() }
-            if value.translation.width > 50 { player.previousTrack() }
+            if enableSwipe {
+                if value.translation.width < -50 {
+                    player.nextTrack()
+                }
+                if value.translation.width > 50 {
+                    player.previousTrack()
+                }
+            }
+            if enableVerticalGestures {
+                if value.translation.height < -40 {
+                    adjust(by: 0.05)
+                }
+                if value.translation.height > 40 {
+                    adjust(by: -0.05)
+                }
+            }
         }
     }
 
-    private var verticalDrag: some Gesture {
-        DragGesture().onEnded { value in
-            if abs(value.translation.height) > 30 {
-                let delta = -Double(value.translation.height) / 500.0
-                if player.artwork == nil {
-                    let brightness = min(1.0, max(0.0, UIScreen.main.brightness + delta))
-                    UIScreen.main.brightness = brightness
-                } else {
-                    let volume = max(0.0, min(1.0, Double(systemPlayer.volume) + delta))
-                    systemPlayer.volume = Float(volume)
-                }
-            }
+    private func adjust(by delta: Double) {
+        if player.videoMode {
+            let newValue = CGFloat(min(1.0, max(0.0, Double(UIScreen.main.brightness) + delta)))
+            UIScreen.main.brightness = newValue
+        } else {
+            player.volume = min(1.0, max(0.0, player.volume + delta))
         }
     }
 }
