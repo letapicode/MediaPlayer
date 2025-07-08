@@ -111,4 +111,15 @@ void LibraryFacade::asyncPlaylistItems(const std::string &name, MediaListCallbac
     m_worker->asyncPlaylistItems(name, std::move(cb));
 }
 
+std::vector<std::string> LibraryFacade::tags(const std::string &path) const {
+  if (m_db)
+    return m_db->getTags(path);
+  return {};
+}
+
+void LibraryFacade::asyncTags(const std::string &path, LibraryWorker::TagsCallback cb) {
+  if (m_worker)
+    m_worker->asyncTags(path, std::move(cb));
+}
+
 } // namespace mediaplayer

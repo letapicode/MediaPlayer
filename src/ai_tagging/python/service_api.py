@@ -3,7 +3,7 @@ import os
 from itertools import count
 from typing import Dict, Any
 
-from fastapi import FastAPI, UploadFile, File
+from fastapi import FastAPI, UploadFile, File, HTTPException
 from fastapi.responses import JSONResponse
 
 from genre_classifier import classify_genre
@@ -33,11 +33,18 @@ def _enqueue_job(path: str, handler) -> int:
 
 
 def _save_upload(upload: UploadFile) -> str:
+    """Persist uploaded file and return the temporary path."""
     suffix = os.path.splitext(upload.filename)[1]
-    fd, path = tempfile.mkstemp(suffix=suffix)
-    with os.fdopen(fd, "wb") as f:
-        f.write(upload.file.read())
-    return path
+    try:
+        fd, path = tempfile.mkstemp(suffix=suffix)
+        with os.fdopen(fd, "wb") as f:
+            f.write(upload.file.read())
+        return path
+    except Exception as exc:
+        if 'fd' in locals():
+            os.close(fd)
+            os.unlink(path)
+        raise HTTPException(status_code=500, detail="Failed to save upload") from exc
 
 
 def _audio_handler(path: str) -> Dict[str, Any]:
@@ -81,5 +88,6 @@ async def get_result(job_id: int):
 
 if __name__ == "__main__":
     import uvicorn
-
+    # Start the service with ``python service_api.py`` or using uvicorn
+    # directly: ``uvicorn service_api:app``.
     uvicorn.run(app, host="0.0.0.0", port=8000)

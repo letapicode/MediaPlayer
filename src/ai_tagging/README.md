@@ -4,8 +4,9 @@ This module provides automatic metadata generation for audio and video files. Th
 analysis code is written in **Python** and uses libraries such as **PyTorch** and
 **ONNX Runtime** for model inference. Python was chosen instead of a C++
 implementation to simplify model loading and experimentation with different
-frameworks. The C++ core interacts with the Python service over a small HTTP API
-using `libcurl`.
+frameworks. Python gives us maximum flexibility to swap out models or
+experiment with new libraries quickly. The C++ core interacts with the Python
+service over a small HTTP API using `libcurl`.
 
 Python sources live in `src/ai_tagging/python/` and models are stored under
 `src/ai_tagging/python/models/` (not tracked in git). The service exposes
@@ -25,11 +26,17 @@ JSON tags once processing finishes.
 Create a virtual environment and install the dependencies listed in
 `requirements.txt`:
 
+
 ```bash
 python3 -m venv venv
 source venv/bin/activate
 pip install -r src/ai_tagging/python/requirements.txt
 ```
+
+The models used by the individual modules are not checked in. Create the
+`src/ai_tagging/python/models/` directory (if it does not exist) and place
+downloaded model files there. Each Python module lists the specific model name
+expected.
 
 Download the required models into `src/ai_tagging/python/models/`. Instructions
 for each submodule are noted in the corresponding Python files.
@@ -48,6 +55,8 @@ The API server can be started with:
 
 ```bash
 python src/ai_tagging/python/service_api.py
+# or
+uvicorn service_api:app
 ```
 
 See `tests/ai_tagging_test.py` for a script that exercises the service and logs

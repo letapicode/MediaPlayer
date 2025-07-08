@@ -112,7 +112,9 @@ Use it to convert audio or video files on the command line.
 
 ### AI Tagging Service
 
-The C++ core communicates with a separate Python service for AI tagging.
-Ensure the service is running (see `src/ai_tagging/README.md`) when
-building features that rely on `AITagClient`. libcurl and nlohmann-json
-are required at compile time as noted above.
+The C++ core communicates with a separate **Python** service for AI tagging.
+Python was selected for its wide ecosystem of pretrained models and
+rapid prototyping ability. Ensure the service is running (see
+`src/ai_tagging/README.md`) when building features that rely on
+`AITagClient`. libcurl and nlohmann-json are required at compile time as
+noted above.

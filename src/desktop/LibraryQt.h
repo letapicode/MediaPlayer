@@ -25,10 +25,12 @@ public:
   Q_INVOKABLE QList<QVariantMap> allMedia() const;
   Q_INVOKABLE QStringList allPlaylists() const;
   Q_INVOKABLE QList<QVariantMap> playlistItems(const QString &name) const;
+  Q_INVOKABLE QStringList tags(const QString &path) const;
 
   Q_INVOKABLE void asyncAllMedia();
   Q_INVOKABLE void asyncAllPlaylists();
   Q_INVOKABLE void asyncPlaylistItems(const QString &name);
+  Q_INVOKABLE void asyncTags(const QString &path);
 
 signals:
   void scanProgress(int current, int total);

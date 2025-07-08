@@ -4,7 +4,13 @@ import numpy as np
 
 
 def segment_scenes(path: str, threshold: float = 30.0) -> List[Tuple[float, str]]:
-    """Return a list of (timestamp, label) scene boundaries."""
+    """Return a list of ``(timestamp, label)`` scene boundaries.
+
+    Example
+    -------
+    >>> segment_scenes("movie.mp4")
+    [(12.5, 'cut'), (30.2, 'cut')]
+    """
     cap = cv2.VideoCapture(path)
     if not cap.isOpened():
         return []

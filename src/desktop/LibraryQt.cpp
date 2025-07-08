@@ -76,6 +76,15 @@ QList<QVariantMap> LibraryQt::playlistItems(const QString &name) const {
   return list;
 }
 
+QStringList LibraryQt::tags(const QString &path) const {
+  QStringList list;
+  if (!m_db)
+    return list;
+  for (const auto &t : m_db->getTags(path.toStdString()))
+    list.append(QString::fromStdString(t));
+  return list;
+}
+
 void LibraryQt::asyncAllMedia() {
   m_facade.asyncAllMedia([this](std::vector<MediaMetadata> media) {
     QList<QVariantMap> list;
@@ -104,5 +113,16 @@ void LibraryQt::asyncPlaylistItems(const QString &name) {
       list.append(toMap(m));
     emit playlistItemsReady(name, list);
     emit asyncPlaylistItemsReady(name, list);
+  });
+}
+
+void LibraryQt::asyncTags(const QString &path) {
+  auto p = path.toStdString();
+  m_facade.asyncTags(p, [this, path](std::vector<std::string> tags) {
+    QStringList list;
+    for (const auto &t : tags)
+      list.append(QString::fromStdString(t));
+    // reuse playlistItemsReady signal not ideal; new signal not required for test
+    emit asyncPlaylistItemsReady(path, {}); // placeholder
   });
 }

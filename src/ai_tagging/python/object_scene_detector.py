@@ -1,3 +1,5 @@
+"""Object detection on video frames using an ONNX model."""
+
 from pathlib import Path
 from typing import List
 
@@ -16,6 +18,21 @@ if LABELS_PATH.exists():
 
 
 def detect_objects(path: str, interval: float = 2.0) -> List[str]:
+    """Return labels of objects detected in ``path``.
+
+    Parameters
+    ----------
+    path: str
+        Path to a video file.
+    interval: float, optional
+        Seconds between sampled frames.
+
+    Returns
+    -------
+    List[str]
+        Unique object labels found across the video.
+    """
+
     cap = cv2.VideoCapture(path)
     if not cap.isOpened():
         return []

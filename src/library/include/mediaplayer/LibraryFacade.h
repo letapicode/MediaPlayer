@@ -34,6 +34,8 @@ public:
   void asyncAllMedia(MediaListCallback cb);
   void asyncAllPlaylists(PlaylistListCallback cb);
   void asyncPlaylistItems(const std::string &name, MediaListCallback cb);
+  std::vector<std::string> tags(const std::string &path) const;
+  void asyncTags(const std::string &path, LibraryWorker::TagsCallback cb);
 
 private:
   LibraryDB *m_db{nullptr};

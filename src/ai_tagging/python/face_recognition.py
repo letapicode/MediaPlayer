@@ -1,3 +1,10 @@
+"""Simple face recognition against a local database.
+
+The ``models/faces`` directory should contain reference images named after the
+person they represent, e.g. ``alice.jpg``. The :func:`recognize_faces` function
+returns the list of known faces detected in a video file.
+"""
+
 from pathlib import Path
 from typing import List
 
@@ -17,6 +24,19 @@ if DB_PATH.exists():
 
 
 def recognize_faces(path: str) -> List[str]:
+    """Identify known faces appearing in ``path``.
+
+    Parameters
+    ----------
+    path: str
+        Path to a video file.
+
+    Returns
+    -------
+    List[str]
+        Names corresponding to images stored in ``models/faces``.
+    """
+
     video = cv2.VideoCapture(path)
     if not video.isOpened():
         return []
