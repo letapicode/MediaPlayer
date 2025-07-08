@@ -136,7 +136,7 @@
 | 110 | MediaSession & Notification | done | relevant |
 | 111 | Permission Handling | done | relevant |
 | 112 | Gesture Detection | done | relevant |
-| 113 | Voice Control (Android) | open | relevant |
+| 113 | Voice Control (Android) | done | implemented in `VoiceControl.kt` |
 | 114 | Instrumented UI Tests | done | relevant |
 | 115 | Compatibility Testing | open | relevant |
 
