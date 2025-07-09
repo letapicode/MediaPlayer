@@ -220,15 +220,15 @@
 |-:|------|--------|-------|
 | 170 | Dockerfile for Core/C++ | done | Dockerfile.core added |
 | 171 | Dockerfile for Qt | done | Dockerfile.qt added |
-| 172 | Android Build Environment | open | relevant |
+| 172 | Android Build Environment | done | Dockerfile.android added |
 | 173 | iOS Build Setup | done | build script added in devops |
 | 174 | GitHub Actions CI Workflow | done | relevant |
-| 175 | Automated Tests in CI | open | relevant |
-| 176 | Static Analysis & Lint | open | relevant |
+| 175 | Automated Tests in CI | done | build.yml runs tests |
+| 176 | Static Analysis & Lint | done | clang-tidy & lint in CI |
 | 177 | Code Formatting | done | relevant |
-| 178 | Git Submodules for Libraries | open | relevant |
-| 179 | Issue Templates and Contribution Guide | open | relevant |
-| 180 | Merge Strategy for AI Agents | open | relevant |
+| 178 | Git Submodules for Libraries | done | see docs/submodules.md |
+| 179 | Issue Templates and Contribution Guide | done | CONTRIBUTING.md exists |
+| 180 | Merge Strategy for AI Agents | done | see docs/merge_conflict.md |
 
 ## Testing & Quality Assurance ([Tasks.MD](Tasks.MD#testing-quality-assurance))
 

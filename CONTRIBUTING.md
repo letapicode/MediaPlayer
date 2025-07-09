@@ -1,6 +1,6 @@
 # Contributing to MediaPlayer
 
-Thank you for your interest in improving MediaPlayer. This document outlines how to set up your development environment, how to claim tasks, and our coding and merge workflow.
+Thank you for your interest in improving MediaPlayer. This document outlines how to set up your development environment, how to claim tasks, and our coding and merge workflow. Standard issue templates for bug reports and feature requests live under `.github/ISSUE_TEMPLATE`.
 
 ## 1. Environment Setup
 
@@ -62,6 +62,9 @@ Only work on one unclaimed task per branch. This keeps merges straightforward an
 - Avoid unsafe functions and prefer modern C++ practices such as smart pointers and RAII.
 - Write unit tests where applicable. New features should include tests if the module has a test suite.
 - **Assets**: Do not commit images (`*.png`, `*.jpg`) or other binary assets. Reference the asset or describe it so maintainers can provide the file.
+- Documentation on the merge process for AI agents is available in [docs/merge_strategy.md](docs/merge_strategy.md) and [docs/merge_conflict.md](docs/merge_conflict.md).
+- Instructions for working with git submodules are in [docs/submodules.md](docs/submodules.md).
+- Continuous integration runs `clang-format`, `clang-tidy`, Android Lint and SwiftLint. Fix any reported issues before pushing.
 
 ## 4. Branch and PR Workflow
 
@@ -69,6 +72,7 @@ Only work on one unclaimed task per branch. This keeps merges straightforward an
 2. Commit logically separated changes with clear messages.
 3. Ensure the project builds on your platform and run tests before opening a PR.
 4. Open a pull request against `main`. Link the issue for the task you claimed.
+   Use the checklist in `.github/PULL_REQUEST_TEMPLATE.md` to verify builds and tests.
 5. At least one maintainer must review and approve the PR. CI must pass before merge.
 
 ### Merge Policy
