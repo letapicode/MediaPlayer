@@ -16,9 +16,12 @@ RUN apt-get update && \
         "platform-tools" \
         "platforms;android-33" \
         "build-tools;33.0.2" \
-        "ndk;23.2.8568313"
+        "ndk;23.2.8568313" && \
+    groupadd -r mediaplayer && useradd -r -g mediaplayer -m mediaplayer
 
 WORKDIR /app
 COPY . /app
+RUN chown -R mediaplayer:mediaplayer /sdk /app
+USER mediaplayer
 
 CMD ["/bin/bash"]

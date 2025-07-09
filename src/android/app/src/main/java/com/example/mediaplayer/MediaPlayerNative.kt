@@ -16,6 +16,10 @@ object MediaPlayerNative {
     external fun nativeNextTrack()
     external fun nativePreviousTrack()
     external fun nativeEnableShuffle(enabled: Boolean)
+    external fun nativeCurrentPath(): String?
+    external fun nativeCurrentPosition(): Double
+    external fun nativeDiscoverDevices(): Array<String>
+    external fun nativeSendSync(address: String, port: Int, path: String, position: Double)
 
     // Calls that may block should be dispatched on Dispatchers.IO by the caller.
 }
