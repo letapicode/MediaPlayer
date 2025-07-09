@@ -4,6 +4,7 @@ RUN apt-get update && \
     DEBIAN_FRONTEND=noninteractive apt-get install -y \
         build-essential cmake git \
         libavcodec-dev libavformat-dev libswresample-dev libswscale-dev \
+        libsqlite3-dev libtag1-dev libpulse-dev libass-dev \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app

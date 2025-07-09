@@ -31,6 +31,14 @@ jobs:
         run: |
           cd src/android
           ./gradlew assembleDebug --no-daemon
+      - name: Unit tests
+        run: |
+          cd src/android
+          ./gradlew testDebug --no-daemon
+      - name: Android Lint
+        run: |
+          cd src/android
+          ./gradlew lint --no-daemon
       - name: Run instrumented tests
         uses: reactivecircus/android-emulator-runner@v2
         with:

@@ -8,7 +8,9 @@ If you modify `Tasks.MD`, regenerate that table with `python tools/generate_para
 
 See `docs/` for additional documentation and `src/` for module code. The
 new [library integration guide](docs/library_integration.md) describes how the
-SQLite library ties into the core engine and UI.
+SQLite library ties into the core engine and UI. Merge guidelines for AI agents
+are in [docs/merge_strategy.md](docs/merge_strategy.md).
+Guidance on managing git submodules lives in [docs/submodules.md](docs/submodules.md).
 
 The canonical list of tasks is maintained in [Tasks.MD](Tasks.MD).
 
