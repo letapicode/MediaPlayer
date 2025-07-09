@@ -27,7 +27,8 @@ public:
 
 private:
   void run();
-  int m_sock{-1};
+  void addDevice(const MdnsDevice &dev);
+  int m_socket{-1};
   std::string m_name;
   uint16_t m_port;
   std::thread m_thread;

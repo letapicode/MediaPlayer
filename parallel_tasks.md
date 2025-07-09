@@ -205,14 +205,14 @@
 |-:|------|--------|-------|
 | 160 | Open URL UI | done | Stream tab in iOS app |
 | 161 | YouTube DL Integration | done | `YouTubeDL` helper in network module |
-| 162 | Local DLNA/UPnP Support | open | relevant |
-| 163 | HTTP Server for Remote Control | open | relevant |
-| 164 | Discovery (mDNS) | open | relevant |
-| 165 | Announcement & Discovery Handlers | open | relevant |
-| 166 | Device Info Exchange | open | relevant |
-| 167 | Sync Playback Position | open | relevant |
-| 168 | Cloud Sync Option | open | relevant |
-| 169 | Testing Sync | open | relevant |
+| 162 | Local DLNA/UPnP Support | done | `DlnaClient` implementation |
+| 163 | HTTP Server for Remote Control | done | `RemoteControlServer/Client` |
+| 164 | Discovery (mDNS) | done | `MdnsService` library usage |
+| 165 | Announcement & Discovery Handlers | done | `SyncController` updates UI |
+| 166 | Device Info Exchange | done | `/status` endpoint served via HTTP |
+| 167 | Sync Playback Position | done | `sendPlay` in `RemoteControlClient` |
+| 168 | Cloud Sync Option | open | `CloudSyncService` HTTP logic pending |
+| 169 | Testing Sync | done | `tests/sync/test_sync_local.py` |
 
 ## DevOps & Infrastructure ([Tasks.MD](Tasks.MD#devops-infrastructure))
 

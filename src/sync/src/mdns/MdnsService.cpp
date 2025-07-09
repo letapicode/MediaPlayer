@@ -1,37 +1,48 @@
 #include "mediaplayer/mdns/MdnsService.h"
+#include "mdns.h"
 #include <arpa/inet.h>
+#include <chrono>
 #include <cstring>
-#include <netinet/in.h>
-#include <sys/socket.h>
-#include <unistd.h>
 
 namespace mediaplayer {
 namespace mdns {
+
+static int record_callback(int sock, const struct sockaddr *from, size_t addrlen,
+                           mdns_entry_type_t entry, uint16_t /*query_id*/, uint16_t rtype,
+                           uint16_t /*rclass*/, uint32_t /*ttl*/, const void *data, size_t size,
+                           size_t name_offset, size_t name_length, size_t record_offset,
+                           size_t record_length, void *user_data) {
+  if (entry != MDNS_ENTRYTYPE_ANSWER)
+    return 0;
+  auto *self = static_cast<MdnsService *>(user_data);
+  MdnsDevice dev;
+  dev.name.assign((const char *)data + name_offset, name_length);
+  if (rtype == MDNS_RECORDTYPE_SRV) {
+    mdns_record_srv_t srv =
+        mdns_record_parse_srv(data, size, record_offset, record_length, nullptr, 0);
+    dev.port = srv.port;
+  } else if (rtype == MDNS_RECORDTYPE_A) {
+    sockaddr_in addr{};
+    mdns_record_parse_a(data, size, record_offset, record_length, &addr);
+    char ip[INET_ADDRSTRLEN];
+    inet_ntop(AF_INET, &addr.sin_addr, ip, sizeof(ip));
+    dev.address = ip;
+  } else {
+    return 0;
+  }
+  if (!dev.address.empty() && dev.port)
+    self->addDevice(dev);
+  return 0;
+}
 
 MdnsService::MdnsService(const std::string &name, uint16_t port) : m_name(name), m_port(port) {}
 
 MdnsService::~MdnsService() { stop(); }
 
 bool MdnsService::start() {
-  m_sock = socket(AF_INET, SOCK_DGRAM, 0);
-  if (m_sock < 0)
+  m_socket = mdns_socket_open_ipv4(nullptr);
+  if (m_socket < 0)
     return false;
-
-  int yes = 1;
-  setsockopt(m_sock, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(yes));
-
-  sockaddr_in addr{};
-  addr.sin_family = AF_INET;
-  addr.sin_port = htons(5353);
-  addr.sin_addr.s_addr = htonl(INADDR_ANY);
-  if (bind(m_sock, reinterpret_cast<sockaddr *>(&addr), sizeof(addr)) < 0)
-    return false;
-
-  ip_mreq mreq{};
-  inet_pton(AF_INET, "224.0.0.251", &mreq.imr_multiaddr.s_addr);
-  mreq.imr_interface.s_addr = htonl(INADDR_ANY);
-  setsockopt(m_sock, IPPROTO_IP, IP_ADD_MEMBERSHIP, &mreq, sizeof(mreq));
-
   m_running = true;
   m_thread = std::thread(&MdnsService::run, this);
   return true;
@@ -39,9 +50,9 @@ bool MdnsService::start() {
 
 void MdnsService::stop() {
   m_running = false;
-  if (m_sock >= 0) {
-    close(m_sock);
-    m_sock = -1;
+  if (m_socket >= 0) {
+    mdns_socket_close(m_socket);
+    m_socket = -1;
   }
   if (m_thread.joinable())
     m_thread.join();
@@ -53,45 +64,34 @@ void MdnsService::setDeviceFoundCallback(std::function<void(const MdnsDevice &)>
   m_callback = std::move(cb);
 }
 
+void MdnsService::addDevice(const MdnsDevice &dev) {
+  for (const auto &d : m_devices) {
+    if (d.address == dev.address && d.port == dev.port)
+      return;
+  }
+  m_devices.push_back(dev);
+  if (m_callback)
+    m_callback(dev);
+}
+
 void MdnsService::run() {
-  char buf[512];
+  char buffer[2048];
+  mdns_string_t service = mdns_string_make_from_cstr("_mediaplayer._tcp.local.");
+  mdns_query_t query{MDNS_RECORDTYPE_PTR, service.str, service.length};
+
   while (m_running) {
-    sockaddr_in src{};
-    socklen_t slen = sizeof(src);
-    int n = recvfrom(m_sock, buf, sizeof(buf) - 1, 0, reinterpret_cast<sockaddr *>(&src), &slen);
-    if (n <= 0)
-      continue;
-    buf[n] = '\0';
-    std::string msg(buf);
-    if (msg.rfind("MP|", 0) == 0) {
-      MdnsDevice dev;
-      size_t p = msg.find('|', 3);
-      dev.name = msg.substr(3, p - 3);
-      dev.port = static_cast<uint16_t>(atoi(msg.c_str() + p + 1));
-      char ip[INET_ADDRSTRLEN];
-      inet_ntop(AF_INET, &src.sin_addr, ip, sizeof(ip));
-      dev.address = ip;
-      bool known = false;
-      for (const auto &d : m_devices) {
-        if (d.address == dev.address && d.port == dev.port) {
-          known = true;
-          break;
-        }
-      }
-      if (!known) {
-        m_devices.push_back(dev);
-        if (m_callback)
-          m_callback(dev);
-      }
-    } else {
-      std::string announce = "MP|" + m_name + "|" + std::to_string(m_port);
-      sockaddr_in dest{};
-      dest.sin_family = AF_INET;
-      dest.sin_port = htons(5353);
-      inet_pton(AF_INET, "224.0.0.251", &dest.sin_addr);
-      sendto(m_sock, announce.c_str(), announce.size(), 0, reinterpret_cast<sockaddr *>(&dest),
-             sizeof(dest));
-    }
+    mdns_multiquery_send(m_socket, &query, 1, buffer, sizeof(buffer), 0);
+    mdns_query_recv(m_socket, buffer, sizeof(buffer), record_callback, this, 0);
+
+    mdns_record_t answer{};
+    std::string host = m_name + "._mediaplayer._tcp.local.";
+    answer.name = mdns_string_make(host.c_str(), host.size());
+    answer.type = MDNS_RECORDTYPE_SRV;
+    answer.data.srv.name = mdns_string_make_from_cstr(m_name.c_str());
+    answer.data.srv.port = m_port;
+    mdns_announce_multicast(m_socket, buffer, sizeof(buffer), answer, nullptr, 0, nullptr, 0);
+
+    std::this_thread::sleep_for(std::chrono::seconds(5));
   }
 }
 
