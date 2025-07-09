@@ -71,3 +71,32 @@ if (mediaplayer::YouTubeDL::getStreamUrl("https://youtube.com/watch?v=...", dire
 ```
 
 The command `youtube-dl -g` must be available in the PATH (installable via `pip install youtube_dl`).
+
+## DLNA/UPnP Client
+
+`DlnaClient` discovers local DLNA servers and lists media:
+
+```cpp
+mediaplayer::upnp::DlnaClient client;
+auto devices = client.discover();
+for (const auto &d : devices) {
+    auto items = client.listMedia(d);
+    for (const auto &t : items)
+        std::cout << t << std::endl;
+}
+```
+
+## Remote Control HTTP Server
+
+`RemoteControlServer` exposes `/status` and `/play` endpoints.
+Use `RemoteControlClient` to interact with another device.
+
+```cpp
+mediaplayer::remote::RemoteControlServer server;
+server.start();
+server.setStatus({"Desktop", currentPath, position});
+
+mediaplayer::remote::RemoteControlClient rc;
+auto stat = rc.getStatus("192.168.1.5", 56791);
+rc.sendPlay("192.168.1.5", 56791, "/path/media.mp4", 10.0);
+```

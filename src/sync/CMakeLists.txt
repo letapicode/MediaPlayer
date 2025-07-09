@@ -1,5 +1,7 @@
 add_library(mediaplayer_sync
     src/SyncService.cpp
+    src/mdns/MdnsService.cpp
+    src/cloud/CloudSyncService.cpp
 )
 
 set_target_properties(mediaplayer_sync PROPERTIES

@@ -15,3 +15,5 @@ Additional tests:
 - `voice_sim` contains a Python script that feeds prerecorded audio to the Vosk
   recognizer and prints the resulting player action.
 - `gesture` holds Qt tests for `MouseGestureFilter`.
+- `upnp_enum_test.cpp` enumerates DLNA servers on the local network.
+- `sync/test_sync_local.py` exercises mDNS discovery and HTTP sync between two running instances.
