@@ -5,10 +5,13 @@ RUN apt-get update && \
         build-essential cmake git \
         libavcodec-dev libavformat-dev libswresample-dev libswscale-dev \
         libsqlite3-dev libtag1-dev libpulse-dev libass-dev \
-    && rm -rf /var/lib/apt/lists/*
+    && rm -rf /var/lib/apt/lists/* && \
+    groupadd -r mediaplayer && useradd -r -g mediaplayer -m mediaplayer
 
 WORKDIR /app
 COPY . /app
+RUN chown -R mediaplayer:mediaplayer /app
+USER mediaplayer
 
 RUN cmake -S . -B /build -DCMAKE_BUILD_TYPE=Release && \
     cmake --build /build --parallel

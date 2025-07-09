@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct DevicesView: View {
+    @EnvironmentObject var player: MediaPlayerViewModel
     var devices: [Device] = []
     var body: some View {
         List(devices) { dev in
@@ -8,7 +9,7 @@ struct DevicesView: View {
                 Text(dev.name)
                 Spacer()
                 Button("Send") {
-                    // TODO call native SyncController
+                    player.sendToDevice(address: dev.address, port: dev.port)
                 }
             }
         }

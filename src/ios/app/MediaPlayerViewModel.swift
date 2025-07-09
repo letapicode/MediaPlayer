@@ -124,6 +124,13 @@ class MediaPlayerViewModel: ObservableObject {
         enableShuffle(!shuffleEnabled)
     }
 
+    func sendToDevice(address: String, port: UInt16) {
+        let meta = bridge.currentMetadata() as? [String: Any] ?? [:]
+        if let path = meta["path"] as? String {
+            bridge.sendSyncTo(address, port: port, path: path, position: position)
+        }
+    }
+
     private func updateNowPlayingInfo() {
         var info: [String: Any] = [MPMediaItemPropertyTitle: currentTitle,
                                    MPMediaItemPropertyArtist: currentArtist]

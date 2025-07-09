@@ -1,6 +1,7 @@
 #import "MediaPlayerBridge.h"
 #include "mediaplayer/LibraryDB.h"
 #include "mediaplayer/MediaPlayer.h"
+#include "mediaplayer/remote/RemoteControlClient.h"
 #include <filesystem>
 #include <memory>
 #include <string>
@@ -14,6 +15,7 @@ NSString *const MediaPlayerTrackLoadedNotification = @"MediaPlayerTrackLoaded";
 @interface MediaPlayerBridge () {
   std::unique_ptr<MediaPlayer> _player;
   std::unique_ptr<LibraryDB> _library;
+  mediaplayer::remote::RemoteControlClient _rcClient;
 }
 @end
 
@@ -194,6 +196,13 @@ NSString *const MediaPlayerTrackLoadedNotification = @"MediaPlayerTrackLoaded";
   if (_player)
     return _player->shuffleEnabled();
   return NO;
+}
+
+- (void)sendSyncTo:(NSString *)address
+              port:(uint16_t)port
+              path:(NSString *)path
+          position:(double)position {
+  _rcClient.sendPlay(address.UTF8String, port, path.UTF8String, position);
 }
 
 @end

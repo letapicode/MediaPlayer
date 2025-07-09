@@ -1,5 +1,7 @@
 #include "android/AndroidGLVideoOutput.h"
 #include "mediaplayer/MediaPlayer.h"
+#include "mediaplayer/SyncService.h"
+#include "mediaplayer/remote/RemoteControlClient.h"
 #include <android/native_window_jni.h>
 #include <jni.h>
 #include <memory>
@@ -8,6 +10,7 @@
 using mediaplayer::MediaPlayer;
 
 static std::unique_ptr<MediaPlayer> g_player;
+static mediaplayer::remote::RemoteControlClient g_rcClient;
 static jobject g_callback = nullptr;
 static jmethodID g_onFinished = nullptr;
 static jmethodID g_onPosition = nullptr;
@@ -153,4 +156,46 @@ extern "C" void Java_com_example_mediaplayer_MediaPlayerNative_nativeSetSurface(
   } else {
     g_player->setVideoOutput(nullptr);
   }
+}
+
+extern "C" jstring Java_com_example_mediaplayer_MediaPlayerNative_nativeCurrentPath(JNIEnv *env,
+                                                                                    jclass) {
+  if (!g_player)
+    return nullptr;
+  return env->NewStringUTF(g_player->metadata().path.c_str());
+}
+
+extern "C" jdouble Java_com_example_mediaplayer_MediaPlayerNative_nativeCurrentPosition(JNIEnv *,
+                                                                                        jclass) {
+  if (!g_player)
+    return 0.0;
+  return g_player->position();
+}
+
+extern "C" jobjectArray
+Java_com_example_mediaplayer_MediaPlayerNative_nativeDiscoverDevices(JNIEnv *env, jclass) {
+  mediaplayer::SyncClient client;
+  auto devices = client.discover();
+  jobjectArray arr =
+      env->NewObjectArray(devices.size(), env->FindClass("java/lang/String"), nullptr);
+  for (size_t i = 0; i < devices.size(); ++i) {
+    std::string s =
+        devices[i].name + "|" + devices[i].address + "|" + std::to_string(devices[i].port);
+    env->SetObjectArrayElement(arr, i, env->NewStringUTF(s.c_str()));
+  }
+  return arr;
+}
+
+extern "C" void Java_com_example_mediaplayer_MediaPlayerNative_nativeSendSync(
+    JNIEnv *env, jclass, jstring address, jint port, jstring path, jdouble position) {
+  if (!address || !path)
+    return;
+  const char *caddr = env->GetStringUTFChars(address, nullptr);
+  const char *cpath = env->GetStringUTFChars(path, nullptr);
+  if (caddr && cpath)
+    g_rcClient.sendPlay(caddr, static_cast<uint16_t>(port), cpath, position);
+  if (caddr)
+    env->ReleaseStringUTFChars(address, caddr);
+  if (cpath)
+    env->ReleaseStringUTFChars(path, cpath);
 }

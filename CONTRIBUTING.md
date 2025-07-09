@@ -30,6 +30,7 @@ For a step-by-step build example, including how to compile and run the test prog
   brew install cmake ffmpeg sqlite taglib
   ```
 - Optional: install Qt via the Qt online installer for desktop work.
+- Install Node.js if you plan to edit QML/JS files so Prettier can run. `npm install -g prettier prettier-plugin-qml` will install the formatter.
 
 ### Android
 - Install the **Android SDK** and **NDK r23+** (e.g. using Android Studio or the command‑line tools).
@@ -58,7 +59,7 @@ Only work on one unclaimed task per branch. This keeps merges straightforward an
 ## 3. Coding Standards
 
 - **C++ Style**: Follow the LLVM coding style. A `clang-format` configuration will be provided; run `clang-format -i` on your changes before committing.
-- **Other Languages**: Use the conventions of the language (Kotlin for Android, Swift for iOS, QML/JS for Qt). Keep code consistently formatted.
+- **Other Languages**: Use the conventions of the language (Kotlin for Android, Swift for iOS, QML/JS for Qt). Keep code consistently formatted. For QML/JavaScript files run `prettier --write` using the configuration in `.prettierrc`.
 - Avoid unsafe functions and prefer modern C++ practices such as smart pointers and RAII.
 - Write unit tests where applicable. New features should include tests if the module has a test suite.
 - **Assets**: Do not commit images (`*.png`, `*.jpg`) or other binary assets. Reference the asset or describe it so maintainers can provide the file.

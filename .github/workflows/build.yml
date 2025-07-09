@@ -16,6 +16,12 @@ jobs:
       SKIP_OFFLINE_TESTS: 'true'
     steps:
       - uses: actions/checkout@v3
+      - name: Cache build
+        uses: actions/cache@v3
+        with:
+          path: build
+          key: ${{ runner.os }}-cmake-${{ hashFiles('**/CMakeLists.txt') }}
+          restore-keys: ${{ runner.os }}-cmake-
       - uses: actions/setup-cmake@v3
       - name: Configure
         run: cmake -B build -S .
@@ -41,6 +47,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+      - name: Cache build
+        uses: actions/cache@v3
+        with:
+          path: build
+          key: ${{ runner.os }}-cmake-${{ hashFiles('**/CMakeLists.txt') }}
+          restore-keys: ${{ runner.os }}-cmake-
       - uses: actions/setup-cmake@v3
       - name: Configure
         run: cmake -B build -S . -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
@@ -52,3 +64,8 @@ jobs:
       - name: clang-format check
         run: |
           find src -name '*.cpp' -o -name '*.h' | xargs clang-format --dry-run --Werror
+      - uses: actions/setup-node@v3
+        with:
+          node-version: "18"
+      - name: Prettier check
+        run: npx prettier --check "src/**/*.qml" "src/**/*.js"
