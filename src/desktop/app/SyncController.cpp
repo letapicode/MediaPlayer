@@ -39,6 +39,22 @@ void SyncController::updateStatus(const QString &path, double position) {
   m_service.setStatus(path.toStdString(), position);
   remote::DeviceStatus status{"Desktop", path.toStdString(), position};
   m_server.setStatus(status);
+  if (m_cloud.configured())
+    m_cloud.pushStatus(path.toStdString(), position);
+}
+
+QVariantMap SyncController::pullCloudStatus() {
+  QVariantMap m;
+  if (m_cloud.pullStatus()) {
+    m["path"] = QString::fromStdString(m_cloud.lastPath());
+    m["position"] = m_cloud.lastPosition();
+  }
+  return m;
+}
+
+void SyncController::setCloudServer(const QString &url, const QString &user, const QString &token) {
+  m_cloud.setServerUrl(url.toStdString());
+  m_cloud.setCredentials(user.toStdString(), token.toStdString());
 }
 
 void SyncController::setServerPort(quint16 port) {

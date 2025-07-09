@@ -13,14 +13,20 @@ public:
     m_user = user;
     m_token = token;
   }
+  bool configured() const { return !m_serverUrl.empty(); }
+
+  const std::string &lastPath() const { return m_lastPath; }
+  double lastPosition() const { return m_lastPosition; }
 
   void pushStatus(const std::string &path, double position);
-  void pullStatus();
+  bool pullStatus();
 
 private:
   std::string m_serverUrl;
   std::string m_user;
   std::string m_token;
+  std::string m_lastPath;
+  double m_lastPosition{0.0};
 };
 
 } // namespace cloud

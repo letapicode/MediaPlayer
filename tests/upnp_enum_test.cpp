@@ -4,8 +4,10 @@
 int main() {
   mediaplayer::upnp::DlnaClient client;
   auto devices = client.discover();
-  for (const auto &dev : devices) {
-    std::cout << dev.friendlyName << " (" << dev.location << ")\n";
+  if (devices.empty()) {
+    std::cerr << "No DLNA devices found\n";
+    return 1;
   }
+  std::cout << "Found " << devices.size() << " DLNA device(s)\n";
   return 0;
 }
