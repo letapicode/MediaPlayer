@@ -211,7 +211,7 @@
 | 165 | Announcement & Discovery Handlers | done | `SyncController` updates UI |
 | 166 | Device Info Exchange | done | `/status` endpoint served via HTTP |
 | 167 | Sync Playback Position | done | `sendPlay` in `RemoteControlClient` |
-| 168 | Cloud Sync Option | open | `CloudSyncService` HTTP logic pending |
+| 168 | Cloud Sync Option | done | cloud_sync_server.py added |
 | 169 | Testing Sync | done | `tests/sync/test_sync_local.py` |
 
 ## DevOps & Infrastructure ([Tasks.MD](Tasks.MD#devops-infrastructure))

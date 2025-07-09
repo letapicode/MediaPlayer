@@ -7,3 +7,4 @@ Helpful documents for working with the project:
 - [Video Output Tasks](video_output_tasks.md)
 - [Desktop GUI Tasks](desktop_gui_tasks.md)
 - [Merge Conflict Handling](merge_conflict.md)
+- [Cloud Sync Server](cloud_sync_server.md)
