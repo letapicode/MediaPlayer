@@ -1,0 +1,6 @@
+wav
+mp3
+flac
+mp4
+avi
+mkv
