@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.15)
 project(MediaPlayer LANGUAGES CXX)
 
+option(BUILD_TESTS "Build test executables" OFF)
+
 if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE Release)
 endif()
@@ -41,3 +43,7 @@ add_subdirectory(src/sync)
 add_subdirectory(src/visualization)
 
 add_subdirectory(src/tools)
+
+if(BUILD_TESTS)
+  add_subdirectory(tests)
+endif()

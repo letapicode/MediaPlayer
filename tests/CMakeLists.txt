@@ -1,0 +1,56 @@
+enable_testing()
+
+add_executable(library_db_tests library_db_tests.cpp)
+target_link_libraries(library_db_tests PRIVATE mediaplayer_library)
+add_test(NAME library_db_tests COMMAND library_db_tests)
+
+add_executable(test_srtparser test_srtparser.cpp)
+target_link_libraries(test_srtparser PRIVATE mediaplayer_subtitles)
+add_test(NAME test_srtparser COMMAND test_srtparser)
+
+add_executable(format_conversion_test format_conversion_test.cpp)
+target_link_libraries(format_conversion_test PRIVATE mediaplayer_conversion)
+add_test(NAME format_conversion_test COMMAND format_conversion_test)
+
+add_executable(library_playlist_test library_playlist_test.cpp)
+target_link_libraries(library_playlist_test PRIVATE mediaplayer_library)
+add_test(NAME library_playlist_test COMMAND library_playlist_test)
+
+add_executable(library_db_update_test library_db_update_test.cpp)
+target_link_libraries(library_db_update_test PRIVATE mediaplayer_library)
+add_test(NAME library_db_update_test COMMAND library_db_update_test)
+
+add_executable(library_playback_update_test library_playback_update_test.cpp)
+target_link_libraries(library_playback_update_test PRIVATE mediaplayer_library)
+add_test(NAME library_playback_update_test COMMAND library_playback_update_test)
+
+add_executable(library_rating_test library_rating_test.cpp)
+target_link_libraries(library_rating_test PRIVATE mediaplayer_library)
+add_test(NAME library_rating_test COMMAND library_rating_test)
+
+add_executable(library_search_test library_search_test.cpp)
+target_link_libraries(library_search_test PRIVATE mediaplayer_library)
+add_test(NAME library_search_test COMMAND library_search_test)
+
+add_executable(library_video_metadata_test library_video_metadata_test.cpp)
+target_link_libraries(library_video_metadata_test PRIVATE mediaplayer_library)
+add_test(NAME library_video_metadata_test COMMAND library_video_metadata_test)
+
+add_executable(subtitle_provider_test subtitle_provider_test.cpp)
+target_link_libraries(subtitle_provider_test PRIVATE mediaplayer_subtitles)
+add_test(NAME subtitle_provider_test COMMAND subtitle_provider_test)
+
+add_executable(library_recommender_test library_recommender_test.cpp)
+target_link_libraries(library_recommender_test PRIVATE mediaplayer_library)
+add_test(NAME library_recommender_test COMMAND library_recommender_test)
+
+add_executable(video_conversion_test video_conversion_test.cpp)
+target_link_libraries(video_conversion_test PRIVATE mediaplayer_conversion)
+add_test(NAME video_conversion_test COMMAND video_conversion_test)
+
+foreach(t test_srtparser format_conversion_test library_playlist_test
+              library_db_update_test library_playback_update_test library_rating_test
+              library_search_test library_video_metadata_test subtitle_provider_test
+              library_recommender_test video_conversion_test library_db_tests)
+  set_target_properties(${t} PROPERTIES CXX_STANDARD 17 CXX_STANDARD_REQUIRED ON)
+endforeach()
