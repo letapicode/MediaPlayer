@@ -78,27 +78,30 @@ This produces static libraries for the core engine, media library, subtitle pars
 
 ## Building the test executables
 
-The test programs in `tests/` can also be built with CMake. Configure the project with testing enabled and build the desired targets:
+The test programs in `tests/` can also be built with CMake. Configure the project
+with testing enabled to generate a single `test` target which builds all
+executables:
 
 ```bash
 cmake .. -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTS=ON
-    cmake --build . --target test_srtparser format_conversion_test library_playlist_test \
-    library_db_update_test library_playback_update_test library_rating_test \
-    library_search_test library_video_metadata_test subtitle_provider_test \
-    library_recommender_test video_conversion_test
+cmake --build . --target test
 ```
 
-Each test target corresponds to a source file in the `tests/` directory.
+Use CTest to run the entire suite:
+
+```bash
+ctest --output-on-failure
+```
 
 ## Running the tests
 
-After building, run a test binary from the build directory, for example:
+Execute all tests with CTest from the build directory:
 
 ```bash
-./test_srtparser
+ctest --output-on-failure
 ```
 
-Successful execution prints a short confirmation message.
+Each executable prints a short confirmation message on success.
 
 ## Building the conversion utility
 
