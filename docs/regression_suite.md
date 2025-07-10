@@ -18,3 +18,10 @@ CI jobs should configure the project with `BUILD_TESTS=ON` and execute `ctest`.
 Additional scripts like `tests/end_to_end.py` can be invoked to simulate user
 flows. Failing tests will mark the job failed preventing regressions from
 entering `main`.
+
+### UI Responsiveness
+
+The Qt test harness `tests/ui_responsiveness.qml` simulates a large library scan
+while checking that the main window continues to process events. Run it manually
+with `qmltestrunner` or integrate into CI using the same command. A short guide
+is provided in `docs/ui_responsiveness_test.md`.

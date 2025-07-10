@@ -234,11 +234,11 @@
 
 | # | Task | Status | Notes |
 |-:|------|--------|-------|
-| 181 | Core Unit Tests Setup | open | relevant |
-| 182 | Library Module Tests | open | relevant |
-| 183 | Visualization Tests | open | relevant |
-| 184 | Playback Integration Test | open | relevant |
-| 185 | End-to-End Script | open | relevant |
+| 181 | Core Unit Tests Setup | done | `visualizer_test.cpp` etc |
+| 182 | Library Module Tests | done | `library_db_test.cpp` |
+| 183 | Visualization Tests | done | `visualizer_test.cpp` |
+| 184 | Playback Integration Test | done | `playback_integration_test.cpp` |
+| 185 | End-to-End Script | done | `tests/end_to_end.py` |
 | 186 | Startup Time Test | open | relevant |
 | 187 | Memory/CPU Profiling | open | relevant |
 | 188 | Battery Test (Mobile) | open | relevant |
