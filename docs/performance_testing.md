@@ -6,9 +6,15 @@ This document outlines basic steps for profiling the application and measuring p
 
 ### Linux
 1. Build the project with debug symbols: `cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo ..`
-2. Run the player under `valgrind --tool=massif` to profile heap allocations.
-3. Use `valgrind --tool=callgrind` or `perf record` to capture CPU hotspots.
+2. Run the player under `valgrind --tool=massif` to profile heap allocations. A helper script `tools/memory_profile.sh` automates this and writes `massif.txt`.
+3. Use `valgrind --tool=callgrind` or `perf record` to capture CPU hotspots. `tools/cpu_profile.sh` wraps the callgrind invocation.
 4. Visualise the results with `ms_print` for Massif or `kcachegrind` for Callgrind data.
+
+## Startup Time
+
+`tests/startup_time_test.cpp` measures how quickly the core player can open a
+small WAV file. The test fails if initialization takes longer than two seconds.
+Include it in routine regression runs to catch performance regressions.
 
 ### macOS
 1. Open the Xcode project and choose Product > Profile.
@@ -22,7 +28,7 @@ This document outlines basic steps for profiling the application and measuring p
 
 ## Battery Consumption
 
-On mobile platforms measure battery drain while playing media for a fixed duration.
+On mobile platforms measure battery drain while playing media for a fixed duration. `tests/mobile/android_battery_test.sh` provides a basic harness for Android devices.
 
 ### Android
 1. Connect the device via ADB and ensure it is fully charged.

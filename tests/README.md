@@ -17,3 +17,6 @@ Additional tests:
 - `gesture` holds Qt tests for `MouseGestureFilter`.
 - `upnp_enum_test.cpp` enumerates DLNA servers on the local network.
 - `sync/test_sync_local.py` exercises mDNS discovery and HTTP sync between two running instances.
+- `startup_time_test.cpp` measures how quickly the `MediaPlayer` instance can open a file.
+- `format_compatibility.py` runs `format_probe` against media samples to verify various container support.
+- `mobile/android_battery_test.sh` automates battery drain measurement on Android devices.

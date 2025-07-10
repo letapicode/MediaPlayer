@@ -9,7 +9,8 @@ TESTS = [
     'format_converter_test',
     'library_db_test',
     'visualizer_test',
-    'playback_integration_test'
+    'playback_integration_test',
+    'startup_time_test'
 ]
 
 
