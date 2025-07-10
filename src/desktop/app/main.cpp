@@ -28,6 +28,7 @@
 #include <QQuickStyle>
 #include <QStandardPaths>
 #include <QtQml/qqml.h>
+#include <chrono>
 #ifdef Q_OS_MAC
 void setupMacIntegration(mediaplayer::MediaPlayerController *controller);
 void connectNowPlayingInfo(mediaplayer::MediaPlayerController *controller);
@@ -39,6 +40,7 @@ void setupWindowsIntegration();
 #endif
 
 int main(int argc, char *argv[]) {
+  auto startupBegin = std::chrono::steady_clock::now();
   QQuickStyle::setStyle("Material");
   QGuiApplication app(argc, argv);
 
@@ -124,10 +126,18 @@ int main(int argc, char *argv[]) {
   QObject::connect(&controller, &mediaplayer::MediaPlayerController::volumeChanged,
                    [&settings, &controller]() { settings.setVolume(controller.volume()); });
 
+  bool measureStartup = !qEnvironmentVariableIsEmpty("MEASURE_STARTUP");
   const QUrl url = QUrl::fromLocalFile("qml/Main.qml");
   engine.load(url);
   if (engine.rootObjects().isEmpty())
     return -1;
+  auto startupEnd = std::chrono::steady_clock::now();
+  double startupSeconds = std::chrono::duration<double>(startupEnd - startupBegin).count();
+  qInfo() << "Startup completed in" << startupSeconds << "seconds";
+  if (measureStartup) {
+    libraryDb.close();
+    return 0;
+  }
   QObject *rootObj = engine.rootObjects().first();
   MouseGestureFilter gestureFilter(&controller);
   rootObj->installEventFilter(&gestureFilter);
