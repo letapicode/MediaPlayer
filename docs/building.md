@@ -24,7 +24,7 @@ sudo apt-get install -y build-essential cmake git \
     libcurl4-openssl-dev \
     nlohmann-json3-dev \
     libsqlite3-dev libtag1-dev libpulse-dev libpulse-simple-dev \
-    libprojectM-dev
+    libprojectM-dev libgtest-dev
 ```
 
 
@@ -89,6 +89,14 @@ cmake .. -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTS=ON
 ```
 
 Each test target corresponds to a source file in the `tests/` directory.
+
+The GoogleTest-based suite can be built and run with:
+
+```bash
+cmake .. -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTS=ON
+cmake --build . --target core_unit_tests
+./core_unit_tests
+```
 
 ## Running the tests
 

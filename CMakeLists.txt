@@ -41,3 +41,8 @@ add_subdirectory(src/sync)
 add_subdirectory(src/visualization)
 
 add_subdirectory(src/tools)
+
+option(BUILD_TESTS "Build unit tests" OFF)
+if(BUILD_TESTS)
+  add_subdirectory(tests)
+endif()
