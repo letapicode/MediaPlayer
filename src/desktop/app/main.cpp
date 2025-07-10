@@ -28,6 +28,7 @@
 #include <QQuickStyle>
 #include <QStandardPaths>
 #include <QtQml/qqml.h>
+#include <chrono>
 #ifdef Q_OS_MAC
 void setupMacIntegration(mediaplayer::MediaPlayerController *controller);
 void connectNowPlayingInfo(mediaplayer::MediaPlayerController *controller);
@@ -39,11 +40,17 @@ void setupWindowsIntegration();
 #endif
 
 int main(int argc, char *argv[]) {
+  auto start = std::chrono::steady_clock::now();
   QQuickStyle::setStyle("Material");
   QGuiApplication app(argc, argv);
 
   qInfo() << "MediaPlayer core version:"
           << QString::fromStdString(mediaplayer::MediaPlayer::version());
+
+  auto afterApp = std::chrono::steady_clock::now();
+  qInfo() << "Startup time:"
+          << std::chrono::duration_cast<std::chrono::milliseconds>(afterApp - start).count()
+          << "ms";
 
   mediaplayer::SettingsManager settings;
 

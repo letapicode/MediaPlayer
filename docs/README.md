@@ -10,3 +10,5 @@ Helpful documents for working with the project:
 - [Merge Strategy](merge_strategy.md)
 - [Git Submodules](submodules.md)
 - [Cloud Sync Server](cloud_sync_server.md)
+- [Performance and Battery Testing](performance_testing.md)
+- [Automated Regression Suite](regression_suite.md)
