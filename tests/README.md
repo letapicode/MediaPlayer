@@ -17,3 +17,14 @@ Additional tests:
 - `gesture` holds Qt tests for `MouseGestureFilter`.
 - `upnp_enum_test.cpp` enumerates DLNA servers on the local network.
 - `sync/test_sync_local.py` exercises mDNS discovery and HTTP sync between two running instances.
+- `visualizer_sine_test.cpp` feeds a 440 Hz sine wave to `BasicVisualizer` and
+  asserts that the generated frequency spectrum contains non-zero values.
+
+To verify the visualizer test manually, build it from the repository root:
+
+```bash
+g++ -std=c++17 tests/visualizer_sine_test.cpp \
+    -Isrc/visualization/include -Isrc/core/include -o visualizer_test
+./visualizer_test
+```
+The program should exit without triggering the assertion.
