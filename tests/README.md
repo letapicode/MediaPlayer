@@ -17,3 +17,6 @@ Additional tests:
 - `gesture` holds Qt tests for `MouseGestureFilter`.
 - `upnp_enum_test.cpp` enumerates DLNA servers on the local network.
 - `sync/test_sync_local.py` exercises mDNS discovery and HTTP sync between two running instances.
+- `end_to_end_automation.py` automates adding a folder to the library and
+  basic playback controls. It uses Qt's QTest on desktop and `adb` on Android
+  (see script comments for details).
