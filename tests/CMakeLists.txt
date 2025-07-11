@@ -1,22 +1,31 @@
-add_executable(format_converter_test format_converter_test.cpp)
-    target_link_libraries(format_converter_test PRIVATE mediaplayer_conversion gtest_main)
+file(GLOB_RECURSE TEST_SOURCES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "*_test.cpp")
 
-        add_executable(library_db_test library_db_test.cpp)
-            target_link_libraries(library_db_test PRIVATE mediaplayer_library gtest_main)
+set(COMMON_LIBS
+    mediaplayer_core
+    mediaplayer_library
+    mediaplayer_network
+    mediaplayer_conversion
+    mediaplayer_subtitles
+    mediaplayer_sync
+    mediaplayer_visualization
+    Qt6::Core
+)
 
-                add_executable(visualizer_test visualizer_test.cpp)
-                    target_link_libraries(visualizer_test PRIVATE mediaplayer_core gtest_main)
+include(GoogleTest)
 
-                        add_executable(playback_integration_test playback_integration_test.cpp)
-                            target_link_libraries(
-                                playback_integration_test PRIVATE mediaplayer_core gtest_main)
-
-                                include(GoogleTest) gtest_discover_tests(format_converter_test)
-                                    gtest_discover_tests(library_db_test)
-                                        gtest_discover_tests(visualizer_test)
-                                            gtest_discover_tests(playback_integration_test)
-                                            add_executable(startup_time_test startup_time_test.cpp)
-                                                target_link_libraries(startup_time_test PRIVATE mediaplayer_core gtest_main)
-                                            gtest_discover_tests(startup_time_test)
-                                            add_executable(format_probe format_probe.cpp)
-                                                target_link_libraries(format_probe PRIVATE mediaplayer_core)
+foreach(test_src ${TEST_SOURCES})
+    get_filename_component(test_name ${test_src} NAME_WE)
+    add_executable(${test_name} ${test_src})
+    file(READ ${CMAKE_CURRENT_SOURCE_DIR}/${test_src} contents)
+    if(contents MATCHES "gtest")
+        target_link_libraries(${test_name} PRIVATE
+            ${COMMON_LIBS}
+            gtest_main
+        )
+        gtest_discover_tests(${test_name})
+    else()
+        target_link_libraries(${test_name} PRIVATE
+            ${COMMON_LIBS}
+        )
+    endif()
+endforeach()
