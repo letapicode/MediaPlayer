@@ -239,10 +239,10 @@
 | 183 | Visualization Tests | done | `visualizer_test.cpp` |
 | 184 | Playback Integration Test | done | `playback_integration_test.cpp` |
 | 185 | End-to-End Script | done | `tests/end_to_end.py` |
-| 186 | Startup Time Test | open | relevant |
-| 187 | Memory/CPU Profiling | open | relevant |
-| 188 | Battery Test (Mobile) | open | relevant |
-| 189 | Formats Compatibility Test | open | relevant |
-| 190 | UI Responsiveness Test | open | relevant |
+| 186 | Startup Time Test | done | `tests/startup_time_test.cpp` |
+| 187 | Memory/CPU Profiling | done | `tests/performance/memory_cpu_profile.sh` |
+| 188 | Battery Test (Mobile) | done | `tests/mobile/android_battery_test.sh` |
+| 189 | Formats Compatibility Test | done | `tests/format_compatibility.py` |
+| 190 | UI Responsiveness Test | done | `tests/ui_responsiveness.qml` |
 | 191 | Automate Regression Suite | open | relevant |
 

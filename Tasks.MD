@@ -425,14 +425,14 @@ Below, each module is detailed with its tasks. Each task listing includes a shor
 
 * **Performance Testing:**
 
-  * *Task:* **Startup Time Test** – Measure how quickly the app opens and is ready to play, especially on low-end device. Possibly instrument the code to log timestamps. Ensure under a threshold (e.g., <2s on desktop). *Environment:* Any (manual measure or simple logs).
-  * *Task:* **Memory/CPU Profiling** – Run the app with a large playlist or 4K video and monitor memory usage, CPU usage. Identify any leaks or bottlenecks. Use Valgrind (for memory) on Linux, Instruments on macOS, Profiler on Android. *Environment:* platform-specific.
-  * *Task:* **Battery Test (Mobile)** – Play a video on Android/iOS for X minutes and measure battery drop, ensuring no excessive background activity beyond decoding. *Environment:* Manual or using power profiling tools (Android Profiler).
+  * *Task:* **Startup Time Test** – Measure how quickly the app opens and is ready to play, especially on low-end device. Possibly instrument the code to log timestamps. Ensure under a threshold (e.g., <2s on desktop). **Status:** done – see `tests/startup_time_test.cpp`. *Environment:* Any (manual measure or simple logs).
+  * *Task:* **Memory/CPU Profiling** – Run the app with a large playlist or 4K video and monitor memory usage, CPU usage. Identify any leaks or bottlenecks. Use Valgrind (for memory) on Linux, Instruments on macOS, Profiler on Android. **Status:** done – see `tests/performance/memory_cpu_profile.sh`. *Environment:* platform-specific.
+  * *Task:* **Battery Test (Mobile)** – Play a video on Android/iOS for X minutes and measure battery drop, ensuring no excessive background activity beyond decoding. **Status:** done – see `tests/mobile/android_battery_test.sh`. *Environment:* Manual or using power profiling tools (Android Profiler).
 
 * **User Acceptance and Edge Cases:**
 
-  * *Task:* **Formats Compatibility Test** – Create a list of various media formats (mp3, flac, mp4, mkv, avi, etc.), attempt to play each on each platform. Verify playback works or at least fails gracefully with an error dialog if unsupported (shouldn’t happen if FFmpeg covers it). *Environment:* Manual or small automated script.
-  * *Task:* **UI Responsiveness Test** – Verify the UI remains responsive during heavy operations (scanning library, downloading stream, etc.). If not, identify where to add threading. *Environment:* Manual.
+  * *Task:* **Formats Compatibility Test** – Create a list of various media formats (mp3, flac, mp4, mkv, avi, etc.), attempt to play each on each platform. Verify playback works or at least fails gracefully with an error dialog if unsupported (shouldn’t happen if FFmpeg covers it). **Status:** done – see `tests/format_compatibility.py`. *Environment:* Manual or small automated script.
+  * *Task:* **UI Responsiveness Test** – Verify the UI remains responsive during heavy operations (scanning library, downloading stream, etc.). If not, identify where to add threading. **Status:** done – see `tests/ui_responsiveness.qml`. *Environment:* Manual.
 
 * **Regression Testing:**
 
