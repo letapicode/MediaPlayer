@@ -1,22 +1,103 @@
+include(GoogleTest)
+
+# Format conversion tests
+add_executable(format_conversion_test format_conversion_test.cpp)
+target_link_libraries(format_conversion_test PRIVATE mediaplayer_conversion)
+
 add_executable(format_converter_test format_converter_test.cpp)
-    target_link_libraries(format_converter_test PRIVATE mediaplayer_conversion gtest_main)
+target_link_libraries(format_converter_test PRIVATE mediaplayer_conversion gtest_main)
+gtest_discover_tests(format_converter_test)
 
-        add_executable(library_db_test library_db_test.cpp)
-            target_link_libraries(library_db_test PRIVATE mediaplayer_library gtest_main)
+# Library tests
+add_executable(library_autoplaylist_test library_autoplaylist_test.cpp)
+target_link_libraries(library_autoplaylist_test PRIVATE mediaplayer_library)
 
-                add_executable(visualizer_test visualizer_test.cpp)
-                    target_link_libraries(visualizer_test PRIVATE mediaplayer_core gtest_main)
+add_executable(library_cleanup_test library_cleanup_test.cpp)
+target_link_libraries(library_cleanup_test PRIVATE mediaplayer_library)
 
-                        add_executable(playback_integration_test playback_integration_test.cpp)
-                            target_link_libraries(
-                                playback_integration_test PRIVATE mediaplayer_core gtest_main)
+add_executable(library_db_test library_db_test.cpp)
+target_link_libraries(library_db_test PRIVATE mediaplayer_library gtest_main)
+gtest_discover_tests(library_db_test)
 
-                                include(GoogleTest) gtest_discover_tests(format_converter_test)
-                                    gtest_discover_tests(library_db_test)
-                                        gtest_discover_tests(visualizer_test)
-                                            gtest_discover_tests(playback_integration_test)
-                                            add_executable(startup_time_test startup_time_test.cpp)
-                                                target_link_libraries(startup_time_test PRIVATE mediaplayer_core gtest_main)
-                                            gtest_discover_tests(startup_time_test)
-                                            add_executable(format_probe format_probe.cpp)
-                                                target_link_libraries(format_probe PRIVATE mediaplayer_core)
+add_executable(library_db_update_test library_db_update_test.cpp)
+target_link_libraries(library_db_update_test PRIVATE mediaplayer_library)
+
+add_executable(library_ftssearch_test library_ftssearch_test.cpp)
+target_link_libraries(library_ftssearch_test PRIVATE mediaplayer_library)
+
+add_executable(library_ignore_nonmedia_test library_ignore_nonmedia_test.cpp)
+target_link_libraries(library_ignore_nonmedia_test PRIVATE mediaplayer_library)
+
+add_executable(library_invalid_filter_test library_invalid_filter_test.cpp)
+target_link_libraries(library_invalid_filter_test PRIVATE mediaplayer_library)
+
+add_executable(library_playback_update_test library_playback_update_test.cpp)
+target_link_libraries(library_playback_update_test PRIVATE mediaplayer_library)
+
+add_executable(library_playlist_test library_playlist_test.cpp)
+target_link_libraries(library_playlist_test PRIVATE mediaplayer_library mediaplayer_core)
+
+add_executable(library_purge_removed_test library_purge_removed_test.cpp)
+target_link_libraries(library_purge_removed_test PRIVATE mediaplayer_library)
+
+add_executable(library_rating_test library_rating_test.cpp)
+target_link_libraries(library_rating_test PRIVATE mediaplayer_library)
+
+add_executable(library_recommender_test library_recommender_test.cpp)
+target_link_libraries(library_recommender_test PRIVATE mediaplayer_library)
+
+add_executable(library_rescan_update_test library_rescan_update_test.cpp)
+target_link_libraries(library_rescan_update_test PRIVATE mediaplayer_library)
+
+add_executable(library_search_test library_search_test.cpp)
+target_link_libraries(library_search_test PRIVATE mediaplayer_library)
+
+add_executable(library_smartplaylist_test library_smartplaylist_test.cpp)
+target_link_libraries(library_smartplaylist_test PRIVATE mediaplayer_library)
+
+add_executable(library_smartquery_test library_smartquery_test.cpp)
+target_link_libraries(library_smartquery_test PRIVATE mediaplayer_library)
+
+add_executable(library_video_metadata_test library_video_metadata_test.cpp)
+target_link_libraries(library_video_metadata_test PRIVATE mediaplayer_library)
+
+add_executable(library_video_notag_index_test library_video_notag_index_test.cpp)
+target_link_libraries(library_video_notag_index_test PRIVATE mediaplayer_library)
+
+# Network and sync tests
+add_executable(mdns_service_test mdns_service_test.cpp)
+target_link_libraries(mdns_service_test PRIVATE mediaplayer_sync)
+
+add_executable(playback_integration_test playback_integration_test.cpp)
+target_link_libraries(playback_integration_test PRIVATE mediaplayer_core gtest_main)
+gtest_discover_tests(playback_integration_test)
+
+add_executable(remote_control_test remote_control_test.cpp)
+target_link_libraries(remote_control_test PRIVATE mediaplayer_network)
+
+add_executable(startup_time_test startup_time_test.cpp)
+target_link_libraries(startup_time_test PRIVATE mediaplayer_core gtest_main)
+gtest_discover_tests(startup_time_test)
+
+add_executable(stress_load_test stress_load_test.cpp)
+target_link_libraries(stress_load_test PRIVATE mediaplayer_core)
+
+add_executable(subtitle_decoder_test subtitle_decoder_test.cpp)
+target_link_libraries(subtitle_decoder_test PRIVATE mediaplayer_core)
+
+add_executable(subtitle_provider_test subtitle_provider_test.cpp)
+target_link_libraries(subtitle_provider_test PRIVATE mediaplayer_subtitles)
+
+add_executable(upnp_enum_test upnp_enum_test.cpp)
+target_link_libraries(upnp_enum_test PRIVATE mediaplayer_network)
+
+add_executable(video_conversion_test video_conversion_test.cpp)
+target_link_libraries(video_conversion_test PRIVATE mediaplayer_conversion)
+
+add_executable(visualizer_test visualizer_test.cpp)
+target_link_libraries(visualizer_test PRIVATE mediaplayer_core gtest_main)
+gtest_discover_tests(visualizer_test)
+
+# Utility binaries
+add_executable(format_probe format_probe.cpp)
+target_link_libraries(format_probe PRIVATE mediaplayer_core)
