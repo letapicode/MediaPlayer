@@ -20,3 +20,4 @@ Additional tests:
 - `startup_time_test.cpp` measures how quickly the `MediaPlayer` instance can open a file.
 - `format_compatibility.py` runs `format_probe` against media samples to verify various container support.
 - `mobile/android_battery_test.sh` automates battery drain measurement on Android devices.
+- `performance/memory_cpu_profile.sh` profiles memory and CPU usage under Valgrind.
