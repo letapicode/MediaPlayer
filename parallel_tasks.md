@@ -244,5 +244,5 @@
 | 188 | Battery Test (Mobile) | done | `tests/mobile/android_battery_test.sh` |
 | 189 | Formats Compatibility Test | done | `tests/format_compatibility.py` |
 | 190 | UI Responsiveness Test | done | `tests/ui_responsiveness.qml` |
-| 191 | Automate Regression Suite | open | relevant |
+| 191 | Automate Regression Suite | done | relevant |
 
