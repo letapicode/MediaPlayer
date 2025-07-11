@@ -14,5 +14,11 @@ popd >/dev/null
 
 python -m unittest discover -s "$ROOT_DIR/tests" -p "*_test.py"
 
+if command -v qmltestrunner >/dev/null 2>&1; then
+    qmltestrunner "$ROOT_DIR/tests/ui_responsiveness.qml"
+else
+    echo "Warning: qmltestrunner not found; skipping UI responsiveness test" >&2
+fi
+
 python "$SCRIPT_DIR/end_to_end.py"
 
