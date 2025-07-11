@@ -22,6 +22,7 @@ preventing regressions from entering `main`.
 ### UI Responsiveness
 
 The Qt test harness `tests/ui_responsiveness.qml` simulates a large library scan
-while checking that the main window continues to process events. Run it manually
-with `qmltestrunner` or integrate into CI using the same command. A short guide
-is provided in `docs/ui_responsiveness_test.md`.
+while checking that the main window continues to process events. If
+`qmltestrunner` is installed, `tests/run_regression_suite.sh` will automatically
+execute the QML test. Otherwise it can be run manually with the same command.
+A short guide is provided in `docs/ui_responsiveness_test.md`.
