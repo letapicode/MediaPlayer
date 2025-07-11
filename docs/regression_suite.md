@@ -6,18 +6,18 @@ suite runs these binaries via `ctest` and can be integrated into CI.
 
 ## Running Locally
 
+The helper script `tests/run_regression_suite.sh` builds the project with
+tests enabled and executes the full suite of checks.
+
 ```bash
-cmake -S . -B build -DBUILD_TESTS=ON
-cmake --build build
-cd build && ctest --output-on-failure
+./tests/run_regression_suite.sh
 ```
 
 ## Continuous Integration
 
-CI jobs should configure the project with `BUILD_TESTS=ON` and execute `ctest`.
-Additional scripts like `tests/end_to_end.py` can be invoked to simulate user
-flows. Failing tests will mark the job failed preventing regressions from
-entering `main`.
+CI jobs should run `tests/run_regression_suite.sh` to build the project with
+tests enabled and execute all checks. Failing tests will mark the job failed
+preventing regressions from entering `main`.
 
 ### UI Responsiveness
 
